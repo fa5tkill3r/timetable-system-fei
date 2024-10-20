@@ -41,24 +41,24 @@ import {ref} from 'vue'
 
 const groups = [
   {
-    label: 'Personal Account',
+    label: '2024',
     versions: [
       {
-        label: 'Alicia Koch',
-        value: 'personal',
+        label: 'ZS v1',
+        value: '2024-zs-v1',
       },
     ],
   },
   {
-    label: 'Versions',
+    label: '2023',
     versions: [
       {
-        label: 'Acme Inc.',
-        value: 'acme-inc',
+        label: 'ZS v1',
+        value: '2023-zs-v1',
       },
       {
-        label: 'Monsters Inc.',
-        value: 'monsters',
+        label: 'Term v1',
+        value: '2023-term-v1',
       },
     ],
   },
@@ -152,32 +152,32 @@ const selectedVersion = ref<Version>(groups[0].versions[0])
       <DialogHeader>
         <DialogTitle>Create version</DialogTitle>
         <DialogDescription>
-          Add a new version to manage products and customers.
+          Create a new version of timetable.
         </DialogDescription>
       </DialogHeader>
       <div>
         <div class="space-y-4 py-2 pb-4">
           <div class="space-y-2">
             <Label for="name">Version name</Label>
-            <Input id="name" placeholder="Acme Inc."/>
+            <Input id="name" placeholder="LS v1"/>
           </div>
           <div class="space-y-2">
-            <Label for="plan">Subscription plan</Label>
+            <Label for="plan">Timetable Type</Label>
             <Select>
               <SelectTrigger>
-                <SelectValue placeholder="Select a plan"/>
+                <SelectValue placeholder="Select type"/>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="free">
-                  <span class="font-medium">Free</span> -
+                <SelectItem value="standard">
+                  <span class="font-medium">Timetable</span> -
                   <span class="text-muted-foreground">
-                    Trial for two weeks
+                    Standard timetable
                   </span>
                 </SelectItem>
-                <SelectItem value="pro">
-                  <span class="font-medium">Pro</span> -
+                <SelectItem value="term">
+                  <span class="font-medium">Terms</span> -
                   <span class="text-muted-foreground">
-                    $9/month per user
+                    Timetable for terms
                   </span>
                 </SelectItem>
               </SelectContent>

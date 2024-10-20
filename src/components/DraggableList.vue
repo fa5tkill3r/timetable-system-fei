@@ -8,8 +8,10 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isSource: false
+  initialItems: () => [],
+  isSource: false,
 });
+
 
 const [target, items] = useDragAndDrop(props.initialItems, {
   accepts: () => true,
@@ -19,7 +21,11 @@ defineExpose({ items });
 </script>
 
 <template>
-
+  <ul ref="target" class="border p-4">
+    <li v-for="item in items" :key="item" class="border-b p-2">
+      {{ item }}
+    </li>
+  </ul>
 </template>
 
 <style scoped>
