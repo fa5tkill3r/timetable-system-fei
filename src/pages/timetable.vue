@@ -2,9 +2,10 @@
 import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
 import { computed, Ref, ref, shallowRef } from "vue";
 import TimeTableCell from "@/components/TimeTableCell.vue";
-import DraggableList from "@/components/DraggableList.vue";
 import {computeColorFromName} from "@/utils.ts";
 import {TimetableActivity} from "@/types.ts";
+import SubjectStack from "@/components/SubjectStack.vue";
+import TimeTableRow from "@/components/TimeTableRow.vue";
 
 const times = [
   "08:00", "09:00", "10:00", "11:00", "12:00",
@@ -25,6 +26,9 @@ const events = [
   makeActivity("I-DP1-AI", "Diplomový projekt 1", 2),
   makeActivity("I-MOBV", "Mobilné výpočty"),
   makeActivity("I-SVIS", "Spoločenské, morálne a právne súvislosti vývoja informačných systémov"),
+  makeActivity("Test 1", "Spoločenské, morálne a právne súvislosti vývoja informačných systémov"),
+  makeActivity("Test 2", "Spoločenské, morálne a právne súvislosti vývoja informačných systémov"),
+  makeActivity("Test 3", "Spoločenské, morálne a právne súvislosti vývoja informačných systémov"),
 ];
 
 
@@ -59,7 +63,7 @@ const initCell = (day: string, time: string): Cell => {
     </div>
 
     <div class="timetable">
-      <table>
+      <table class="">
         <thead>
         <tr>
           <th></th>
@@ -69,16 +73,24 @@ const initCell = (day: string, time: string): Cell => {
         <tbody>
         <tr v-for="day in days" :key="day">
           <td>{{ day }}</td>
-          <DraggableList v-for="time in times" :key="time" class="">
-<!--            <DraggableList/>-->
-          </DraggableList>
+          <TimeTableRow :times="times" :day="day"/>
+<!--          <TimeTableCell v-for="time in times" :key="time" class="">-->
+<!--&lt;!&ndash;            <TimeTableCell/>&ndash;&gt;-->
+<!--          </TimeTableCell>-->
         </tr>
         </tbody>
       </table>
-      <DraggableList
-          :initial-items="events"
-      />
+
     </div>
+
+    <h3 class="text-2xl font-bold tracking-tight">
+      Subjects
+    </h3>
+
+    <SubjectStack
+      class=""
+      :initial-items="events"
+    />
   </div>
 </template>
 
