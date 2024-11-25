@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
-import { computed, Ref, ref, shallowRef } from "vue";
-import TimeTableCell from "@/components/TimeTableCell.vue";
+import {useDragAndDrop} from "@formkit/drag-and-drop/vue";
+import {Ref, ref} from "vue";
 import {computeColorFromName} from "@/utils.ts";
 import {TimetableActivity} from "@/types.ts";
 import SubjectStack from "@/components/SubjectStack.vue";
@@ -12,9 +11,28 @@ const times = [
   "13:00", "14:00", "15:00", "16:00",
 ];
 
-const days = [
-  "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-];
+const days = ref([
+  {
+    name: "Monday",
+    rows: 1,
+  },
+  {
+    name: "Tuesday",
+    rows: 1,
+  },
+  {
+    name: "Wednesday",
+    rows: 1,
+  },
+  {
+    name: "Thursday",
+    rows: 1,
+  },
+  {
+    name: "Friday",
+    rows: 1,
+  }
+])
 
 function makeActivity(shortName: string, name: string, duration = 1): TimetableActivity {
   const color = computeColorFromName(name);
@@ -51,6 +69,30 @@ const initCell = (day: string, time: string): Cell => {
   };
 };
 
+function addRow(day: string, row: number) {
+  const fd = days.value.find(d => d.name === day);
+  if (!fd) {
+    return;
+  }
+
+  console.log(`Adding row to ${day} at ${row}`);
+  fd.rows = row + 1;
+}
+
+function deleteRow(day: string, row: number) {
+  if (row === 1) {
+    return;
+  }
+
+  const fd = days.value.find(d => d.name === day);
+  if (!fd) {
+    return;
+  }
+
+  console.log(`Deleting row from ${day} at ${row}`);
+  fd.rows = row - 1;
+}
+
 
 </script>
 
@@ -71,13 +113,23 @@ const initCell = (day: string, time: string): Cell => {
         </tr>
         </thead>
         <tbody>
-        <tr v-for="day in days" :key="day">
-          <td>{{ day }}</td>
-          <TimeTableRow :times="times" :day="day"/>
+        <template v-for="day in days" :key="day.name">
+          <tr v-for="row in day.rows" :key="row">
+            <td
+              v-if="row === 1"
+              :rowspan="day.rows"
+            >{{ day.name }}</td>
+            <TimeTableRow
+              :times="times"
+              :day="day"
+              @add-row="() => addRow(day.name, row)"
+              @empty="() => deleteRow(day.name, row)"
+            />
+          </tr>
 <!--          <TimeTableCell v-for="time in times" :key="time" class="">-->
 <!--&lt;!&ndash;            <TimeTableCell/>&ndash;&gt;-->
 <!--          </TimeTableCell>-->
-        </tr>
+        </template>
         </tbody>
       </table>
 

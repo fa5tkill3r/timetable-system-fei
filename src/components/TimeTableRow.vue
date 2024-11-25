@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {TimetableActivity} from "@/types.ts";
 import TimeTableCell from "@/components/TimeTableCell.vue";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
+import {state} from "@formkit/drag-and-drop";
 
 interface Props {
   times: string[];
@@ -12,7 +12,11 @@ const childRefs = ref<HTMLElement[]>([]);
 
 const props = defineProps<Props>()
 
-const events = ref<TimetableActivity[]>([]);
+const emits = defineEmits<{
+  'add-row': [day: string],
+  'empty': [],
+}>();
+
 
 const tableDataCells = computed<number>(() => {
   // events from childRefs
@@ -32,14 +36,15 @@ const tableDataCells = computed<number>(() => {
   return cellCount - length;
 })
 
-function addEvents(newEvents: TimetableActivity[]) {
-  events.value.push(...newEvents);
-}
 
-function removeEvents(oldEvents: TimetableActivity[]) {
-  events.value = events.value.filter(event => !oldEvents.includes(event));
-}
-
+state.on('dragEnded', (event) => {
+  console.log('dragend');
+  const lengths = childRefs.value.map((childRef) => childRef.items.length);
+  if (lengths.every((length) => length === 0)) {
+    console.log('empty');
+    emits('empty');
+  }
+});
 
 </script>
 
@@ -48,6 +53,8 @@ function removeEvents(oldEvents: TimetableActivity[]) {
     ref="childRefs"
     v-for="time in tableDataCells"
     :key="time"
+    :day="props.day"
+    @addRow="(day) => emits('add-row', day)"
 
 
   />

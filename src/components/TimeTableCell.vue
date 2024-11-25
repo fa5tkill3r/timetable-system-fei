@@ -7,11 +7,13 @@ import {calculateBrightness} from "@/utils.ts";
 interface Props {
   initialItems: TimetableActivity[];
   isSource?: boolean;
+  day: string;
 }
 
 const emit = defineEmits<{
   'items-added': [items: TimetableActivity[]],
   'items-removed': [items: TimetableActivity[]],
+  'add-row': [day: string],
 }>();
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,8 +23,21 @@ const props = withDefaults(defineProps<Props>(), {
 
 
 const [target, items] = useDragAndDrop(props.initialItems, {
-  accepts: () => true,
+  accepts: () => {
+    if (items.value.length < 1) {
+
+      return true;
+    }
+
+    emit('add-row', props.day);
+    return false;
+  },
+  handleDragend: (event) => {
+    console.log(event);
+  },
+
 });
+
 
 
 const colSpan = computed(() => items.value.reduce((acc, item) => acc + item.duration, 0));
