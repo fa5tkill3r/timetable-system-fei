@@ -11,8 +11,8 @@ const links = [
     text: "Timetable editor",
   },
   {
-    to: "/data",
-    text: "Data",
+    to: "/requirements",
+    text: "Requirements",
   },
   {
     to: "/settings",
