@@ -7,3 +7,14 @@ export interface TimetableActivity {
     color: string
     shortName: string
 }
+
+export interface Requirement {
+    type: 'Osobná' | 'Predmetová'
+    subject: string
+    createdAt: string
+}
+
+export enum RequirementType {
+    Personal = 'Personal',
+    Subject = 'Subject',
+}
