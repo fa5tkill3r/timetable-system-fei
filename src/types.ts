@@ -18,3 +18,11 @@ export enum RequirementType {
     Personal = 'Personal',
     Subject = 'Subject',
 }
+
+export interface Subject {
+    id: number
+    name: string
+    shortName: string
+    code: string
+    color: string
+}
