@@ -35,34 +35,65 @@ import {toTypedSchema} from '@vee-validate/zod'
 import {Check, Circle, Dot} from 'lucide-vue-next'
 import {h, ref} from 'vue'
 import * as z from 'zod'
-import RoomSelect from "@/components/requirements/RoomSelect.vue";
+import RoomInput from "@/components/RoomInput.vue";
 import {cn} from "@/lib/utils.ts";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
 import {useStore} from "@/store/store.ts";
+import MultiSelect from "@/components/MultiSelect.vue";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import ComboBox from "@/components/ComboBox.vue";
+import {Switch} from "@/components/ui/switch";
+import { Textarea } from '@/components/ui/textarea'
 
 const store = useStore()
+
+const specialRequirements = [
+  {
+    id: 1,
+    name: 'Cvičenie po prednáške',
+    code: 'exercise_after_lecture',
+    conflictsWith: ['exercise_immediately_after_lecture'],
+  },
+  {
+    id: 2,
+    name: 'Cvičenie ihneď po prednáške',
+    code: 'exercise_immediately_after_lecture',
+    conflictsWith: ['exercise_after_lecture', 'lecture_and_exercise_on_different_days'],
+  },
+  {
+    id: 3,
+    name: 'Prednáška a cvičenie v iný deň',
+    code: 'lecture_and_exercise_on_different_days',
+    conflictsWith: ['exercise_immediately_after_lecture'],
+  },
+  {
+    id: 4,
+    name: 'Prednáška a cvičenie v jednom bloku',
+    code: 'lecture_and_exercise_in_one_block',
+  }
+]
+const specialRequirementsSchema = specialRequirements.reduce((schema, requirement) => {
+  schema[requirement.code] = z.boolean().optional();
+  return schema;
+}, {});
 
 const formSchema = [
   z.object({
     subject: z.number(),
   }),
-  z.object({
-    password: z.string().min(2).max(50),
-    confirmPassword: z.string(),
-  }).refine(
-    (values) => {
-      return values.password === values.confirmPassword
-    },
-    {
-      message: 'Passwords must match!',
-      path: ['confirmPassword'],
-    },
-  ),
+  z.object({}),
+  z.object(specialRequirementsSchema),
   z.object({
     favoriteDrink: z.union([z.literal('coffee'), z.literal('tea'), z.literal('soda')]),
   }),
 ]
+
+console.log(specialRequirementsSchema)
 
 const stepIndex = ref(1)
 const steps = [
@@ -87,6 +118,11 @@ const steps = [
     description: 'Špeciálne požiadavky pre predmet',
   },
 ]
+
+const restrictRoomsOption = ref(false)
+const restrictRooms = ref(false)
+
+
 
 function onSubmit(values: any) {
   toast({
@@ -131,7 +167,7 @@ function onSubmit(values: any) {
                 v-for="step in steps"
                 :key="step.step"
                 v-slot="{ state }"
-                class="relative flex w-full flex-col items-center justify-center"
+                class="relative flex w-full flex-col"
                 :step="step.step"
               >
                 <StepperSeparator
@@ -193,7 +229,7 @@ function onSubmit(values: any) {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent class="w-[200px] p-0">
+                      <PopoverContent class="w-[var(--radix-popover-trigger-width)] p-0">
                         <Command>
                           <CommandInput placeholder="Vyhladať predmet..."/>
                           <CommandEmpty>Predmet nebol nájdený.</CommandEmpty>
@@ -244,53 +280,84 @@ function onSubmit(values: any) {
                 <!--                </FormField>-->
               </template>
 
-              <template v-if="stepIndex === 2">
-                <FormField v-slot="{ componentField }" name="password">
+              <template v-if="stepIndex === 3">
+                <FormField v-slot="{ componentField }" name="capacity">
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Kapacita študentov</FormLabel>
                     <FormControl>
-                      <Input type="password" v-bind="componentField"/>
+                      <Input type="number" v-bind="componentField"/>
                     </FormControl>
                     <FormMessage/>
                   </FormItem>
                 </FormField>
 
-                <FormField v-slot="{ componentField }" name="confirmPassword">
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" v-bind="componentField"/>
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                </FormField>
+                <ComboBox :options="store.roomTypes" class="flex justify-center" title="Typ miestnosti"
+                          search-placeholder="Vyhľadať typ miestnosti..."/>
+
+                <Collapsible>
+                  <CollapsibleTrigger
+                    class="text-primary font-semibold cursor-pointer mb-2"
+                  >
+                    <div class="flex items-center gap-2">
+                      <ChevronsUpDown class="h-4 w-4"/>
+                      <span>Vybavenie miestnosti</span>
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div class="flex flex-wrap gap-x-4 gap-y-2 justify-start">
+                      <div v-for="equipment in store.equipments" :key="equipment.id">
+                        <MultiSelect :item="equipment"/>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+
+                <Switch v-model:checked="restrictRoomsOption" class="mb-4" label="Show Room Input" />
+                <div v-if="restrictRoomsOption">
+                  <RoomInput :rooms="store.rooms"/>
+                </div>
+
               </template>
 
-              <template v-if="stepIndex === 3">
-                <FormField v-slot="{ componentField }" name="favoriteDrink">
-                  <FormItem>
-                    <FormLabel>Drink</FormLabel>
+              <template v-if="stepIndex === 4">
+                <FormField v-for="requirement in specialRequirements" v-slot="{ value, handleChange }"
+                           :key="requirement.id" :name="requirement.code">
+                  <FormItem class="flex flex-row items-center justify-between">
+                    <div class="space-y-0.5">
+                      <FormLabel class="text-base">
+                        {{ requirement.name }}
+                      </FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        :checked="value"
+                        @update:checked="(checked) => {
+                          handleChange(checked);
+                          if (checked) {
+                            requirement.conflictsWith?.forEach(conflict => {
+                              setFieldValue(conflict, false);
+                            });
+                          }
+                        }"
+                      />
+                    </FormControl>
+                  </FormItem>
+                </FormField>
 
-                    <Select v-bind="componentField">
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a drink"/>
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value="coffee">
-                            Coffe
-                          </SelectItem>
-                          <SelectItem value="tea">
-                            Tea
-                          </SelectItem>
-                          <SelectItem value="soda">
-                            Soda
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                <FormField name="customRequirement" class="flex justify-center">
+                  <FormItem class="flex flex-col">
+                    <FormLabel class="text-base">Špeciálna požiadavka</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Špeciálna požiadavka..."
+                        class="resize-none"
+                        v-bind="componentField"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Ak máte špeciálnu požiadavku, zadajte ju sem.
+                    </FormDescription>
                     <FormMessage/>
                   </FormItem>
                 </FormField>
@@ -302,12 +369,12 @@ function onSubmit(values: any) {
                 Späť
               </Button>
               <div class="flex items-center gap-3">
-                <Button v-if="stepIndex !== 3" :type="meta.valid ? 'button' : 'submit'" :disabled="isNextDisabled"
+                <Button v-if="stepIndex !== 4" :type="meta.valid ? 'button' : 'submit'" :disabled="isNextDisabled"
                         size="sm" @click="meta.valid && nextStep()">
                   Ďalej
                 </Button>
                 <Button
-                  v-if="stepIndex === 3" size="sm" type="submit"
+                  v-if="stepIndex === 4" size="sm" type="submit"
                 >
                   Vytvoriť požiadavku
                 </Button>

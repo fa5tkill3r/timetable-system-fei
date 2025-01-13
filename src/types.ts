@@ -26,3 +26,21 @@ export interface Subject {
     code: string
     color: string
 }
+
+export interface Equipment {
+    id: number
+    name: string
+}
+
+export interface RoomType {
+    id: number
+    name: string
+}
+
+export interface Room {
+    id: number
+    name: string
+    capacity: number
+    roomType: RoomType
+    equipment: Equipment[]
+}
