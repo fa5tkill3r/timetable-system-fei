@@ -8,6 +8,7 @@ interface Props {
   initialItems: TimetableActivity[];
   isSource?: boolean;
   day: string;
+  timeSlot: string;
 }
 
 const emit = defineEmits<{
@@ -23,10 +24,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 
 const [target, items] = useDragAndDrop(props.initialItems, {
-  accepts: () => {
+  accepts: (item, s, ss) => {
     if (items.value.length < 1) {
 
       return true;
+    }
+
+
+    // Check if the item is already in the items array
+    if (item.data.enabledNodes.length > 0) {
+      return false;
     }
 
     emit('add-row', props.day);
@@ -38,11 +45,11 @@ const [target, items] = useDragAndDrop(props.initialItems, {
 
 });
 
-
+const timeslot = ref(props.timeSlot);
 
 const colSpan = computed(() => items.value.reduce((acc, item) => acc + item.duration, 0));
 
-defineExpose({ items });
+defineExpose({ items, colSpan, timeslot});
 
 // Watch for changes in the items array
 watch(items, (newItems, oldItems) => {
@@ -50,6 +57,7 @@ watch(items, (newItems, oldItems) => {
   const removedItems = oldItems.filter(item => !newItems.includes(item));
 
   if (addedItems.length > 0) {
+    console.log('addddd')
     emit('items-added', addedItems);
   }
 
