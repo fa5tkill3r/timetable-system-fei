@@ -3,6 +3,21 @@ import { ref, computed } from 'vue'
 import _ from 'lodash'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-vue-next';
+import {
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu'
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 // const timeSlots = [
@@ -388,14 +403,29 @@ const toggleMenu = () => {
       <div
         v-for="event in events"
         :key="event.id"
-        :style="getEventStyle(event)"
-        class="event"
-        draggable="true"
-        @dragstart="handleDragStart($event, event)"
-        @dragend="handleDragEnd"
+        class="relative"
       >
-        <div class="event-title">{{ event.title }}</div>
-        <div class="event-time">{{ event.startTime }} - {{ event.endTime }}</div>
+        <ContextMenu>
+          <ContextMenuTrigger>
+            <div
+              :style="getEventStyle(event)"
+              class="event"
+              draggable="true"
+              @dragstart="handleDragStart($event, event)"
+              @dragend="handleDragEnd"
+            >
+              <div class="event-title">{{ event.title }}</div>
+              <div class="event-time">{{ event.startTime }} - {{ event.endTime }}</div>
+            </div>
+          </ContextMenuTrigger>
+          <ContextMenuContent class="w-64">
+            <ContextMenuLabel>{{ event.title }} options</ContextMenuLabel>
+            <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
+            <ContextMenuItem @click="deleteEvent(event)">Delete</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem @click="duplicateEvent(event)">Duplicate</ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
       </div>
     </div>
 
