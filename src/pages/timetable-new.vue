@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import _ from 'lodash'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-vue-next';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 // const timeSlots = [
@@ -407,15 +409,30 @@ const toggleMenu = () => {
         <ChevronRight v-else class="w-4 h-4" />
       </button>
 
-      <div
-        v-if="isMenuOpen"
-        class="w-64 bg-white border-l border-t border-b border-gray-200 p-4 relative"
-        :class="{ 'bg-gray-50': isOverMenu }"
-        @dragover="handleMenuDragOver"
-        @dragleave="handleMenuDragLeave"
-        @drop="handleMenuDrop"
-      >
-        <h3 class="text-lg font-semibold mb-4">Event Templates</h3>
+
+
+
+    </div>
+
+    <div
+      v-if="isMenuOpen"
+      class="bg-white border-l border-t border-b border-gray-200 p-4 fixed top-0 right-0 max-w-full w-80 h-full z-10"
+      :class="{ 'bg-gray-50': isOverMenu }"
+      @dragover="handleMenuDragOver"
+      @dragleave="handleMenuDragLeave"
+      @drop="handleMenuDrop"
+    >
+    <Tabs default-value="events">
+      <TabsList class="w-full">
+        <TabsTrigger value="events" class="w-full">
+          Events
+        </TabsTrigger>
+        <TabsTrigger value="requirements" class="w-full">
+          Requirements
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="events">
+        <h3 class="text-lg font-semibold mb-4">Events</h3>
         <div class="space-y-3">
           <div
             v-for="template in eventTemplates"
@@ -444,7 +461,11 @@ const toggleMenu = () => {
             <span>Drop to remove event</span>
           </div>
         </div>
-      </div>
+      </TabsContent>
+      <TabsContent value="requirements">
+        Change your password here.
+      </TabsContent>
+    </Tabs>
     </div>
   </div>
 </template>
