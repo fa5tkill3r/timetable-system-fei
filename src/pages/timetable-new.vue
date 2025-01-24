@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import _ from 'lodash'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight, Trash2, MoreVertical } from 'lucide-vue-next';
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -45,6 +45,13 @@ const timeSlots = [
 ]
 
 const events = ref([])
+const searchQuery = ref('')
+
+const filteredEventTemplates = computed(() => {
+  return eventTemplates.value.filter(template =>
+    template.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
 
 // Event templates with quantity
 const eventTemplates = ref([
@@ -365,7 +372,7 @@ const toggleMenu = () => {
       :style="containerStyle"
       @dragover="handleDragOver"
       @drop="handleDrop"
-      class="flex-shrink-0"
+      class="flex-shrink-0 bg-white rounded-lg shadow-md overflow-hidden"
     >
       <div :style="cornerCellStyle"></div>
 
@@ -374,6 +381,7 @@ const toggleMenu = () => {
         v-for="(time, index) in timeSlots"
         :key="index"
         :style="getHeaderStyle(index)"
+        class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
       >
         {{ time.from }} - {{ time.to }}
       </div>
@@ -403,19 +411,22 @@ const toggleMenu = () => {
       <div
         v-for="event in events"
         :key="event.id"
-        class="relative"
+        class="relative group"
       >
         <ContextMenu>
           <ContextMenuTrigger>
             <div
               :style="getEventStyle(event)"
-              class="event"
+              class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
               draggable="true"
               @dragstart="handleDragStart($event, event)"
               @dragend="handleDragEnd"
             >
-              <div class="event-title">{{ event.title }}</div>
-              <div class="event-time">{{ event.startTime }} - {{ event.endTime }}</div>
+              <div class="flex justify-between items-center">
+                <div class="event-title font-semibold text-gray-800">{{ event.title }}</div>
+                <MoreVertical class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              <div class="event-time text-sm text-gray-600">{{ event.startTime }} - {{ event.endTime }}</div>
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent class="w-64">
@@ -430,19 +441,15 @@ const toggleMenu = () => {
     </div>
 
     <!-- Event Templates Menu -->
-    <div class="relative flex-shrink-0">
-      <button
-        @click="toggleMenu"
-        class="absolute -left-6 top-2 bg-white border border-gray-200 rounded-l p-1 hover:bg-gray-50"
-      >
-        <ChevronLeft v-if="isMenuOpen" class="w-4 h-4" />
-        <ChevronRight v-else class="w-4 h-4" />
-      </button>
-
-
-
-
-    </div>
+<!--    <div class="fixed top-10 right-20 h-full flex items-center">-->
+<!--      <button-->
+<!--        @click="toggleMenu"-->
+<!--        class="absolute -left-6 top-2 bg-white border border-gray-200 rounded-l p-1 hover:bg-gray-50"-->
+<!--      >-->
+<!--        <ChevronLeft v-if="isMenuOpen" class="w-4 h-4" />-->
+<!--        <ChevronRight v-else class="w-4 h-4" />-->
+<!--      </button>-->
+<!--    </div>-->
 
     <div
       v-if="isMenuOpen"
@@ -493,7 +500,7 @@ const toggleMenu = () => {
         </div>
       </TabsContent>
       <TabsContent value="requirements">
-        Change your password here.
+        TODO: Add requirements
       </TabsContent>
     </Tabs>
     </div>
