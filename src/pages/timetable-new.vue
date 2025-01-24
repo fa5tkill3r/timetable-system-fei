@@ -1,10 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
+import _ from 'lodash'
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+// const timeSlots = [
+//   { from: '9:00',  to: '10:00' },
+//   { from: '10:00', to: '11:00' },
+//   { from: '11:00', to: '12:00' },
+//   { from: '12:00', to: '13:00' },
+//   { from: '13:00', to: '14:00' },
+//   { from: '14:00', to: '15:00' },
+//   { from: '15:00', to: '16:00' },
+//   { from: '16:00', to: '17:00' },
+//   { from: '17:00', to: '18:00' }
+// ]
+
 const timeSlots = [
-  '9:00', '10:00', '11:00', '12:00', '13:00',
-  '14:00', '15:00', '16:00', '17:00'
+  { from: '9:00',  to: '9:50' },
+  { from: '10:00', to: '10:50' },
+  { from: '11:00', to: '11:50' },
+  { from: '12:00', to: '12:50' },
+  { from: '13:00', to: '13:50' },
+  { from: '14:00', to: '14:50' },
+  { from: '15:00', to: '15:50' },
+  { from: '16:00', to: '16:50' },
+  { from: '17:00', to: '17:50' }
 ]
 
 const events = ref([])
@@ -62,15 +82,15 @@ const getDayFromPosition = (y) => {
 }
 
 const getEventDuration = (event) => {
-  const startIndex = timeSlots.indexOf(event.startTime)
-  const endIndex = timeSlots.indexOf(event.endTime)
-  return endIndex - startIndex
+  const startIndex = timeSlots.findIndex(slot => slot.from === event.startTime)
+  const endIndex = timeSlots.findIndex(slot => slot.to === event.endTime)
+  return endIndex - startIndex + 1
 }
 
 // Style computation functions
 const getEventStyle = (event) => {
   const dayIndex = days.indexOf(event.day)
-  const startIndex = timeSlots.indexOf(event.startTime)
+  const startIndex = timeSlots.findIndex(slot => slot.from === event.startTime)
   const duration = getEventDuration(event)
 
   return {
@@ -104,17 +124,17 @@ const getCellStyle = (dayIndex, timeIndex) => {
       if (!draggedEvent.value && !draggedTemplate.value) return 'transparent'
 
       const duration = draggedEvent.value
-        ? timeSlots.indexOf(draggedEvent.value.endTime) - timeSlots.indexOf(draggedEvent.value.startTime)
+        ? timeSlots.findIndex(slot => slot.to === draggedEvent.value.endTime) - timeSlots.findIndex(slot => slot.from === draggedEvent.value.startTime) + 1
         : draggedTemplate.value.duration
 
       if (draggedOverDay.value === days[dayIndex] &&
-        draggedOverTime.value === timeSlots[timeIndex] &&
+        _.isEqual(draggedOverTime.value, timeSlots[timeIndex]) &&
         timeIndex + duration <= timeSlots.length) {
         return '#e3f2fd'
       }
 
       if (draggedOverDay.value === days[dayIndex] &&
-        draggedOverTime.value === timeSlots[timeIndex]) {
+        _.isEqual(draggedOverTime.value, timeSlots[timeIndex])) {
         return '#fb0101'
       }
 
@@ -262,15 +282,15 @@ const handleDrop = (event) => {
 
   if (draggedTemplate.value) {
     // Create new event from template
-    const newStartIndex = timeSlots.indexOf(position.time)
-    const newEndIndex = newStartIndex + draggedTemplate.value.duration
+    const newStartIndex = timeSlots.findIndex(slot => slot.from === position.time.from)
+    const newEndIndex = newStartIndex + draggedTemplate.value.duration - 1
 
     if (newEndIndex <= timeSlots.length) {
       const newEvent = {
         id: nextEventId++,
         day: position.day,
-        startTime: timeSlots[newStartIndex],
-        endTime: timeSlots[newEndIndex],
+        startTime: timeSlots[newStartIndex].from,
+        endTime: timeSlots[newEndIndex].to,
         title: draggedTemplate.value.title,
         color: draggedTemplate.value.color
       }
@@ -284,11 +304,9 @@ const handleDrop = (event) => {
     }
   } else {
     // Handle existing event drop
-    const duration = timeSlots.indexOf(draggedEvent.value.endTime) -
-      timeSlots.indexOf(draggedEvent.value.startTime)
-
-    const newStartIndex = timeSlots.indexOf(position.time)
-    const newEndIndex = newStartIndex + duration
+    const duration = getEventDuration(draggedEvent.value)
+    const newStartIndex = timeSlots.findIndex(slot => slot.from === position.time.from)
+    const newEndIndex = newStartIndex + duration - 1
 
     if (newEndIndex <= timeSlots.length) {
       const eventIndex = events.value.findIndex(e => e.id === draggedEvent.value.id)
@@ -296,8 +314,8 @@ const handleDrop = (event) => {
         const updatedEvent = {
           ...events.value[eventIndex],
           day: position.day,
-          startTime: timeSlots[newStartIndex],
-          endTime: timeSlots[newEndIndex]
+          startTime: timeSlots[newStartIndex].from,
+          endTime: timeSlots[newEndIndex].to
         }
         events.value[eventIndex] = updatedEvent
       }
@@ -337,10 +355,10 @@ const toggleMenu = () => {
       <!-- Time slots header -->
       <div
         v-for="(time, index) in timeSlots"
-        :key="time"
+        :key="index"
         :style="getHeaderStyle(index)"
       >
-        {{ time }}
+        {{ time.from }} - {{ time.to }}
       </div>
 
       <!-- Days column -->
