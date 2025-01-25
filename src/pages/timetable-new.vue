@@ -29,6 +29,7 @@
     ContextMenuTrigger,
   } from '@/components/ui/context-menu'
   import { Input } from '@/components/ui/input'
+  import { ScrollArea, ScrollBar  } from '@/components/ui/scroll-area'
 
   // Types
   interface TimeSlot {
@@ -422,7 +423,7 @@
   <div class="min-h-screen flex justify-center items-start pt-10">
     <div class="flex">
       <!-- Scrollable Container -->
-      <div
+      <ScrollArea
         class="overflow-auto max-w-[calc(100vw-theme(space.10))] p-1"
         :class="{ 'max-w-[calc(100vw-theme(space.8)-theme(space.10))]': isMenuOpen }"
       >
@@ -572,7 +573,12 @@
             <TabsContent value="requirements"> TODO: Add requirements</TabsContent>
           </Tabs>
         </div>
-      </div>
+        <ScrollBar
+          orientation="horizontal"
+          :class="{ 'mr-80': isMenuOpen }"
+        />
+
+      </ScrollArea>
     </div>
   </div>
 </template>
