@@ -18,6 +18,8 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu'
+import { Input } from '@/components/ui/input'
+
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 // const timeSlots = [
@@ -459,50 +461,60 @@ const toggleMenu = () => {
       @dragleave="handleMenuDragLeave"
       @drop="handleMenuDrop"
     >
-    <Tabs default-value="events">
-      <TabsList class="w-full">
-        <TabsTrigger value="events" class="w-full">
-          Events
-        </TabsTrigger>
-        <TabsTrigger value="requirements" class="w-full">
-          Requirements
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="events">
-        <h3 class="text-lg font-semibold mb-4">Events</h3>
-        <div class="space-y-3">
-          <div
-            v-for="template in eventTemplates"
-            :key="template.id"
-            v-show="template.quantity > 0"
-            class="p-3 rounded-lg cursor-move relative group"
-            :style="{ backgroundColor: template.color }"
-            draggable="true"
-            @dragstart="handleDragStart($event, template, true)"
-            @dragend="handleDragEnd"
-          >
-            <div class="font-medium">{{ template.title }}</div>
-            <div class="text-sm text-gray-600">
-              Duration: {{ template.duration }} hour(s)
-              <span class="ml-2">Remaining: {{ template.quantity }}</span>
+      <Tabs default-value="events">
+        <TabsList class="w-full">
+          <TabsTrigger value="events" class="w-full">
+            Events
+          </TabsTrigger>
+          <TabsTrigger value="requirements" class="w-full">
+            Requirements
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="events">
+          <h3 class="text-lg font-semibold mb-4">Events</h3>
+
+          <!-- Search input -->
+          <Input
+            v-model="searchQuery"
+            type="text"
+            class="p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Search events..." />
+
+          <!-- Event templates list -->
+          <div class="space-y-3">
+            <div
+              v-for="template in filteredEventTemplates"
+              :key="template.id"
+              v-show="template.quantity > 0"
+              class="p-3 rounded-lg cursor-move relative group"
+              :style="{ backgroundColor: template.color }"
+              draggable="true"
+              @dragstart="handleDragStart($event, template, true)"
+              @dragend="handleDragEnd"
+            >
+              <div class="font-medium">{{ template.title }}</div>
+              <div class="text-sm text-gray-600">
+                Duration: {{ template.duration }} hour(s)
+                <span class="ml-2">Remaining: {{ template.quantity }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <!-- Modified overlay to prevent pointer events interference -->
-        <div
-          v-if="isOverMenu"
-          class="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50 bg-opacity-50 rounded pointer-events-none flex items-center justify-center"
-        >
-          <div class="flex items-center text-blue-600">
-            <Trash2 class="w-5 h-5 mr-2" />
-            <span>Drop to remove event</span>
+
+          <!-- Modified overlay to prevent pointer events interference -->
+          <div
+            v-if="isOverMenu"
+            class="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50 bg-opacity-50 rounded pointer-events-none flex items-center justify-center"
+          >
+            <div class="flex items-center text-blue-600">
+              <Trash2 class="w-5 h-5 mr-2" />
+              <span>Drop to remove event</span>
+            </div>
           </div>
-        </div>
-      </TabsContent>
-      <TabsContent value="requirements">
-        TODO: Add requirements
-      </TabsContent>
-    </Tabs>
+        </TabsContent>
+        <TabsContent value="requirements">
+          TODO: Add requirements
+        </TabsContent>
+      </Tabs>
     </div>
   </div>
 </template>
