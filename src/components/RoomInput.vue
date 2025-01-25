@@ -1,68 +1,92 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { toast } from '@/components/ui/toast'
-import { toTypedSchema } from '@vee-validate/zod'
-import { useForm } from 'vee-validate'
-import {h, PropType} from 'vue'
-import { z } from 'zod'
+  import { Button } from '@/components/ui/button'
+  import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+  } from '@/components/ui/form'
+  import { toast } from '@/components/ui/toast'
+  import { toTypedSchema } from '@vee-validate/zod'
+  import { useForm } from 'vee-validate'
+  import { h, PropType } from 'vue'
+  import { z } from 'zod'
 
-import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
-import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input'
-import { ComboboxAnchor, ComboboxContent, ComboboxInput, ComboboxPortal, ComboboxRoot } from 'radix-vue'
-import { computed, ref } from 'vue'
-import {Room} from "@/types.ts";
+  import {
+    CommandEmpty,
+    CommandGroup,
+    CommandItem,
+    CommandList,
+  } from '@/components/ui/command'
+  import {
+    TagsInput,
+    TagsInputInput,
+    TagsInputItem,
+    TagsInputItemDelete,
+    TagsInputItemText,
+  } from '@/components/ui/tags-input'
+  import {
+    ComboboxAnchor,
+    ComboboxContent,
+    ComboboxInput,
+    ComboboxPortal,
+    ComboboxRoot,
+  } from 'radix-vue'
+  import { computed, ref } from 'vue'
+  import { Room } from '@/types.ts'
 
-const props = defineProps({
-  rooms: {
-    type: Object as PropType<Room[]>,
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: false,
-  },
-  searchPlaceholder: {
-    type: String,
-    default: 'Search options...',
-  },
-})
-
-const formSchema = toTypedSchema(z.object({
-  fruits: z.array(z.string()).min(1).max(3),
-}))
-
-const modelValue = ref<string[]>([])
-const open = ref(false)
-const searchTerm = ref('')
-
-const { handleSubmit } = useForm({
-  validationSchema: formSchema,
-  initialValues: {
-    fruits: ['Apple', 'Banana'],
-  },
-})
-
-const onSubmit = handleSubmit((values) => {
-  toast({
-    title: 'You submitted the following values:',
-    description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
+  const props = defineProps({
+    rooms: {
+      type: Object as PropType<Room[]>,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: false,
+    },
+    searchPlaceholder: {
+      type: String,
+      default: 'Search options...',
+    },
   })
-})
 
-const filteredRooms = computed(() => props.rooms.filter(i => !modelValue.value.includes(i.name)))
+  const formSchema = toTypedSchema(
+    z.object({
+      fruits: z.array(z.string()).min(1).max(3),
+    }),
+  )
 
+  const modelValue = ref<string[]>([])
+  const open = ref(false)
+  const searchTerm = ref('')
+
+  const { handleSubmit } = useForm({
+    validationSchema: formSchema,
+    initialValues: {
+      fruits: ['Apple', 'Banana'],
+    },
+  })
+
+  const onSubmit = handleSubmit((values) => {
+    toast({
+      title: 'You submitted the following values:',
+      description: h(
+        'pre',
+        { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' },
+        h('code', { class: 'text-white' }, JSON.stringify(values, null, 2)),
+      ),
+    })
+  })
+
+  const filteredRooms = computed(() =>
+    props.rooms.filter((i) => !modelValue.value.includes(i.name)),
+  )
 </script>
 
 <template>
@@ -78,10 +102,20 @@ const filteredRooms = computed(() => props.rooms.filter(i => !modelValue.value.i
             </TagsInputItem>
           </div>
 
-          <ComboboxRoot v-model="modelValue" v-model:open="open" v-model:search-term="searchTerm" @click="open = true" class="w-full">
+          <ComboboxRoot
+            v-model="modelValue"
+            v-model:open="open"
+            v-model:search-term="searchTerm"
+            @click="open = true"
+            class="w-full"
+          >
             <ComboboxAnchor as-child>
               <ComboboxInput placeholder="Miestnosti..." as-child>
-                <TagsInputInput class="w-full px-3" :class="modelValue.length > 0 ? 'mt-2' : ''" @keydown.enter.prevent />
+                <TagsInputInput
+                  class="w-full px-3"
+                  :class="modelValue.length > 0 ? 'mt-2' : ''"
+                  @keydown.enter.prevent
+                />
               </ComboboxInput>
             </ComboboxAnchor>
 
@@ -94,17 +128,21 @@ const filteredRooms = computed(() => props.rooms.filter(i => !modelValue.value.i
                   <CommandEmpty />
                   <CommandGroup>
                     <CommandItem
-                      v-for="room in filteredRooms" :key="room.value" :value="room.name"
-                      @select.prevent="(ev) => {
-                  if (typeof ev.detail.value === 'string') {
-                    searchTerm = ''
-                    modelValue.push(ev.detail.value)
-                  }
+                      v-for="room in filteredRooms"
+                      :key="room.value"
+                      :value="room.name"
+                      @select.prevent="
+                        (ev) => {
+                          if (typeof ev.detail.value === 'string') {
+                            searchTerm = ''
+                            modelValue.push(ev.detail.value)
+                          }
 
-                  if (filteredRooms.length === 0) {
-                    open = false
-                  }
-                }"
+                          if (filteredRooms.length === 0) {
+                            open = false
+                          }
+                        }
+                      "
                     >
                       {{ room.name }}
                     </CommandItem>
@@ -115,13 +153,10 @@ const filteredRooms = computed(() => props.rooms.filter(i => !modelValue.value.i
           </ComboboxRoot>
         </TagsInput>
       </FormControl>
-      <FormDescription>
-      </FormDescription>
+      <FormDescription> </FormDescription>
       <FormMessage />
     </FormItem>
   </FormField>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

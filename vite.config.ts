@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import autoprefixer from 'autoprefixer'
 
 import tailwind from 'tailwindcss'
-import {defineConfig} from 'vite'
+import { defineConfig } from 'vite'
 import VueRouter from 'unplugin-vue-router/vite'
 
 export default defineConfig({
@@ -14,9 +14,9 @@ export default defineConfig({
   },
   plugins: [
     VueRouter({
-      dts: './src/types/typed-router.d.ts'
+      dts: './src/types/typed-router.d.ts',
     }),
-    vue()
+    vue(),
   ],
   resolve: {
     alias: {

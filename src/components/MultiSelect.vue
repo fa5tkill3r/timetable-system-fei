@@ -1,70 +1,69 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+  import { ref, computed } from 'vue'
+  import { Button } from '@/components/ui/button'
+  import { Input } from '@/components/ui/input'
+  import { cn } from '@/lib/utils'
 
-const props = defineProps<{
-  item: Object
-}>()
+  const props = defineProps<{
+    item: Object
+  }>()
 
-const isToggled = ref(false)
-const customCount = ref<number>(1)
+  const isToggled = ref(false)
+  const customCount = ref<number>(1)
 
-const isInputFocused = ref(false)
+  const isInputFocused = ref(false)
 
-const toggleButton = () => {
-  if (isInputFocused.value) {
-    return
+  const toggleButton = () => {
+    if (isInputFocused.value) {
+      return
+    }
+    if (isToggled.value) {
+      customCount.value = 1
+    }
+    isToggled.value = !isToggled.value
   }
-  if (isToggled.value) {
-    customCount.value = 1
-  }
-  isToggled.value = !isToggled.value
-}
 
-const increment = (event: Event) => {
-  event.stopPropagation()
+  const increment = (event: Event) => {
+    event.stopPropagation()
 
-  if (customCount.value === '' || isNaN(Number(customCount.value))) {
-    customCount.value = 1
+    if (customCount.value === '' || isNaN(Number(customCount.value))) {
+      customCount.value = 1
+    } else {
+      customCount.value = Number(customCount.value) + 1
+    }
   }
-  else {
-    customCount.value = Number(customCount.value) + 1
-  }
-}
 
-const decrement = (event: Event) => {
-  event.stopPropagation()
+  const decrement = (event: Event) => {
+    event.stopPropagation()
 
-  if (customCount.value === '' || isNaN(Number(customCount.value))) {
-    customCount.value = 0
+    if (customCount.value === '' || isNaN(Number(customCount.value))) {
+      customCount.value = 0
+    } else if (Number(customCount.value) > 1) {
+      customCount.value = Number(customCount.value) - 1
+    }
   }
-  else if (Number(customCount.value) > 1) {
-    customCount.value = Number(customCount.value) - 1
-  }
-}
 
-const sanitizeInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  let value = target.value
-  if (isNaN(Number(value))) {
-    value = '1'
-  } else if (Number(value) < 0) {
-    value = '1'
+  const sanitizeInput = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    let value = target.value
+    if (isNaN(Number(value))) {
+      value = '1'
+    } else if (Number(value) < 0) {
+      value = '1'
+    }
+    customCount.value = Number(value)
   }
-  customCount.value = Number(value)
-}
-
 </script>
 
 <template>
   <Button
     @click="toggleButton"
-    :class="cn(
-      'w-fit flex items-center justify-between h-14',
-      isToggled && 'bg-green-500 text-white hover:bg-green-600',
-    )"
+    :class="
+      cn(
+        'w-fit flex items-center justify-between h-14',
+        isToggled && 'bg-green-500 text-white hover:bg-green-600',
+      )
+    "
     variant="outline"
   >
     <template v-if="isToggled">

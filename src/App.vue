@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import Dashboard from "@/pages/index.vue";
-import TimetableSwitcher from "@/components/TimetableSwitcher.vue";
-import Navigation from "@/components/Navigation.vue";
-
-
-
+  import HelloWorld from './components/HelloWorld.vue'
+  import Dashboard from '@/pages/index.vue'
+  import TimetableSwitcher from '@/components/TimetableSwitcher.vue'
+  import Navigation from '@/components/Navigation.vue'
 </script>
 
 <template>
@@ -24,6 +21,4 @@ import Navigation from "@/components/Navigation.vue";
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
