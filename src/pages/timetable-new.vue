@@ -420,7 +420,7 @@
 </script>
 
 <template>
-  <div class="min-h-screen flex justify-center items-start pt-10">
+  <div class="flex justify-center items-start pt-10">
     <div class="flex">
       <!-- Scrollable Container -->
       <ScrollArea
@@ -501,17 +501,6 @@
             </ContextMenu>
           </div>
         </div>
-
-        <!-- Event Templates Menu -->
-        <!--    <div class="fixed top-10 right-20 h-full flex items-center">-->
-        <!--      <button-->
-        <!--        @click="toggleMenu"-->
-        <!--        class="absolute -left-6 top-2 bg-white border border-gray-200 rounded-l p-1 hover:bg-gray-50"-->
-        <!--      >-->
-        <!--        <ChevronLeft v-if="isMenuOpen" class="w-4 h-4" />-->
-        <!--        <ChevronRight v-else class="w-4 h-4" />-->
-        <!--      </button>-->
-        <!--    </div>-->
 
         <div
           v-if="isMenuOpen"
