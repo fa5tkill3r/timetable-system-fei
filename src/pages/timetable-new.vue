@@ -177,12 +177,12 @@
 
         const duration = draggedEvent.value
           ? timeSlots.findIndex(
-              (slot) => slot.to === draggedEvent.value?.endTime,
-            ) -
-            timeSlots.findIndex(
-              (slot) => slot.from === draggedEvent.value?.startTime,
-            ) +
-            1
+            (slot) => slot.to === draggedEvent.value?.endTime,
+          ) -
+          timeSlots.findIndex(
+            (slot) => slot.from === draggedEvent.value?.startTime,
+          ) +
+          1
           : draggedTemplate.value?.duration || 0
 
         if (
@@ -419,149 +419,160 @@
 </script>
 
 <template>
-  <div class="flex">
-    <!-- Calendar Container -->
-    <div
-      :style="containerStyle"
-      @dragover="handleDragOver"
-      @drop="handleDrop"
-      class="flex-shrink-0 bg-white rounded-lg shadow-md overflow-hidden"
-    >
-      <div :style="cornerCellStyle"></div>
-
-      <!-- Time slots header -->
+  <div class="min-h-screen flex justify-center items-start pt-10">
+    <div class="flex">
+      <!-- Scrollable Container -->
       <div
-        v-for="(time, index) in timeSlots"
-        :key="index"
-        :style="getHeaderStyle(index)"
-        class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+        class="overflow-auto max-w-[calc(100vw-theme(space.10))] p-1"
+        :class="{ 'max-w-[calc(100vw-theme(space.8)-theme(space.10))]': isMenuOpen }"
       >
-        {{ time.from }} - {{ time.to }}
-      </div>
-
-      <!-- Days column -->
-      <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
-        {{ day }}
-      </div>
-
-      <!-- Grid cells -->
-      <div v-for="(day, dayIndex) in days" :key="day">
+        <!-- Calendar Container -->
         <div
-          v-for="(time, timeIndex) in timeSlots"
-          :key="`${day}-${time}`"
-          :style="getCellStyle(dayIndex, timeIndex)"
-        />
-      </div>
+          :style="containerStyle"
+          @dragover="handleDragOver"
+          @drop="handleDrop"
+          class="flex-shrink-0 bg-white rounded-lg shadow-md overflow-hidden mb-2"
+          :class="{ 'mr-80': isMenuOpen }"
+        >
+          <div :style="cornerCellStyle"></div>
 
-      <!-- Events -->
-      <div v-for="event in events" :key="event.id" class="relative group">
-        <ContextMenu>
-          <ContextMenuTrigger>
-            <div
-              :style="getEventStyle(event)"
-              class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
-              draggable="true"
-              @dragstart="handleDragStart($event, event)"
-              @dragend="handleDragEnd"
-            >
-              <div class="flex justify-between items-center">
-                <div class="event-title font-semibold text-gray-800">
-                  {{ event.title }}
-                </div>
-                <MoreVertical
-                  class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                />
-              </div>
-              <div class="event-time text-sm text-gray-600">
-                {{ event.startTime }} - {{ event.endTime }}
-              </div>
-            </div>
-          </ContextMenuTrigger>
-          <ContextMenuContent class="w-64">
-            <ContextMenuLabel>{{ event.title }} options</ContextMenuLabel>
-            <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
-            <ContextMenuItem @click="deleteEvent(event)"
-              >Delete</ContextMenuItem
-            >
-            <ContextMenuSeparator />
-            <ContextMenuItem @click="duplicateEvent(event)"
-              >Duplicate</ContextMenuItem
-            >
-          </ContextMenuContent>
-        </ContextMenu>
-      </div>
-    </div>
-
-    <!-- Event Templates Menu -->
-    <!--    <div class="fixed top-10 right-20 h-full flex items-center">-->
-    <!--      <button-->
-    <!--        @click="toggleMenu"-->
-    <!--        class="absolute -left-6 top-2 bg-white border border-gray-200 rounded-l p-1 hover:bg-gray-50"-->
-    <!--      >-->
-    <!--        <ChevronLeft v-if="isMenuOpen" class="w-4 h-4" />-->
-    <!--        <ChevronRight v-else class="w-4 h-4" />-->
-    <!--      </button>-->
-    <!--    </div>-->
-
-    <div
-      v-if="isMenuOpen"
-      class="bg-white border-l border-t border-b border-gray-200 p-4 fixed top-0 right-0 max-w-full w-80 h-full z-10"
-      :class="{ 'bg-gray-50': isOverMenu }"
-      @dragover="handleMenuDragOver"
-      @dragleave="handleMenuDragLeave"
-      @drop="handleMenuDrop"
-    >
-      <Tabs default-value="events">
-        <TabsList class="w-full">
-          <TabsTrigger value="events" class="w-full"> Events </TabsTrigger>
-          <TabsTrigger value="requirements" class="w-full">
-            Requirements
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="events">
-          <h3 class="text-lg font-semibold mb-4">Events</h3>
-
-          <!-- Search input -->
-          <Input
-            v-model="searchQuery"
-            type="text"
-            class="p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Search events..."
-          />
-
-          <!-- Event templates list -->
-          <div class="space-y-3">
-            <div
-              v-for="template in filteredEventTemplates"
-              :key="template.id"
-              v-show="template.quantity > 0"
-              class="p-3 rounded-lg cursor-move relative group"
-              :style="{ backgroundColor: template.color }"
-              draggable="true"
-              @dragstart="handleDragStart($event, template, true)"
-              @dragend="handleDragEnd"
-            >
-              <div class="font-medium">{{ template.title }}</div>
-              <div class="text-sm text-gray-600">
-                Duration: {{ template.duration }} hour(s)
-                <span class="ml-2">Remaining: {{ template.quantity }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modified overlay to prevent pointer events interference -->
+          <!-- Time slots header -->
           <div
-            v-if="isOverMenu"
-            class="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50 bg-opacity-50 rounded pointer-events-none flex items-center justify-center"
+            v-for="(time, index) in timeSlots"
+            :key="index"
+            :style="getHeaderStyle(index)"
+            class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
           >
-            <div class="flex items-center text-blue-600">
-              <Trash2 class="w-5 h-5 mr-2" />
-              <span>Drop to remove event</span>
-            </div>
+            {{ time.from }} - {{ time.to }}
           </div>
-        </TabsContent>
-        <TabsContent value="requirements"> TODO: Add requirements </TabsContent>
-      </Tabs>
+
+          <!-- Days column -->
+          <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
+            {{ day }}
+          </div>
+
+          <!-- Grid cells -->
+          <div v-for="(day, dayIndex) in days" :key="day">
+            <div
+              v-for="(time, timeIndex) in timeSlots"
+              :key="`${day}-${time}`"
+              :style="getCellStyle(dayIndex, timeIndex)"
+            />
+          </div>
+
+          <!-- Events -->
+          <div v-for="event in events" :key="event.id" class="relative group">
+            <ContextMenu>
+              <ContextMenuTrigger>
+                <div
+                  :style="getEventStyle(event)"
+                  class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
+                  draggable="true"
+                  @dragstart="handleDragStart($event, event)"
+                  @dragend="handleDragEnd"
+                >
+                  <div class="flex justify-between items-center">
+                    <div class="event-title font-semibold text-gray-800">
+                      {{ event.title }}
+                    </div>
+                    <MoreVertical
+                      class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  </div>
+                  <div class="event-time text-sm text-gray-600">
+                    {{ event.startTime }} - {{ event.endTime }}
+                  </div>
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent class="w-64">
+                <ContextMenuLabel>{{ event.title }} options</ContextMenuLabel>
+                <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
+                <ContextMenuItem @click="deleteEvent(event)"
+                >Delete
+                </ContextMenuItem
+                >
+                <ContextMenuSeparator />
+                <ContextMenuItem @click="duplicateEvent(event)"
+                >Duplicate
+                </ContextMenuItem
+                >
+              </ContextMenuContent>
+            </ContextMenu>
+          </div>
+        </div>
+
+        <!-- Event Templates Menu -->
+        <!--    <div class="fixed top-10 right-20 h-full flex items-center">-->
+        <!--      <button-->
+        <!--        @click="toggleMenu"-->
+        <!--        class="absolute -left-6 top-2 bg-white border border-gray-200 rounded-l p-1 hover:bg-gray-50"-->
+        <!--      >-->
+        <!--        <ChevronLeft v-if="isMenuOpen" class="w-4 h-4" />-->
+        <!--        <ChevronRight v-else class="w-4 h-4" />-->
+        <!--      </button>-->
+        <!--    </div>-->
+
+        <div
+          v-if="isMenuOpen"
+          class="bg-white border-l border-t border-b border-gray-200 p-4 fixed top-0 right-0 max-w-full w-80 h-full z-10"
+          :class="{ 'bg-gray-50': isOverMenu }"
+          @dragover="handleMenuDragOver"
+          @dragleave="handleMenuDragLeave"
+          @drop="handleMenuDrop"
+        >
+          <Tabs default-value="events">
+            <TabsList class="w-full">
+              <TabsTrigger value="events" class="w-full"> Events</TabsTrigger>
+              <TabsTrigger value="requirements" class="w-full">
+                Requirements
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="events">
+              <h3 class="text-lg font-semibold mb-4">Events</h3>
+
+              <!-- Search input -->
+              <Input
+                v-model="searchQuery"
+                type="text"
+                class="p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Search events..."
+              />
+
+              <!-- Event templates list -->
+              <div class="space-y-3">
+                <div
+                  v-for="template in filteredEventTemplates"
+                  :key="template.id"
+                  v-show="template.quantity > 0"
+                  class="p-3 rounded-lg cursor-move relative group"
+                  :style="{ backgroundColor: template.color }"
+                  draggable="true"
+                  @dragstart="handleDragStart($event, template, true)"
+                  @dragend="handleDragEnd"
+                >
+                  <div class="font-medium">{{ template.title }}</div>
+                  <div class="text-sm text-gray-600">
+                    Duration: {{ template.duration }} hour(s)
+                    <span class="ml-2">Remaining: {{ template.quantity }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modified overlay to prevent pointer events interference -->
+              <div
+                v-if="isOverMenu"
+                class="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50 bg-opacity-50 rounded pointer-events-none flex items-center justify-center"
+              >
+                <div class="flex items-center text-blue-600">
+                  <Trash2 class="w-5 h-5 mr-2" />
+                  <span>Drop to remove event</span>
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="requirements"> TODO: Add requirements</TabsContent>
+          </Tabs>
+        </div>
+      </div>
     </div>
   </div>
 </template>
