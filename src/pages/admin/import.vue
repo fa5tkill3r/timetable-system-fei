@@ -104,45 +104,12 @@
         <div class="space-y-3">
           <Button class="w-full justify-start" @click="moveToNextStep">
             <ArrowRightIcon class="h-4 w-4 mr-2" />
-            Import data with selected term
+            Create schema from term
           </Button>
           <Button variant="outline" class="w-full justify-start" @click="reset">
             <XIcon class="h-4 w-4 mr-2" />
             Start over
           </Button>
-        </div>
-      </div>
-
-      <!-- Step 4: Select Term -->
-      <div v-else-if="step === 'select-term'" class="py-4 space-y-6">
-        <p class="text-lg font-medium">Select the AIS term to import:</p>
-        <div class="space-y-4">
-          <Select v-model="selectedTermString">
-            <SelectTrigger class="w-full">
-              <SelectValue placeholder="Select a term" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="term in terms"
-                :key="term.id"
-                :value="String(term.id)"
-              >
-                {{ term.year_start }} - {{ term.semester }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div class="flex justify-between pt-4">
-            <Button variant="outline" @click="step = 'success'">
-              Back
-            </Button>
-            <Button
-              :disabled="!selectedTermString"
-              @click="importWithTerm"
-            >
-              Import with selected term
-            </Button>
-          </div>
         </div>
       </div>
     </div>
@@ -151,6 +118,7 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import {
     ChevronUpIcon,
     FolderIcon,
@@ -162,6 +130,8 @@
   import { Button } from '@/components/ui/button'
   import { client } from '@/lib/client.ts'
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+  const router = useRouter()
 
   // Types
   interface FileItem {
@@ -175,12 +145,12 @@
     semester: string | number;
   }
 
-  type StepId = 'browse' | 'importing' | 'success' | 'select-term';
+  type StepId = 'browse' | 'importing' | 'success';
 
   const steps = [
     { id: 'browse' as const, label: 'Browse Directories' },
     { id: 'success' as const, label: 'Confirm Import' },
-    { id: 'select-term' as const, label: 'Select Term' }
+    { id: 'schema' as const, label: 'Create schema' },
   ];
 
   // State
@@ -189,9 +159,6 @@
   const loading = ref(false)
   const error = ref<string | null>(null)
   const step = ref<StepId>('browse')
-  const terms = ref<Term[]>([])
-  const selectedTermString = ref<string>('')
-  const selectedTerm = computed(() => selectedTermString.value ? parseInt(selectedTermString.value) : null)
 
   // CSV detection
   const csvFileCount = computed(() => {
@@ -204,7 +171,6 @@
   }
 
   function isSelectedDir(item: FileItem): boolean {
-    // No need to select individual directories anymore
     return false
   }
 
@@ -259,7 +225,6 @@
         : item.name
       fetchDirectoryContents()
     }
-    // We don't select files anymore, just navigate directories
   }
 
   // Import functionality
@@ -270,7 +235,11 @@
 
     try {
       const { data, error: importError } = await client.POST('/api/imports_exports/fei/terms/import/dir/', {
-        params: { path: currentPath.value }
+        params: {
+          query: {
+            path: currentPath.value,
+          },
+        },
       })
 
       if (importError) {
@@ -278,9 +247,6 @@
         step.value = 'browse'
         return
       }
-
-      // Fetch available terms for next step
-      await fetchTerms()
 
       step.value = 'success'
     } catch (err) {
@@ -290,60 +256,15 @@
     }
   }
 
-  // Fetch available terms for import
-  async function fetchTerms() {
-    try {
-      // Using fetch instead of client to avoid TypeScript issues
-      const response = await fetch('/api/imports_exports/fei/terms?limit=100')
-      const data = await response.json()
-
-      if (!response.ok) {
-        error.value = 'Failed to fetch terms'
-        return
-      }
-
-      if (data && 'results' in data) {
-        terms.value = data.results as Term[]
-      }
-    } catch (err) {
-      console.error('Failed to fetch terms:', err)
-    }
-  }
-
-  // Move to term selection step
+  // Navigate to schema page
   function moveToNextStep() {
-    step.value = 'select-term'
-  }
-
-  // Import with selected term
-  async function importWithTerm() {
-    if (!selectedTerm.value) return
-
-    try {
-      const { data, error: importError } = await client.POST('/imports_exports/fei/import/db', {
-        params: {
-          query: { id: selectedTerm.value },
-          header: { 'X-Term': `term_${new Date().getFullYear()}` }
-        }
-      })
-
-      if (importError) {
-        error.value = 'Failed to import with selected term'
-        return
-      }
-
-      reset()
-    } catch (err) {
-      error.value = 'Failed to import with selected term'
-      console.error(err)
-    }
+    router.push('/admin/schema')
   }
 
   function reset() {
     step.value = 'browse'
     currentPath.value = ''
     error.value = null
-    selectedTermString.value = ''
     fetchDirectoryContents()
   }
 
