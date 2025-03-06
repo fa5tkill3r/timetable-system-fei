@@ -15,8 +15,8 @@
       text: 'Requirements',
     },
     {
-      to: '/settings',
-      text: 'Settings',
+      to: '/admin',
+      text: 'Admin',
     },
   ]
 </script>
