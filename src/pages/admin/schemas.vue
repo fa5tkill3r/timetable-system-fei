@@ -2,7 +2,7 @@
   <div class="container py-6 space-y-6">
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-semibold">Schema Management</h1>
-      <Button @click="openNewSchemaDialog">Create New Schema</Button>
+      <Button @click="isNewSchemaDialogOpen = true">Create New Schema</Button>
     </div>
 
     <!-- Schema listing -->
@@ -61,11 +61,7 @@
     <NewSchemaDialog
       :open="isNewSchemaDialogOpen"
       :terms="terms"
-      :schema="newSchema"
-      :term-id="selectedTermId"
       @update:open="isNewSchemaDialogOpen = $event"
-      @update:term-id="selectedTermId = $event"
-      @create="handleCreateSchema"
     />
 
     <EditSchemaDialog
@@ -110,14 +106,6 @@
   const isEditSchemaDialogOpen = ref(false)
   const isDeleteDialogOpen = ref(false)
 
-  const selectedTermId = ref<number | null>(null)
-  const newSchema = ref<SchemaRequest>({
-    term: '',
-    end_date: '',
-    start_date: '',
-    is_active: false,
-  })
-
   const editingSchema = ref<Schema>({
     id: 0,
     term: '',
@@ -152,27 +140,22 @@
 
   async function fetchTerms() {
     try {
-      const { data } = await client.GET('/api/imports_exports/fei/terms/', {
-        params: { query: { limit: 20 } },
+      const {data} = await client.GET('/api/imports_exports/fei/terms/', {
+        params: {
+          query: {
+            ordering: '-year_start',
+            year_start__gte: new Date().getFullYear() - 3,
+            // limit: 20
+          }
+        },
       })
 
-      if (data && Array.isArray(data.results)) {
-        terms.value = data.results!
+      if (data && Array.isArray(data)) {
+        terms.value = data!
       }
     } catch (err) {
       console.error('Error fetching terms:', err)
     }
-  }
-
-  function openNewSchemaDialog() {
-    newSchema.value = {
-      term: '',
-      end_date: '',
-      start_date: '',
-      is_active: false,
-    }
-    selectedTermId.value = null
-    isNewSchemaDialogOpen.value = true
   }
 
   async function handleCreateSchema(schema: SchemaRequest) {

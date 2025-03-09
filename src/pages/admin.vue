@@ -7,6 +7,7 @@
     DownloadIcon,
     BuildingIcon,
     WrenchIcon,
+    LibraryIcon,
   } from 'lucide-vue-next'
 
   const route = useRoute()
@@ -39,6 +40,12 @@
     {
       title: 'Administration',
       items: [
+        {
+          label: 'Schemas',
+          path: '/admin/schemas',
+          pathMatch: 'schemas',
+          icon: LibraryIcon
+        },
         {
           label: 'Terms',
           path: '/admin/terms',
