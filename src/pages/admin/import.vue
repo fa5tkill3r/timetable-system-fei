@@ -19,65 +19,11 @@
     <div class="border rounded-lg shadow-sm p-6 bg-card">
       <!-- Step 1: Directory Browser -->
       <div v-if="step === 'browse'" class="space-y-4">
-        <!-- Current path -->
-        <div class="flex items-center space-x-2">
-          <Button variant="outline" size="sm" @click="navigateUp" :disabled="currentPath === ''">
-            <ChevronUpIcon class="h-4 w-4 mr-2" />
-            Up
-          </Button>
-          <div class="px-3 py-1 bg-muted rounded-md text-sm flex-1 overflow-x-auto">
-            <span class="whitespace-nowrap">{{ currentPath || '/' }}</span>
-          </div>
-        </div>
-
-        <!-- File browser -->
-        <div class="border rounded-md h-[400px] overflow-y-auto">
-          <div v-if="loading" class="flex justify-center items-center h-full">
-            <div class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
-          </div>
-          <div v-else-if="error" class="p-4 text-destructive text-center">
-            {{ error }}
-          </div>
-          <div v-else class="divide-y">
-            <div
-              v-for="item in directoryContents"
-              :key="item.name"
-              @click="handleItemClick(item)"
-              class="flex items-center p-3 hover:bg-accent cursor-pointer transition-colors"
-              :class="{'bg-primary/10': isSelectedDir(item)}"
-            >
-              <FolderIcon v-if="item.isDirectory" class="h-4 w-4 mr-2 text-blue-500" />
-              <FileIcon v-else class="h-4 w-4 mr-2" :class="isCsvFile(item.name) ? 'text-green-500' : 'text-gray-500'" />
-              <span>{{ item.name }}</span>
-              <span v-if="isSelectedDir(item)" class="ml-2 text-xs bg-primary/20 px-2 py-0.5 rounded-full">Selected</span>
-            </div>
-            <div v-if="directoryContents.length === 0" class="p-4 text-center text-muted-foreground">
-              This directory is empty
-            </div>
-          </div>
-        </div>
-
-        <!-- Current directory status -->
-        <div class="p-3 bg-muted rounded-md">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <FolderIcon class="h-4 w-4 mr-2 text-primary" />
-              <span>Current directory: <span class="font-medium">{{ currentPath || '/' }}</span></span>
-            </div>
-            <div class="flex items-center">
-              <span v-if="hasCsvFiles" class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                CSV files found: {{ csvFileCount }}
-              </span>
-              <span v-else class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-                No CSV files
-              </span>
-            </div>
-          </div>
-        </div>
+        <FileExplorer v-model="selectedDirectory" />
 
         <div class="flex justify-end pt-4">
           <Button
-            :disabled="!hasCsvFiles || loading"
+            :disabled="!selectedDirectory || loading"
             @click="importDirectory"
           >
             Import Current Directory
@@ -120,25 +66,17 @@
   import { ref, computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import {
-    ChevronUpIcon,
-    FolderIcon,
-    FileIcon,
     XIcon,
     CheckIcon,
     ArrowRightIcon
   } from 'lucide-vue-next'
   import { Button } from '@/components/ui/button'
   import { client } from '@/lib/client.ts'
-  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+  import FileExplorer from '@/components/common/file-explorer.vue'
 
   const router = useRouter()
 
   // Types
-  interface FileItem {
-    name: string;
-    isDirectory: boolean;
-  }
-
   interface Term {
     id: number;
     year_start: string | number;
@@ -154,82 +92,14 @@
   ];
 
   // State
-  const currentPath = ref('')
-  const directoryContents = ref<FileItem[]>([])
+  const selectedDirectory = ref('')
   const loading = ref(false)
   const error = ref<string | null>(null)
   const step = ref<StepId>('browse')
 
-  // CSV detection
-  const csvFileCount = computed(() => {
-    return directoryContents.value.filter(item => !item.isDirectory && isCsvFile(item.name)).length
-  })
-  const hasCsvFiles = computed(() => csvFileCount.value > 0)
-
-  function isCsvFile(filename: string): boolean {
-    return filename.toLowerCase().endsWith('.csv')
-  }
-
-  function isSelectedDir(item: FileItem): boolean {
-    return false
-  }
-
-  // Directory navigation
-  async function fetchDirectoryContents() {
-    loading.value = true
-    error.value = null
-
-    try {
-      const { data, error: fetchError } = await client.GET('/api/import/lsData/', {
-        params: { query: { path: currentPath.value } }
-      })
-
-      if (fetchError) {
-        error.value = 'Failed to fetch directory contents'
-        return
-      }
-
-      // Transform API response format
-      const directories = ((data?.dirs as string[]) || []).map((name: string) => ({
-        name,
-        isDirectory: true
-      }))
-
-      const files = ((data?.files as string[]) || []).map((name: string) => ({
-        name,
-        isDirectory: false
-      }))
-
-      directoryContents.value = [...directories, ...files]
-    } catch (err) {
-      error.value = 'An error occurred while fetching directory contents'
-      console.error(err)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  function navigateUp() {
-    if (currentPath.value === '') return
-
-    const parts = currentPath.value.split('/')
-    parts.pop()
-    currentPath.value = parts.join('/')
-    fetchDirectoryContents()
-  }
-
-  function handleItemClick(item: FileItem) {
-    if (item.isDirectory) {
-      currentPath.value = currentPath.value
-        ? `${currentPath.value}/${item.name}`
-        : item.name
-      fetchDirectoryContents()
-    }
-  }
-
   // Import functionality
   async function importDirectory() {
-    if (!hasCsvFiles.value) return
+    if (!selectedDirectory.value) return
 
     step.value = 'importing'
 
@@ -237,7 +107,7 @@
       const { data, error: importError } = await client.POST('/api/imports_exports/fei/terms/import/dir/', {
         params: {
           query: {
-            path: currentPath.value,
+            path: selectedDirectory.value,
           },
         },
       })
@@ -263,13 +133,7 @@
 
   function reset() {
     step.value = 'browse'
-    currentPath.value = ''
+    selectedDirectory.value = ''
     error.value = null
-    fetchDirectoryContents()
   }
-
-  // Initialize
-  onMounted(() => {
-    fetchDirectoryContents()
-  })
 </script>
