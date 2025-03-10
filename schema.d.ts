@@ -796,6 +796,26 @@ export interface paths {
         patch: operations["tt_partial_update"];
         trace?: never;
     };
+    "/api/ttecontroller/generate-tte-events/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Import FEI dataset from DATA directory
+         * @description Import FEI exports from dir specified.
+         */
+        get: operations["ttecontroller_generate_tte_events_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ttevent/": {
         parameters: {
             query?: never;
@@ -908,62 +928,6 @@ export interface paths {
         patch: operations["users_partial_update"];
         trace?: never;
     };
-    "/api/users/relations/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["users_relations_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["users_relations_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/relations/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["users_relations_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["users_relations_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["users_relations_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["users_relations_partial_update"];
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -987,22 +951,24 @@ export interface components {
             /** Format: date-time */
             end_date: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         Allowance: {
             readonly id?: number;
-            subject: number;
-            event_type: number;
+            readonly subject?: string;
+            readonly event_type?: string;
             amount?: number;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         AllowanceRequest: {
-            subject: number;
-            event_type: number;
             amount?: number;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         Building: {
             readonly id?: number;
             name: string;
             abbrev: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         BuildingRequest: {
             name: string;
             abbrev: string;
@@ -1014,10 +980,12 @@ export interface components {
             subject_a_code?: string | null;
             subject_b_code?: string | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         Equipment: {
             id: number;
             name: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         EquipmentRequest: {
             id: number;
             name: string;
@@ -1027,7 +995,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-04T21:47:26.155929
+             * @default 2025-03-09T21:56:22.297198
              */
             timestamp: string;
         };
@@ -1036,7 +1004,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-04T21:47:26.156031
+             * @default 2025-03-09T21:56:22.297285
              */
             timestamp: string;
         };
@@ -1055,61 +1023,55 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AISObdobie"][];
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedAllowanceRequest: {
-            subject?: number;
-            event_type?: number;
             amount?: number;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedBuildingRequest: {
             name?: string;
             abbrev?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedEquipmentRequest: {
             id?: number;
             name?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedRoomEquipmentRequest: {
-            room?: number;
-            equipment?: number;
             count?: number;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedRoomRequest: {
             id?: number;
             name?: string;
             capacity?: number;
-            building?: number | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedSubjectGroupRequest: {
-            subject?: number;
             name?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedSubjectRequest: {
             name?: string;
             code?: string;
             nominal_semester?: number | null;
-            building?: number | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedSubjectUserRoleRequest: {
-            user?: number;
-            subject?: number;
             name?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedTTEventRequest: {
-            tt?: number;
-            subject?: number;
-            event_type?: number;
             day_of_week?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
-            room?: number | null;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedTTRequest: {
             name?: string;
             program?: string;
-            owner?: number;
             /**
              * @description * `PUBLISHED` - Published
              *     * `HIDDEN` - Hidden
@@ -1118,6 +1080,7 @@ export interface components {
              */
             status?: "PUBLISHED" | "HIDDEN" | "WIP";
         };
+        /** @description Base serializer that automatically handles nested serialization */
         PatchedUserRequest: {
             username?: string;
             full_name?: string | null;
@@ -1132,66 +1095,69 @@ export interface components {
             end_date?: string | null;
             is_active?: boolean;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         Room: {
             id: number;
             name: string;
             capacity: number;
-            building: number | null;
+            readonly building?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         RoomEquipment: {
-            room: number;
-            equipment: number;
+            readonly room?: string;
+            readonly equipment?: string;
             count: number;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         RoomEquipmentRequest: {
-            room: number;
-            equipment: number;
             count: number;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         RoomRequest: {
             id: number;
             name: string;
             capacity: number;
-            building: number | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         Subject: {
             readonly id?: number;
             name: string;
             code: string;
-            nominal_semester?: number | null;
-            building?: number | null;
+            nominal_semester: number | null;
+            readonly building?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         SubjectGroup: {
             readonly id?: number;
-            subject: number;
+            readonly subject?: string;
             name: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         SubjectGroupRequest: {
-            subject: number;
             name: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         SubjectRequest: {
             name: string;
             code: string;
-            nominal_semester?: number | null;
-            building?: number | null;
+            nominal_semester: number | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         SubjectUserRole: {
-            readonly id?: number;
-            user: number;
-            subject: number;
+            readonly user?: string;
+            readonly subject?: string;
             name: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         SubjectUserRoleRequest: {
-            user: number;
-            subject: number;
             name: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         TT: {
             readonly id?: number;
             name: string;
             program: string;
-            owner: number;
+            readonly owner?: string;
             /**
              * @description * `PUBLISHED` - Published
              *     * `HIDDEN` - Hidden
@@ -1204,35 +1170,30 @@ export interface components {
             /** Format: date-time */
             readonly updated_at?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         TTEvent: {
             readonly id?: number;
-            tt: number;
-            subject: number;
-            event_type: number;
+            readonly tt?: string;
+            readonly subject?: string;
+            readonly event_type?: string;
             day_of_week?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
-            room?: number | null;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
+            readonly room?: string;
+            readonly weeks_bitmask?: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         TTEventRequest: {
-            tt: number;
-            subject: number;
-            event_type: number;
             day_of_week?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
-            room?: number | null;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         TTRequest: {
             name: string;
             program: string;
-            owner: number;
             /**
              * @description * `PUBLISHED` - Published
              *     * `HIDDEN` - Hidden
@@ -1255,6 +1216,7 @@ export interface components {
         TokenRefreshRequest: {
             refresh: string;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         User: {
             readonly id?: number;
             username: string;
@@ -1262,6 +1224,7 @@ export interface components {
             /** Format: date-time */
             last_logout?: string | null;
         };
+        /** @description Base serializer that automatically handles nested serialization */
         UserRequest: {
             username: string;
             full_name?: string | null;
@@ -1297,9 +1260,13 @@ export interface operations {
     allowence_list: {
         parameters: {
             query?: {
+                /** @description Filter by event type ID (1=Lecture, 2=Exercise, 2=Seminar, etc.) */
                 event_type?: number;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                /** @description Filter by subject ID */
                 subject?: number;
             };
             header: {
@@ -1331,7 +1298,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["AllowanceRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["AllowanceRequest"];
@@ -1351,7 +1318,10 @@ export interface operations {
     };
     allowence_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -1387,7 +1357,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["AllowanceRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["AllowanceRequest"];
@@ -1464,6 +1434,8 @@ export interface operations {
         parameters: {
             query?: {
                 abbrev?: string;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -1517,7 +1489,10 @@ export interface operations {
     };
     buildings_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -1629,6 +1604,8 @@ export interface operations {
     equipment_list: {
         parameters: {
             query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -1682,7 +1659,10 @@ export interface operations {
     };
     equipment_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -2133,6 +2113,8 @@ export interface operations {
             query?: {
                 count?: number;
                 equipment?: number;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 room?: string;
@@ -2186,7 +2168,10 @@ export interface operations {
     };
     room_equipment_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -2300,6 +2285,8 @@ export interface operations {
             query?: {
                 building?: number;
                 capacity?: number;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -2353,7 +2340,10 @@ export interface operations {
     };
     rooms_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -2611,10 +2601,14 @@ export interface operations {
     subject_groups_list: {
         parameters: {
             query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 subject?: number;
+                subject__code?: string;
+                subject__nominal_semester?: number;
             };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
@@ -2665,7 +2659,10 @@ export interface operations {
     };
     subject_groups_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -2804,6 +2801,8 @@ export interface operations {
     subject_user_roles_list: {
         parameters: {
             query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -2859,7 +2858,10 @@ export interface operations {
     };
     subject_user_roles_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -2972,6 +2974,8 @@ export interface operations {
         parameters: {
             query?: {
                 code?: string;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 name?: string;
                 nominal_semester?: number;
                 /** @description Which field to use when ordering the results. */
@@ -3026,7 +3030,10 @@ export interface operations {
     };
     subjects_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -3219,6 +3226,8 @@ export interface operations {
             query?: {
                 /** @description Filter by creation date (format: YYYY-MM-DD) */
                 created_at?: string;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 /** @description Case-insensitive search for timetable name */
                 name?: string;
                 /** @description Which field to use when ordering the results. */
@@ -3283,7 +3292,10 @@ export interface operations {
     };
     tt_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -3392,6 +3404,35 @@ export interface operations {
             };
         };
     };
+    ttecontroller_generate_tte_events_list: {
+        parameters: {
+            query: {
+                /** @description Specifies the subjectgroup name */
+                subjectgroup_name: string;
+                /** @description Specifies the tt name */
+                tt_name: string;
+                /** @description Specifies the tt program */
+                tt_program: string;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEvent"][];
+                };
+            };
+        };
+    };
     ttevent_list: {
         parameters: {
             query?: {
@@ -3401,6 +3442,8 @@ export interface operations {
                 duration?: number;
                 /** @description Filter by event type ID (lecture, lab, etc.) */
                 event_type?: number;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description Filter by room ID */
@@ -3445,7 +3488,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["TTEventRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["TTEventRequest"];
@@ -3465,7 +3508,10 @@ export interface operations {
     };
     ttevent_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -3501,7 +3547,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["TTEventRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["TTEventRequest"];
@@ -3578,6 +3624,8 @@ export interface operations {
         parameters: {
             query?: {
                 full_name?: string;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 username?: string;
@@ -3625,7 +3673,10 @@ export interface operations {
     };
     users_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
             header?: never;
             path: {
                 /** @description A unique integer value identifying this user. */
@@ -3718,155 +3769,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    users_relations_list: {
-        parameters: {
-            query?: {
-                name?: string;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                subject?: number;
-                user?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"][];
-                };
-            };
-        };
-    };
-    users_relations_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectUserRoleRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectUserRoleRequest"];
-                "multipart/form-data": components["schemas"]["SubjectUserRoleRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
-                };
-            };
-        };
-    };
-    users_relations_retrieve: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
-                };
-            };
-        };
-    };
-    users_relations_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectUserRoleRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectUserRoleRequest"];
-                "multipart/form-data": components["schemas"]["SubjectUserRoleRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
-                };
-            };
-        };
-    };
-    users_relations_destroy: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    users_relations_partial_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedSubjectUserRoleRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedSubjectUserRoleRequest"];
-                "multipart/form-data": components["schemas"]["PatchedSubjectUserRoleRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
                 };
             };
         };
