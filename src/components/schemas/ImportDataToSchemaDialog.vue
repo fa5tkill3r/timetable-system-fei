@@ -5,7 +5,7 @@
   >
     <DialogContent class="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Import Data to "{{ schema?.term }}" Schema</DialogTitle>
+        <DialogTitle>Import Data to "{{ schema?.human_name }}" Schema</DialogTitle>
         <DialogDescription>
           Select a term and directory containing CSV files to import to your
           schema.
@@ -196,7 +196,7 @@
               <div class="space-y-2">
                 <p>
                   <span class="text-muted-foreground">Schema:</span>
-                  {{ schema?.term }}
+                  {{ schema?.human_name }}
                 </p>
                 <p>
                   <span class="text-muted-foreground">Term:</span>
@@ -503,12 +503,11 @@
           params: {
             query: {
               path: formattedPath,
-              term_id: selectedTermId.value,
+              term: Number(selectedTermId.value),
             },
-          },
-          headers: {
-            // Add X-Term header with schema name
-            'X-Term': props.schema?.term || '',
+            header: {
+              'X-Term': props.schema?.schema_name || '',
+            },
           },
         },
       )
@@ -546,14 +545,14 @@
     errorMessage.value = ''
   }
 
-  // Watch for year filter changes only to update terms
+  // Filters watcher (year, semester)
   watch(
-    () => filters.value.year,
-    (newYear, oldYear) => {
-      if (newYear !== oldYear) {
+    [() => filters.value.year, () => filters.value.semester],
+    ([newYear, newSemester], [oldYear, oldSemester]) => {
+      if (newYear !== oldYear || newSemester !== oldSemester) {
         fetchTerms()
       }
-    },
+    }
   )
 
   // Handle CSV stats from file explorer

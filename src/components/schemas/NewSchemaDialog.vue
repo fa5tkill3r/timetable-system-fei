@@ -11,7 +11,7 @@
       <div class="space-y-4 py-4">
         <div class="space-y-2">
           <Label for="name">Schema Name</Label>
-          <Input id="name" v-model="schemaRequest.term" placeholder="Enter a name for the schema"/>
+          <Input id="name" v-model="schemaRequest.human_name" placeholder="Enter a name for the schema"/>
         </div>
 
         <div class="space-y-2">
@@ -129,7 +129,7 @@ const df = new DateFormatter('sk-SK', {
 })
 
 const schemaRequest = ref<SchemaRequest>({
-  term: '',
+  human_name: '',
   start_date: '',
   end_date: '',
   is_active: false
@@ -143,8 +143,8 @@ const emit = defineEmits<{
 
 // Computed
 const canCreateSchema = computed<boolean>(() => {
-  return !!schemaRequest.value.term && 
-         schemaRequest.value.term.trim() !== '' &&
+  return !!schemaRequest.value.human_name &&
+         schemaRequest.value.human_name.trim() !== '' &&
          !!startDate.value &&
          !!endDate.value
 })
@@ -185,7 +185,7 @@ async function createSchema() {
 
 function resetForm() {
   schemaRequest.value = {
-    term: '',
+    human_name: '',
     start_date: '',
     end_date: '',
     is_active: false

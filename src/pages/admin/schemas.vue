@@ -32,7 +32,7 @@
             </TableCell>
           </TableRow>
           <TableRow v-for="schema in schemas" :key="schema.id">
-            <TableCell>{{ schema.term }}</TableCell>
+            <TableCell>{{ schema.human_name }}</TableCell>
             <TableCell>{{ formatDate(schema.start_date) }}</TableCell>
             <TableCell>{{ formatDate(schema.end_date) }}</TableCell>
             <TableCell>
@@ -123,7 +123,7 @@ const isImportDialogOpen = ref(false)
 
 const editingSchema = ref<Schema>({
   id: 0,
-  term: '',
+  human_name: '',
   start_date: '',
   end_date: '',
   is_active: false,

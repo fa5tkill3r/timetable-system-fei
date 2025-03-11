@@ -496,6 +496,23 @@ export interface paths {
         patch: operations["schemas_partial_update"];
         trace?: never;
     };
+    "/api/schemas/{id}/activate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Explicit endpoint to activate a schema */
+        post: operations["schemas_activate_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/subject-groups/": {
         parameters: {
             query?: never;
@@ -995,7 +1012,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-09T21:56:22.297198
+             * @default 2025-03-11T19:04:43.364478
              */
             timestamp: string;
         };
@@ -1004,7 +1021,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-09T21:56:22.297285
+             * @default 2025-03-11T19:04:43.364543
              */
             timestamp: string;
         };
@@ -1088,7 +1105,7 @@ export interface components {
             last_logout?: string | null;
         };
         PatchedschemaRequest: {
-            term?: string;
+            human_name?: string;
             /** Format: date */
             start_date?: string | null;
             /** Format: date */
@@ -1233,7 +1250,8 @@ export interface components {
         };
         schema: {
             readonly id?: number;
-            term: string;
+            human_name: string;
+            readonly schema_name?: string;
             /** Format: date */
             start_date?: string | null;
             /** Format: date */
@@ -1241,7 +1259,7 @@ export interface components {
             is_active?: boolean;
         };
         schemaRequest: {
-            term: string;
+            human_name: string;
             /** Format: date */
             start_date?: string | null;
             /** Format: date */
@@ -2587,6 +2605,28 @@ export interface operations {
                 "multipart/form-data": components["schemas"]["PatchedschemaRequest"];
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["schema"];
+                };
+            };
+        };
+    };
+    schemas_activate_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this schema. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
