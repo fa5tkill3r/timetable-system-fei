@@ -1,15 +1,13 @@
 <script setup lang="ts">
-  import HelloWorld from './components/HelloWorld.vue'
-  import Dashboard from '@/pages/index.vue'
-  import TimetableSwitcher from '@/components/TimetableSwitcher.vue'
-  import Navigation from '@/components/Navigation.vue'
+import Navigation from '@/components/Navigation.vue'
+import SchemaSwitcher from './components/SchemaSwitcher.vue'
 </script>
 
 <template>
   <div class="hidden flex-col md:flex">
     <div class="border-b">
       <div class="flex h-16 items-center px-4">
-        <TimetableSwitcher />
+        <SchemaSwitcher />
         <Navigation class="mx-6" />
         <div class="ml-auto flex items-center space-x-4">
           <Search />
