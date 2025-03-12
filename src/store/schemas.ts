@@ -5,9 +5,6 @@ import { components } from 'schema'
 
 type Schema = components['schemas']['schema']
 
-// List of API endpoints that should NOT include the X-Term header
-const EXCLUDED_PATHS = ['/auth/login', '/auth/register']
-
 export const useSchemaStore = defineStore('schemas', () => {
   const schemas = ref<Schema[]>([])
   const isLoading = ref(false)
@@ -63,14 +60,10 @@ export const useSchemaStore = defineStore('schemas', () => {
   }
 
   // Get active schema object
-  const activeSchema = computed(
+  const activeSchema = computed<Schema | null>(
     () => schemas.value.find((schema) => schema.is_active) || null,
   )
 
-  // Check if a URL should have the schema header
-  const shouldAddSchemaHeader = (url: string) => {
-    return !EXCLUDED_PATHS.some((path) => url.includes(path))
-  }
 
   // Initialize store - load active schema from localStorage
   const initialize = () => {
@@ -84,7 +77,6 @@ export const useSchemaStore = defineStore('schemas', () => {
     error,
     fetchSchemas,
     setActiveSchema,
-    shouldAddSchemaHeader,
     initialize,
   }
 })
