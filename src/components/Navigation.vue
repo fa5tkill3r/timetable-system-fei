@@ -33,29 +33,5 @@
     >
       {{ link.text }}
     </RouterLink>
-    <!--    <a-->
-    <!--        href="/examples/dashboard"-->
-    <!--        class="text-sm font-medium transition-colors hover:text-primary"-->
-    <!--    >-->
-    <!--      Dashboard-->
-    <!--    </a>-->
-    <!--    <a-->
-    <!--        href="/examples/dashboard"-->
-    <!--        class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"-->
-    <!--    >-->
-    <!--      Timetable Editor-->
-    <!--    </a>-->
-    <!--    <a-->
-    <!--        href="/examples/dashboard"-->
-    <!--        class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"-->
-    <!--    >-->
-    <!--      Data-->
-    <!--    </a>-->
-    <!--    <a-->
-    <!--        href="/examples/dashboard"-->
-    <!--        class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"-->
-    <!--    >-->
-    <!--      Settings-->
-    <!--    </a>-->
   </nav>
 </template>
