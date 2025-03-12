@@ -51,87 +51,35 @@
       </Table>
     </div>
 
-    <!-- Create/Edit Subject Dialog -->
-    <Dialog :open="dialogVisible" @update:open="dialogVisible = $event">
-      <DialogContent class="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{{ isEditMode ? 'Edit Subject' : 'Create Subject' }}</DialogTitle>
-          <DialogDescription>
-            {{ isEditMode ? 'Update the subject details below.' : 'Fill in the details to create a new subject.' }}
-          </DialogDescription>
-        </DialogHeader>
-        <form @submit.prevent="saveSubject">
-          <div class="grid gap-4 py-4">
-            <div class="grid gap-2">
-              <Label for="name">Name</Label>
-              <Input id="name" v-model="subject.name" required />
-            </div>
-            <div class="grid gap-2">
-              <Label for="code">Code</Label>
-              <Input id="code" v-model="subject.code" required />
-            </div>
-            <div class="grid gap-2">
-              <Label for="nominal_semester">Nominal Semester</Label>
-              <!-- @vue-ignore -->
-              <Input id="nominal_semester" v-model="subject.nominal_semester" type="number" required />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" :disabled="dialogLoading">
-              <span v-if="dialogLoading" class="mr-2">
-                <div
-                  class="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full inline-block">
-                </div>
-              </span>
-              {{ isEditMode ? 'Update' : 'Create' }}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <!-- Subject Dialog Component -->
+    <SubjectDialog 
+      :open="dialogVisible" 
+      :subject="selectedSubject"
+      :is-loading="dialogLoading"
+      @update:open="dialogVisible = $event"
+      @save="saveSubject"
+    />
 
-    <!-- Confirmation dialog for deletion -->
-    <Dialog :open="deleteDialog" @update:open="deleteDialog = $event">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete Subject</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete this subject? This action cannot be undone.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" @click="deleteDialog = false">Cancel</Button>
-          <Button variant="destructive" @click="deleteSubject" :disabled="deleteLoading">
-            <span v-if="deleteLoading" class="mr-2">
-              <div
-                class="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full inline-block">
-              </div>
-            </span>
-            Delete
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <!-- Delete Dialog Component -->
+    <DeleteSubjectDialog 
+      :open="deleteDialog" 
+      :subject="subjectToDelete"
+      :is-loading="deleteLoading"
+      @update:open="deleteDialog = $event"
+      @delete="deleteSubject"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref } from 'vue'
 import { useSubjectStore } from '@/store/subjects'
 import { PencilIcon, TrashIcon } from 'lucide-vue-next'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import SubjectDialog from '@/components/subjects/SubjectDialog.vue'
+import DeleteSubjectDialog from '@/components/subjects/DeleteSubjectDialog.vue'
 import { components } from 'schema'
 
 type SubjectRequest = components['schemas']['SubjectRequest']
@@ -144,72 +92,46 @@ const { toast } = useToast()
 // Dialog state
 const dialogVisible = ref(false)
 const dialogLoading = ref(false)
-const isEditMode = computed(() => !!subject.value.id)
+const selectedSubject = ref<Subject | null>(null)
 
 // Delete dialog state
 const deleteDialog = ref(false)
 const deleteLoading = ref(false)
 const subjectToDelete = ref<Subject | null>(null)
 
-// Subject form data
-const subject = ref<Subject>({
-  id: undefined,
-  name: '',
-  code: '',
-  nominal_semester: 1 as number | null
-})
-
-const subjectRequest = computed<SubjectRequest>(() => {
-  return {
-    name: subject.value.name,
-    code: subject.value.code,
-    nominal_semester: subject.value.nominal_semester
-  }
-})
-
 // Open create dialog
 function openCreateDialog() {
-  resetSubjectForm()
+  selectedSubject.value = null
   dialogVisible.value = true
 }
 
 // Open edit dialog for a subject
 function openEditDialog(subjectData: Subject) {
-  subject.value = { ...subjectData }
+  selectedSubject.value = { ...subjectData }
   dialogVisible.value = true
 }
 
-// Reset form data
-function resetSubjectForm() {
-  subject.value = {
-    id: undefined,
-    name: '',
-    code: '',
-    nominal_semester: 1 as number
-  }
-}
-
 // Save subject (create or update)
-async function saveSubject() {
+async function saveSubject(subjectData: SubjectRequest, id?: number) {
   dialogLoading.value = true
 
   try {
-    if (subject.value.id) {
+    if (id) {
       // Update existing subject
-      const result = await subjectStore.updateSubject(subject.value.id, subjectRequest.value)
+      const result = await subjectStore.updateSubject(id, subjectData)
       if (result) {
         toast({
           title: "Subject updated",
-          description: `Subject "${subject.value.name}" has been updated successfully.`
+          description: `Subject "${subjectData.name}" has been updated successfully.`
         })
       }
     } else {
       // Create new subject
-      const result = await subjectStore.createSubject(subjectRequest.value)
+      const result = await subjectStore.createSubject(subjectData)
       if (result) {
         toast({
           title: "Subject created",
-          description: `Subject "${subject.value.name}" has been created successfully.`
+          description: `Subject "${subjectData.name}" has been created successfully.`
         })
       }
     }
@@ -219,7 +141,7 @@ async function saveSubject() {
   } catch (error) {
     toast({
       title: "Error",
-      description: `Failed to ${subject.value.id ? 'update' : 'create'} subject.`,
+      description: `Failed to ${id ? 'update' : 'create'} subject.`,
       variant: "destructive"
     })
   } finally {

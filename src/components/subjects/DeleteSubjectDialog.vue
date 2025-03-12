@@ -2,9 +2,9 @@
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Delete Schema</DialogTitle>
+        <DialogTitle>Delete Subject</DialogTitle>
         <DialogDescription>
-          Are you sure you want to delete schema "{{ schema?.human_name }}"? This action cannot be undone.
+          Are you sure you want to delete subject "{{ subject?.name }}"? This action cannot be undone.
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
@@ -34,11 +34,11 @@ import {
 } from '@/components/ui/dialog'
 import type { components } from '@/../schema'
 
-type Schema = components['schemas']['schema']
+type Subject = components['schemas']['Subject']
 
 defineProps<{
   open: boolean
-  schema?: Schema | null
+  subject?: Subject | null
   isLoading?: boolean
 }>()
 
