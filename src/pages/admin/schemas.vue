@@ -125,7 +125,7 @@ const deleteLoading = ref(false)
 const isImportDialogOpen = ref(false)
 
 const selectedSchema = ref<Schema | null>(null)
-const selectedSchemaForImport = ref<Schema | null>(null)
+const selectedSchemaForImport = ref<Schema | undefined>(undefined)
 const schemaToDelete = ref<Schema | null>(null)
 
 // Methods
@@ -145,7 +145,7 @@ async function fetchTerms() {
       params: {
         query: {
           ordering: '-year_start',
-          year_start__gte: new Date().getFullYear() - 3,
+          year_start__gte: (new Date().getFullYear() - 3).toString(),
         }
       },
     })
