@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import Navigation from '@/components/Navigation.vue'
 import SchemaSwitcher from './components/SchemaSwitcher.vue'
+import Toaster from '@/components/ui/toast/Toaster.vue'
+
 </script>
 
 <template>
+  <Toaster />
   <div class="flex flex-col h-screen">
     <div class="border-b">
       <div class="flex h-16 items-center px-4">
