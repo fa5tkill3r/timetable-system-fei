@@ -90,11 +90,6 @@
       open.value = false
     }
   }
-  
-  onMounted(() => {
-    // Initialize the schemas
-    schemaStore.initialize()
-  })
 </script>
 
 <template>

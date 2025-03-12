@@ -64,19 +64,22 @@ export const useSchemaStore = defineStore('schemas', () => {
     () => schemas.value.find((schema) => schema.is_active) || null,
   )
 
+  // Get term header for API requests
+  const termHeader = computed(() => {
+    return activeSchema.value?.id
+      ? { 'X-Term': String(activeSchema.value?.schema_name) }
+      : { 'X-Term': '' }
+  })
 
-  // Initialize store - load active schema from localStorage
-  const initialize = () => {
-    fetchSchemas()
-  }
+  fetchSchemas()
 
   return {
     schemas,
     activeSchema,
+    termHeader,
     isLoading,
     error,
     fetchSchemas,
     setActiveSchema,
-    initialize,
   }
 })

@@ -18,7 +18,7 @@
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-if="loading">
+          <TableRow v-if="isLoading">
             <TableCell colspan="5" class="text-center py-4">
               <div class="flex justify-center items-center">
                 <div class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mr-2"></div>
@@ -105,6 +105,7 @@ import NewSchemaDialog from '@/components/schemas/NewSchemaDialog.vue'
 import EditSchemaDialog from '@/components/schemas/EditSchemaDialog.vue'
 import DeleteSchemaDialog from '@/components/schemas/DeleteSchemaDialog.vue'
 import ImportDataToSchemaDialog from '@/components/schemas/ImportDataToSchemaDialog.vue'
+import { useSchemaStore } from '@/store/schemas'
 
 type Schema = components['schemas']['schema'];
 type SchemaRequest = components['schemas']['schemaRequest'];
@@ -112,10 +113,10 @@ type Term = components['schemas']['PaginatedAISObdobieList'];
 
 const { toast } = useToast()
 
+const { schemas, isLoading } = useSchemaStore()
+
 // State
-const schemas = ref<Schema[]>([])
 const terms = ref<Term[]>([])
-const loading = ref(true)
 const isNewSchemaDialogOpen = ref(false)
 const isEditSchemaDialogOpen = ref(false)
 const isDeleteDialogOpen = ref(false)
@@ -139,19 +140,6 @@ function formatDate(dateString: string | null | undefined) {
   } catch (e) {
     console.error('Date parsing error:', e)
     return dateString
-  }
-}
-
-async function fetchSchemas() {
-  loading.value = true
-  try {
-    const { data } = await client.GET('/api/schemas/')
-    schemas.value = data || []
-  } catch (err) {
-    console.error('Error fetching schemas:', err)
-    schemas.value = []
-  } finally {
-    loading.value = false
   }
 }
 
@@ -183,52 +171,12 @@ function handleSchemaCreated(schema: Schema) {
   fetchSchemas()
 }
 
-async function handleCreateSchema(schema: SchemaRequest) {
-  try {
-    await client.POST('/api/schemas/', {
-      body: schema
-    })
-
-    isNewSchemaDialogOpen.value = false
-    await fetchSchemas()
-  } catch (err) {
-    console.error('Error creating schema:', err)
-  }
-}
 
 function editSchema(schema: Schema) {
   editingSchema.value = { ...schema }
   isEditSchemaDialogOpen.value = true
 }
 
-async function handleUpdateSchema(schema: Schema) {
-  try {
-    await client.PUT(`/api/schemas/{id}/`, {
-      params: {
-        path: {
-          id: schema.id!,
-        },
-      },
-      body: schema,
-    })
-
-    toast({
-      title: "Schema updated",
-      description: `Schema "${schema.term}" has been updated successfully.`
-    })
-    
-    isEditSchemaDialogOpen.value = false
-    await fetchSchemas()
-  } catch (err) {
-    console.error('Error updating schema:', err)
-    
-    toast({
-      title: "Update failed",
-      description: "There was an error updating the schema.",
-      variant: "destructive",
-    })
-  }
-}
 
 function confirmDeleteSchema(schema: Schema) {
   schemaToDelete.value = schema
@@ -277,7 +225,6 @@ function handleImportSuccess() {
 
 // Lifecycle
 onMounted(() => {
-  fetchSchemas()
   fetchTerms()
 })
 </script>

@@ -12,8 +12,7 @@ const pinia = createPinia()
 app.use(router)
 app.use(pinia)
 
-const schemaStore = useSchemaStore()
-schemaStore.initialize()
+useSchemaStore()
 
 // Add Lodash globally
 app.config.globalProperties._ = _
