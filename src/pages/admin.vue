@@ -77,47 +77,49 @@
 </script>
 
 <template>
-  <div class="flex h-screen">
-    <!-- Sidebar -->
-    <div class="w-64 border-r bg-card shadow-sm flex flex-col">
-      <div class="h-16 flex items-center px-4 border-b">
-        <h2 class="text-lg font-semibold">Admin Dashboard</h2>
+  <div class="flex flex-col flex-1 h-full">
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Sidebar -->
+      <div class="w-64 border-r bg-card shadow-sm flex flex-col">
+        <div class="h-16 flex items-center px-4 border-b">
+          <h2 class="text-lg font-semibold">Admin Dashboard</h2>
+        </div>
+
+        <nav class="p-2 space-y-1 flex-1 overflow-auto">
+          <!-- Nav sections -->
+          <template v-for="(section, sectionIndex) in navSections" :key="`section-${sectionIndex}`">
+            <div class="py-2">
+              <h3 class="px-3 text-xs font-medium text-muted-foreground mb-2">{{ section.title }}</h3>
+              <div class="space-y-1">
+                <RouterLink
+                  v-for="item in section.items"
+                  :key="item.path"
+                  :to="item.path"
+                  class="flex items-center px-3 py-2 text-sm rounded-md transition-colors"
+                  :class="$route.path.includes(item.pathMatch) ? 'bg-accent text-accent-foreground' : 'hover:bg-muted text-muted-foreground hover:text-foreground'"
+                >
+                  <component :is="item.icon" class="h-4 w-4 mr-2" />
+                  <span>{{ item.label }}</span>
+                </RouterLink>
+              </div>
+            </div>
+
+            <!-- Add separator between sections if not last section -->
+            <div v-if="sectionIndex < navSections.length - 1" class="h-px bg-border my-2"></div>
+          </template>
+        </nav>
       </div>
 
-      <nav class="p-2 space-y-1 flex-1 overflow-auto">
-        <!-- Nav sections -->
-        <template v-for="(section, sectionIndex) in navSections" :key="`section-${sectionIndex}`">
-          <div class="py-2">
-            <h3 class="px-3 text-xs font-medium text-muted-foreground mb-2">{{ section.title }}</h3>
-            <div class="space-y-1">
-              <RouterLink
-                v-for="item in section.items"
-                :key="item.path"
-                :to="item.path"
-                class="flex items-center px-3 py-2 text-sm rounded-md transition-colors"
-                :class="$route.path.includes(item.pathMatch) ? 'bg-accent text-accent-foreground' : 'hover:bg-muted text-muted-foreground hover:text-foreground'"
-              >
-                <component :is="item.icon" class="h-4 w-4 mr-2" />
-                <span>{{ item.label }}</span>
-              </RouterLink>
-            </div>
-          </div>
+      <!-- Main content -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-16 border-b bg-card flex items-center px-6">
+          <h1 class="text-xl font-semibold">{{ pageTitle }}</h1>
+        </header>
 
-          <!-- Add separator between sections if not last section -->
-          <div v-if="sectionIndex < navSections.length - 1" class="h-px bg-border my-2"></div>
-        </template>
-      </nav>
-    </div>
-
-    <!-- Main content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <header class="h-16 border-b bg-card flex items-center px-6">
-        <h1 class="text-xl font-semibold">{{ pageTitle }}</h1>
-      </header>
-
-      <main class="flex-1 overflow-auto">
-        <router-view></router-view>
-      </main>
+        <main class="flex-1 overflow-auto">
+          <router-view></router-view>
+        </main>
+      </div>
     </div>
   </div>
 </template>

@@ -4,7 +4,7 @@ import SchemaSwitcher from './components/SchemaSwitcher.vue'
 </script>
 
 <template>
-  <div class="hidden flex-col md:flex">
+  <div class="flex flex-col h-screen">
     <div class="border-b">
       <div class="flex h-16 items-center px-4">
         <SchemaSwitcher />
@@ -15,7 +15,7 @@ import SchemaSwitcher from './components/SchemaSwitcher.vue'
         </div>
       </div>
     </div>
-    <RouterView />
+    <RouterView class="flex-1 flex overflow-hidden" />
   </div>
 </template>
 
