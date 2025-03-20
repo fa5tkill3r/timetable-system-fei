@@ -384,6 +384,62 @@ export interface paths {
         patch: operations["room_equipment_partial_update"];
         trace?: never;
     };
+    "/api/room-groups/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all objects
+         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+         */
+        get: operations["room_groups_list"];
+        put?: never;
+        /**
+         * Create new object
+         * @description Creates a new object with the provided data. Returns the created object.
+         */
+        post: operations["room_groups_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/room-groups/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get single object
+         * @description Retrieves a specific object by its unique identifier (ID).
+         */
+        get: operations["room_groups_retrieve"];
+        /**
+         * Update object
+         * @description Fully updates an existing object. All fields must be provided.
+         */
+        put: operations["room_groups_update"];
+        post?: never;
+        /**
+         * Delete object
+         * @description Permanently removes the specified object from the database.
+         */
+        delete: operations["room_groups_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial update object
+         * @description Partially updates an existing object. Only specified fields will be modified.
+         */
+        patch: operations["room_groups_partial_update"];
+        trace?: never;
+    };
     "/api/rooms/": {
         parameters: {
             query?: never;
@@ -968,24 +1024,26 @@ export interface components {
             /** Format: date-time */
             end_date: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         Allowance: {
             readonly id?: number;
-            readonly subject?: string;
-            readonly event_type?: string;
+            subject: number;
+            event_type: number;
             amount?: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         AllowanceRequest: {
+            subject: number;
+            event_type: number;
             amount?: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         Building: {
             readonly id?: number;
             name: string;
             abbrev: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         BuildingRequest: {
             name: string;
             abbrev: string;
@@ -997,14 +1055,13 @@ export interface components {
             subject_a_code?: string | null;
             subject_b_code?: string | null;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         Equipment: {
-            id: number;
+            readonly id?: number;
             name: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         EquipmentRequest: {
-            id: number;
             name: string;
         };
         Err_serializer: {
@@ -1012,7 +1069,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-11T19:04:43.364478
+             * @default 2025-03-18T22:31:22.656803
              */
             timestamp: string;
         };
@@ -1021,7 +1078,16 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-11T19:04:43.364543
+             * @default 2025-03-18T22:31:22.656875
+             */
+            timestamp: string;
+        };
+        Ok_serializerRequest: {
+            code: number;
+            message: string;
+            /**
+             * Format: date-time
+             * @default 2025-03-18T22:31:22.656875
              */
             timestamp: string;
         };
@@ -1040,55 +1106,72 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AISObdobie"][];
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedAllowanceRequest: {
+            subject?: number;
+            event_type?: number;
             amount?: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedBuildingRequest: {
             name?: string;
             abbrev?: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedEquipmentRequest: {
-            id?: number;
             name?: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedRoomEquipmentRequest: {
+            room?: number;
+            equipment?: number;
             count?: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        PatchedRoomGroupRequest: {
+            name?: string;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedRoomRequest: {
-            id?: number;
             name?: string;
             capacity?: number;
+            building?: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedSubjectGroupRequest: {
+            subject?: number;
             name?: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedSubjectRequest: {
             name?: string;
             code?: string;
             nominal_semester?: number | null;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedSubjectUserRoleRequest: {
+            user?: number;
+            subject?: number;
             name?: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTEventRequest: {
+            tt?: number;
+            subject?: number;
+            event_type?: number;
             day_of_week?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
+            room?: number;
+            /** Format: int64 */
+            weeks_bitmask?: number | null;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTRequest: {
             name?: string;
             program?: string;
+            owner?: number;
             /**
              * @description * `PUBLISHED` - Published
              *     * `HIDDEN` - Hidden
@@ -1097,7 +1180,7 @@ export interface components {
              */
             status?: "PUBLISHED" | "HIDDEN" | "WIP";
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedUserRequest: {
             username?: string;
             full_name?: string | null;
@@ -1112,69 +1195,84 @@ export interface components {
             end_date?: string | null;
             is_active?: boolean;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         Room: {
-            id: number;
+            readonly id?: number;
             name: string;
             capacity: number;
-            readonly building?: string;
+            building: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         RoomEquipment: {
-            readonly room?: string;
-            readonly equipment?: string;
+            room: number;
+            equipment: number;
             count: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         RoomEquipmentRequest: {
+            room: number;
+            equipment: number;
             count: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        RoomGroup: {
+            readonly id?: number;
+            name: string;
+            readonly owner?: components["schemas"]["User"];
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        RoomGroupRequest: {
+            name: string;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         RoomRequest: {
-            id: number;
             name: string;
             capacity: number;
+            building: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         Subject: {
             readonly id?: number;
             name: string;
             code: string;
             nominal_semester: number | null;
-            readonly building?: string;
+            readonly building?: number;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectGroup: {
             readonly id?: number;
-            readonly subject?: string;
+            subject: number;
             name: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectGroupRequest: {
+            subject: number;
             name: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectRequest: {
             name: string;
             code: string;
             nominal_semester: number | null;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectUserRole: {
-            readonly user?: string;
-            readonly subject?: string;
+            user: number;
+            subject: number;
             name: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectUserRoleRequest: {
+            user: number;
+            subject: number;
             name: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         TT: {
             readonly id?: number;
             name: string;
             program: string;
-            readonly owner?: string;
+            owner: number;
             /**
              * @description * `PUBLISHED` - Published
              *     * `HIDDEN` - Hidden
@@ -1187,30 +1285,38 @@ export interface components {
             /** Format: date-time */
             readonly updated_at?: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         TTEvent: {
             readonly id?: number;
-            readonly tt?: string;
-            readonly subject?: string;
-            readonly event_type?: string;
+            tt: number;
+            subject: number;
+            event_type: number;
             day_of_week?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
-            readonly room?: string;
-            readonly weeks_bitmask?: string;
+            room: number;
+            /** Format: int64 */
+            weeks_bitmask?: number | null;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         TTEventRequest: {
+            tt: number;
+            subject: number;
+            event_type: number;
             day_of_week?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
+            room: number;
+            /** Format: int64 */
+            weeks_bitmask?: number | null;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         TTRequest: {
             name: string;
             program: string;
+            owner: number;
             /**
              * @description * `PUBLISHED` - Published
              *     * `HIDDEN` - Hidden
@@ -1233,7 +1339,7 @@ export interface components {
         TokenRefreshRequest: {
             refresh: string;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         User: {
             readonly id?: number;
             username: string;
@@ -1241,7 +1347,7 @@ export interface components {
             /** Format: date-time */
             last_logout?: string | null;
         };
-        /** @description Base serializer that automatically handles nested serialization */
+        /** @description Base serializer that automatically handles nested serialization with caching */
         UserRequest: {
             username: string;
             full_name?: string | null;
@@ -1316,7 +1422,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["AllowanceRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["AllowanceRequest"];
@@ -1375,7 +1481,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["AllowanceRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["AllowanceRequest"];
@@ -1622,9 +1728,14 @@ export interface operations {
     equipment_list: {
         parameters: {
             query?: {
+                id?: number;
+                /** @description Multiple values may be separated by commas. */
+                id__in?: number[];
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
+                name__icontains?: string;
+                name__iregex?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
             };
@@ -1837,7 +1948,13 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Ok_serializerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["Ok_serializerRequest"];
+                "multipart/form-data": components["schemas"]["Ok_serializerRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -1872,7 +1989,13 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Ok_serializerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["Ok_serializerRequest"];
+                "multipart/form-data": components["schemas"]["Ok_serializerRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -2130,12 +2253,33 @@ export interface operations {
         parameters: {
             query?: {
                 count?: number;
+                count__gte?: number;
+                count__lte?: number;
                 equipment?: number;
+                /** @description Multiple values may be separated by commas. */
+                equipment__in?: number[];
+                equipment__name?: string;
+                equipment__name__icontains?: string;
+                equipment__name__iregex?: string;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                room?: string;
+                room?: number;
+                room__building?: number;
+                room__building__abbrev?: string;
+                room__building__abbrev__icontains?: string;
+                room__building__abbrev__iregex?: string;
+                /** @description Multiple values may be separated by commas. */
+                room__building__in?: number[];
+                room__building__name?: string;
+                room__building__name__icontains?: string;
+                room__building__name__iregex?: string;
+                /** @description Multiple values may be separated by commas. */
+                room__in?: number[];
+                room__name?: string;
+                room__name__icontains?: string;
+                room__name__iregex?: string;
             };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
@@ -2298,14 +2442,216 @@ export interface operations {
             };
         };
     };
+    room_groups_list: {
+        parameters: {
+            query?: {
+                id?: number;
+                /** @description Multiple values may be separated by commas. */
+                id__in?: number[];
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+                name?: string;
+                name__icontains?: string;
+                name__iregex?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                owner?: number;
+                /** @description Multiple values may be separated by commas. */
+                owner__in?: number[];
+                owner__username?: string;
+                owner__username__icontains?: string;
+                owner__username__iregex?: string;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomGroup"][];
+                };
+            };
+        };
+    };
+    room_groups_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoomGroupRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RoomGroupRequest"];
+                "multipart/form-data": components["schemas"]["RoomGroupRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomGroup"];
+                };
+            };
+        };
+    };
+    room_groups_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique value identifying this room group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomGroup"];
+                };
+            };
+        };
+    };
+    room_groups_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique value identifying this room group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoomGroupRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RoomGroupRequest"];
+                "multipart/form-data": components["schemas"]["RoomGroupRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomGroup"];
+                };
+            };
+        };
+    };
+    room_groups_destroy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique value identifying this room group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    room_groups_partial_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique value identifying this room group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedRoomGroupRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedRoomGroupRequest"];
+                "multipart/form-data": components["schemas"]["PatchedRoomGroupRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomGroup"];
+                };
+            };
+        };
+    };
     rooms_list: {
         parameters: {
             query?: {
                 building?: number;
+                building__abbrev?: string;
+                building__abbrev__icontains?: string;
+                building__abbrev__iregex?: string;
+                /** @description Multiple values may be separated by commas. */
+                building__in?: number[];
+                building__name?: string;
+                building__name__icontains?: string;
+                building__name__iregex?: string;
                 capacity?: number;
+                capacity__gte?: number;
+                capacity__lte?: number;
+                equipment?: number[];
+                /** @description Multiple values may be separated by commas. */
+                equipment__in?: number[];
+                equipment__name?: string;
+                equipment__name__icontains?: string;
+                equipment__name__iregex?: string;
+                id?: number;
+                /** @description Multiple values may be separated by commas. */
+                id__in?: number[];
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
+                name__icontains?: string;
+                name__iregex?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
             };
@@ -3528,7 +3874,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["TTEventRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["TTEventRequest"];
@@ -3587,7 +3933,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["TTEventRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["TTEventRequest"];
