@@ -56,7 +56,7 @@
         ref="dataTable"
         :data="equipment"
         :columns="columns"
-        :is-loading="buildingStore.isLoading"
+        :is-loading="buildingStore.isLoading || equipmentStore.isLoading"
         :search-term="searchTerm"
         :page-index="pageIndex"
         :page-size="pageSize"
@@ -128,7 +128,7 @@
 import { ref, computed, h, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBuildingStore } from '@/store/buildings'
-import { useEquipmentStore } from '@/store/equipment' // Add this import
+import { useEquipmentStore } from '@/store/equipment'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -179,19 +179,28 @@ const roomId = computed(() => parseInt(params.roomId));
 // Get data from store
 const building = computed(() => buildingStore.selectedBuilding)
 const room = computed(() => buildingStore.selectedRoom)
-const equipment = computed(() => buildingStore.equipment)
+const roomEquipment = computed(() => buildingStore.equipment)
 
-// Dialog states
-const equipmentDialogVisible = ref(false)
-const deleteDialogVisible = ref(false)
-const dialogLoading = ref(false)
-const selectedEquipment = ref<Equipment | null>(null)
-const deleteDialogTitle = ref('')
-const deleteDialogDescription = ref('')
-const itemToDelete = ref<number | null>(null)
+// Initialize the equipment store to access available equipment items
+const equipmentStore = useEquipmentStore()
+const availableEquipment = computed(() => equipmentStore.equipment)
 
-// Define table columns
-const columns: ColumnDef<Equipment>[] = [
+// Process equipment to include name from equipment store
+const equipment = computed(() => {
+  return roomEquipment.value.map(item => {
+    const equipDetails = availableEquipment.value.find(e => e.id === item.equipment);
+    return {
+      id: item.id,
+      equipment_id: item.equipment,
+      room_id: item.room,
+      count: item.count,
+      name: equipDetails?.name || `Equipment ID: ${item.equipment}`
+    };
+  });
+});
+
+// Define table columns - without type column
+const columns: ColumnDef<any>[] = [
   {
     id: 'select',
     header: ({ table }) => h(Checkbox, {
@@ -217,22 +226,12 @@ const columns: ColumnDef<Equipment>[] = [
     },
   },
   {
-    accessorKey: 'type',
+    accessorKey: 'count',
     header: ({ column }) => {
       return h(Button, {
         variant: 'ghost',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-      }, () => ['Type', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
-    },
-    cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('type')),
-  },
-  {
-    accessorKey: 'quantity',
-    header: ({ column }) => {
-      return h(Button, {
-        variant: 'ghost',
-        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-      }, () => ['Quantity', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+      }, () => ['Count', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
     },
   },
   {
@@ -261,6 +260,10 @@ const columns: ColumnDef<Equipment>[] = [
 const fetchData = async () => {
   if (roomId.value) {
     await buildingStore.fetchEquipment(roomId.value)
+    // Also fetch available equipment if not already loaded
+    if (equipmentStore.equipment.length === 0) {
+      await equipmentStore.fetchEquipment()
+    }
   }
 }
 
@@ -336,16 +339,16 @@ watch(
 )
 
 // Dialog handlers
-function openEquipmentDialog(equipment?: Equipment) {
-  selectedEquipment.value = equipment ? { ...equipment } : null
+function openEquipmentDialog(item?: any) {
+  selectedEquipment.value = item ? { ...item } : null
   equipmentDialogVisible.value = true
 }
 
 // Confirm delete handlers
-function confirmDeleteEquipment(equipment: Equipment) {
-  itemToDelete.value = equipment.id
+function confirmDeleteEquipment(item: any) {
+  itemToDelete.value = item.id
   deleteDialogTitle.value = 'Delete Equipment'
-  deleteDialogDescription.value = `Are you sure you want to delete "${equipment.name}"?`
+  deleteDialogDescription.value = `Are you sure you want to delete "${item.name}"?`
   deleteDialogVisible.value = true
 }
 
@@ -355,22 +358,30 @@ async function saveEquipment(equipmentData: any) {
   try {
     if (selectedEquipment.value?.id) {
       // Update
-      const result = await buildingStore.updateEquipment(selectedEquipment.value.id, equipmentData)
+      const result = await buildingStore.updateEquipment(selectedEquipment.value.id, {
+        equipment_id: equipmentData.equipment_id,
+        room_id: roomId.value,
+        count: equipmentData.count
+      })
       if (result) {
         toast({
           title: "Equipment updated",
-          description: `Equipment "${equipmentData.name}" has been updated successfully.`
+          description: `Equipment has been updated successfully.`
         })
         equipmentDialogVisible.value = false
         await fetchData() // Refresh after update
       }
     } else {
       // Create
-      const result = await buildingStore.createEquipment(roomId.value, equipmentData)
+      const result = await buildingStore.createEquipment(roomId.value, {
+        equipment_id: equipmentData.equipment_id,
+        room_id: roomId.value,
+        count: equipmentData.count
+      })
       if (result) {
         toast({
-          title: "Equipment created",
-          description: `Equipment "${equipmentData.name}" has been created successfully.`
+          title: "Equipment added",
+          description: `Equipment has been added successfully.`
         })
         equipmentDialogVisible.value = false
         await fetchData() // Refresh after create
@@ -379,7 +390,7 @@ async function saveEquipment(equipmentData: any) {
   } catch (error) {
     toast({
       title: "Error",
-      description: `Failed to ${selectedEquipment.value?.id ? 'update' : 'create'} equipment.`,
+      description: `Failed to ${selectedEquipment.value?.id ? 'update' : 'add'} equipment.`,
       variant: "destructive"
     })
   } finally {
@@ -410,9 +421,6 @@ async function handleDelete() {
     dialogLoading.value = false
   }
 }
-
-// Initialize the equipment store to access available equipment items
-const equipmentStore = useEquipmentStore()
 
 // Load available equipment on mount
 onMounted(async () => {
