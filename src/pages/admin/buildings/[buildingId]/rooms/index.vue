@@ -1,6 +1,5 @@
 <template>
   <div class="container py-6 space-y-6">
-    <!-- Loading state for building -->
     <div v-if="!building && buildingStore.isLoading" class="flex justify-center py-8">
       <div class="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
     </div>
@@ -37,7 +36,6 @@
         </div>
       </div>
       
-      <!-- Rooms table with DataTable component -->
       <DataTable
         ref="dataTable"
         :data="rooms"
@@ -53,12 +51,10 @@
         @update:search-term="onSearchChange"
         @selection-change="onSelectionChange"
       >
-        <!-- Empty state slot -->
         <template #empty>
           No rooms found. Add your first room to this building.
         </template>
         
-        <!-- Selection actions slot -->
         <template #selection-actions>
           <div class="space-x-2">
             <Button variant="outline" size="sm">
@@ -70,7 +66,6 @@
           </div>
         </template>
         
-        <!-- Pagination slot -->
         <template #pagination="{ filteredCount, selectedCount }">
           <TablePagination
             :current-page="pageIndex"
@@ -87,7 +82,6 @@
       Building not found
     </div>
 
-    <!-- Dialogs -->
     <RoomDialog
       :open="roomDialogVisible"
       :room="selectedRoom"
@@ -97,7 +91,6 @@
       @save="saveRoom"
     />
 
-    <!-- Confirmation dialog -->
     <ConfirmDeleteDialog
       :open="deleteDialogVisible"
       :title="deleteDialogTitle"
@@ -116,7 +109,7 @@ import { useBuildingStore } from '@/store/buildings'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { DataTable } from '@/components/ui/data-table'
+import DataTable from '@/components/common/DataTable.vue'
 import { 
   PencilIcon, TrashIcon, BuildingIcon, 
   ArrowUpDown 
@@ -144,7 +137,6 @@ interface RouteParams {
   buildingId: string;
 }
 
-// Initialize store, route and toast
 const buildingStore = useBuildingStore()
 const route = useRoute()
 const params = route.params as RouteParams;
@@ -158,12 +150,10 @@ const pageIndex = ref(0)
 const pageSize = ref(10)
 const selectedRows = ref({})
 
-// Get buildingId from route
 const buildingId = computed(() => parseInt(params.buildingId))
 const building = computed(() => buildingStore.selectedBuilding)
 const rooms = computed(() => buildingStore.rooms)
 
-// Dialog states
 const roomDialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
 const dialogLoading = ref(false)
@@ -172,7 +162,6 @@ const deleteDialogTitle = ref('')
 const deleteDialogDescription = ref('')
 const itemToDelete = ref<number | null>(null)
 
-// Define table columns
 const columns: ColumnDef<Room>[] = [
   {
     id: 'select',
@@ -237,14 +226,12 @@ const columns: ColumnDef<Room>[] = [
   },
 ]
 
-// Simplified data fetching
 const fetchData = async () => {
   if (buildingId.value) {
     await buildingStore.fetchRooms(buildingId.value)
   }
 }
 
-// Event handlers
 const onSearchChange = (value: string) => {
   searchTerm.value = value
   pageIndex.value = 0 // Reset to first page on search
@@ -258,7 +245,6 @@ const onSelectionChange = (selection: Record<string, boolean>) => {
   selectedRows.value = selection
 }
 
-// Load building and its rooms
 async function loadBuilding(id: number) {
   const buildingData = await buildingStore.getBuilding(id)
   if (!buildingData) {
@@ -273,28 +259,24 @@ async function loadBuilding(id: number) {
   await fetchData()
 }
 
-// Watch for route changes
 watch(() => params.buildingId, async (newId) => {
   if (newId) {
     await loadBuilding(parseInt(newId as string))
   }
 }, { immediate: true })
 
-// Dialog handlers
 function openRoomDialog(room?: Room) {
   selectedRoom.value = room ? { ...room } : null
   roomDialogVisible.value = true
 }
 
-// Confirm delete handlers
 function confirmDeleteRoom(room: Room) {
-  itemToDelete.value = room.id
+  itemToDelete.value = room.id || null
   deleteDialogTitle.value = 'Delete Room'
   deleteDialogDescription.value = `Are you sure you want to delete room "${room.name}"? This will also delete all equipment in this room.`
   deleteDialogVisible.value = true
 }
 
-// Save room
 async function saveRoom(roomData: any) {
   dialogLoading.value = true
   try {
@@ -332,7 +314,6 @@ async function saveRoom(roomData: any) {
   }
 }
 
-// Handle delete
 async function handleDelete() {
   if (!itemToDelete.value) return
   

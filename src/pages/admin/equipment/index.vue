@@ -88,7 +88,7 @@ import { useEquipmentStore } from '@/store/equipment'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Button } from '@/components/ui/button'
 import { PencilIcon, TrashIcon, ArrowUpDown } from 'lucide-vue-next'
-import { DataTable } from '@/components/ui/data-table'
+import DataTable from '@/components/common/DataTable.vue'
 import EquipmentDialog from '@/components/dialogs/EquipmentDialog.vue'
 import ConfirmDeleteDialog from '@/components/dialogs/ConfirmDeleteDialog.vue'
 import {
@@ -198,7 +198,7 @@ function openEquipmentDialog(equipment?: Equipment) {
 }
 
 function confirmDeleteEquipment(equipment: Equipment) {
-  itemToDelete.value = equipment.id
+  itemToDelete.value = equipment.id || null
   deleteDialogTitle.value = 'Delete Equipment'
   deleteDialogDescription.value = `Are you sure you want to delete "${equipment.name}"?`
   deleteDialogVisible.value = true

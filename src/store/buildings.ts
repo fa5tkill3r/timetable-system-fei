@@ -4,30 +4,27 @@ import { client } from '../lib/client'
 import { useSchemaStore } from './schemas'
 import { components } from 'schema'
 
-// Define types from schema components
-type Equipment = components['schemas']['Equipment']
+type RoomEquipment = components['schemas']['RoomEquipment'] 
+type RoomEquipmentRequest = components['schemas']['RoomEquipmentRequest'] 
 type Room = components['schemas']['Room']
-type Building = components['schemas']['Building']
-type EquipmentRequest = components['schemas']['EquipmentRequest']
 type RoomRequest = components['schemas']['RoomRequest']
+type Building = components['schemas']['Building']
 type BuildingRequest = components['schemas']['BuildingRequest']
 
 export const useBuildingStore = defineStore('buildings', () => {
   const schemaStore = useSchemaStore()
   const buildings = ref<Building[]>([])
   const rooms = ref<Room[]>([])
-  const equipment = ref<Equipment[]>([])
+  const roomEquipment = ref<RoomEquipment[]>([])
   const selectedBuilding = ref<Building | null>(null)
   const selectedRoom = ref<Room | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  // Fetch all buildings
   const fetchBuildings = async () => {
-    // Don't fetch if no active schema
     if (!schemaStore.activeSchema?.id) {
       buildings.value = []
-      return
+      return []
     }
     
     isLoading.value = true
@@ -45,16 +42,17 @@ export const useBuildingStore = defineStore('buildings', () => {
       } else {
         error.value = 'Failed to fetch buildings'
         buildings.value = []
+        return []
       }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       buildings.value = []
+      return []
     } finally {
       isLoading.value = false
     }
   }
 
-  // Get a specific building
   const getBuilding = async (id: number) => {
     isLoading.value = true
     error.value = null
@@ -82,7 +80,83 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  // Fetch rooms for a building
+  const createBuilding = async (building: BuildingRequest) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const response = await client.POST('/api/buildings/', {
+        params: {
+          header: schemaStore.termHeader,
+        },
+        body: building,
+      })
+      if (response.data) {
+        await fetchBuildings()
+        return response.data
+      } else {
+        error.value = 'Failed to create building'
+        return null
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const updateBuilding = async (id: number, building: BuildingRequest) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const response = await client.PUT('/api/buildings/{id}/', {
+        params: {
+          path: { id },
+          header: schemaStore.termHeader,
+        },
+        body: building
+      })
+      if (response.data) {
+        await fetchBuildings()
+        return response.data
+      } else {
+        error.value = 'Failed to update building'
+        return null
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const deleteBuilding = async (id: number) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const { response } = await client.DELETE('/api/buildings/{id}/', {
+        params: {
+          path: { id },
+          header: schemaStore.termHeader,
+        }
+      })
+      if (response.status === 204) {
+        buildings.value = buildings.value.filter(b => b.id !== id)
+        return true
+      } else {
+        error.value = 'Failed to delete building'
+        return false
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      return false
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+
   const fetchRooms = async (buildingId: number) => {
     if (!schemaStore.activeSchema?.id) {
       rooms.value = []
@@ -117,7 +191,6 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  // Get a specific room
   const getRoom = async (id: number) => {
     isLoading.value = true
     error.value = null
@@ -145,121 +218,6 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  // Fetch equipment for a room
-  const fetchEquipment = async (roomId: number) => {
-    if (!schemaStore.activeSchema?.id) {
-      equipment.value = []
-      return []
-    }
-    
-    isLoading.value = true
-    error.value = null
-    
-    try {
-      const response = await client.GET('/api/room-equipment/', {
-        params: {
-          header: schemaStore.termHeader,
-          query: { room: roomId }
-        }
-      })
-      
-      if (response.data) {
-        equipment.value = response.data
-        return response.data
-      } else {
-        error.value = 'Failed to fetch equipment'
-        equipment.value = []
-        return []
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      equipment.value = []
-      return []
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  // Create a new building
-  const createBuilding = async (building: BuildingRequest) => {
-    isLoading.value = true
-    error.value = null
-    try {
-      const response = await client.POST('/api/buildings/', {
-        params: {
-          header: schemaStore.termHeader,
-        },
-        body: building,
-      })
-      if (response.data) {
-        await fetchBuildings()
-        return response.data
-      } else {
-        error.value = 'Failed to create building'
-        return null
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return null
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  // Update existing building
-  const updateBuilding = async (id: number, building: BuildingRequest) => {
-    isLoading.value = true
-    error.value = null
-    try {
-      const response = await client.PUT('/api/buildings/{id}/', {
-        params: {
-          path: { id },
-          header: schemaStore.termHeader,
-        },
-        body: building
-      })
-      if (response.data) {
-        await fetchBuildings()
-        return response.data
-      } else {
-        error.value = 'Failed to update building'
-        return null
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return null
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  // Delete building
-  const deleteBuilding = async (id: number) => {
-    isLoading.value = true
-    error.value = null
-    try {
-      const { response } = await client.DELETE('/api/buildings/{id}/', {
-        params: {
-          path: { id },
-          header: schemaStore.termHeader,
-        }
-      })
-      if (response.status === 204) {
-        buildings.value = buildings.value.filter(b => b.id !== id)
-        return true
-      } else {
-        error.value = 'Failed to delete building'
-        return false
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return false
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  // Create a room in a building
   const createRoom = async (room: RoomRequest) => {
     isLoading.value = true
     error.value = null
@@ -287,7 +245,6 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  // Update room
   const updateRoom = async (roomId: number, room: RoomRequest) => {
     isLoading.value = true
     error.value = null
@@ -316,7 +273,6 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  // Delete room
   const deleteRoom = async (roomId: number, buildingId: number) => {
     isLoading.value = true
     error.value = null
@@ -344,8 +300,42 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  // Equipment operations
-  const createEquipment = async (roomId: number, equipmentData: EquipmentRequest) => {
+
+  const fetchRoomEquipment = async (roomId: number) => {
+    if (!schemaStore.activeSchema?.id) {
+      roomEquipment.value = []
+      return []
+    }
+    
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await client.GET('/api/room-equipment/', {
+        params: {
+          header: schemaStore.termHeader,
+          query: { room: roomId }
+        }
+      })
+      
+      if (response.data) {
+        roomEquipment.value = response.data
+        return response.data
+      } else {
+        error.value = 'Failed to fetch equipment'
+        roomEquipment.value = []
+        return []
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      roomEquipment.value = []
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const createRoomEquipment = async (roomId: number, equipmentData: RoomEquipmentRequest) => {
     isLoading.value = true
     error.value = null
     try {
@@ -353,18 +343,13 @@ export const useBuildingStore = defineStore('buildings', () => {
         params: {
           header: schemaStore.termHeader,
         },
-        body: {
-          ...equipmentData,
-          room_id: roomId
-        }
+        body: equipmentData
       })
       if (response.data) {
-        if (equipment.value.length > 0) {
-          await fetchEquipment(roomId)
-        }
+        await fetchRoomEquipment(roomId)
         return response.data
       } else {
-        error.value = 'Failed to create equipment'
+        error.value = 'Failed to add equipment to room'
         return null
       }
     } catch (err) {
@@ -375,7 +360,7 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const updateEquipment = async (equipmentId: number, equipmentData: EquipmentRequest) => {
+  const updateRoomEquipment = async (equipmentId: number, equipmentData: RoomEquipmentRequest) => {
     isLoading.value = true
     error.value = null
     try {
@@ -387,12 +372,10 @@ export const useBuildingStore = defineStore('buildings', () => {
         body: equipmentData
       })
       if (response.data) {
-        if (equipment.value.length > 0) {
-          await fetchEquipment(equipmentData.room_id)
-        }
+        await fetchRoomEquipment(equipmentData.room)
         return response.data
       } else {
-        error.value = 'Failed to update equipment'
+        error.value = 'Failed to update room equipment'
         return null
       }
     } catch (err) {
@@ -403,7 +386,7 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const deleteEquipment = async (equipmentId: number, roomId: number) => {
+  const deleteRoomEquipment = async (equipmentId: number, roomId: number) => {
     isLoading.value = true
     error.value = null
     try {
@@ -414,12 +397,10 @@ export const useBuildingStore = defineStore('buildings', () => {
         }
       })
       if (response.status === 204) {
-        if (equipment.value.length > 0) {
-          await fetchEquipment(roomId)
-        }
+        await fetchRoomEquipment(roomId)
         return true
       } else {
-        error.value = 'Failed to delete equipment'
+        error.value = 'Failed to delete room equipment'
         return false
       }
     } catch (err) {
@@ -430,20 +411,18 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  // Clear selected items
   const clearSelections = () => {
     selectedBuilding.value = null
     selectedRoom.value = null
   }
 
-  // Use watchEffect to automatically fetch buildings when active schema changes
   watchEffect(() => {
     if (schemaStore.activeSchema?.id) {
       fetchBuildings()
     } else {
       buildings.value = []
       rooms.value = []
-      equipment.value = []
+      roomEquipment.value = []
       clearSelections()
     }
   })
@@ -451,7 +430,7 @@ export const useBuildingStore = defineStore('buildings', () => {
   return {
     buildings,
     rooms,
-    equipment,
+    roomEquipment,
     selectedBuilding,
     selectedRoom,
     isLoading,
@@ -460,16 +439,16 @@ export const useBuildingStore = defineStore('buildings', () => {
     getBuilding,
     fetchRooms,
     getRoom,
-    fetchEquipment,
+    fetchRoomEquipment,
     createBuilding,
     updateBuilding,
     deleteBuilding,
     createRoom,
     updateRoom,
     deleteRoom,
-    createEquipment,
-    updateEquipment,
-    deleteEquipment,
+    createRoomEquipment,
+    updateRoomEquipment,
+    deleteRoomEquipment,
     clearSelections
   }
 })

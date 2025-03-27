@@ -18,7 +18,6 @@
       <Button @click="openBuildingDialog()">Add New Building</Button>
     </div>
     
-    <!-- Building Table with DataTable component -->
     <DataTable
       :data="buildings"
       :columns="columns"
@@ -33,12 +32,10 @@
       @update:search-term="onSearchChange"
       @selection-change="onSelectionChange"
     >
-      <!-- Empty state slot -->
       <template #empty>
         No buildings found.
       </template>
       
-      <!-- Selection actions slot -->
       <template #selection-actions>
         <div class="space-x-2">
           <Button variant="outline" size="sm">
@@ -50,7 +47,6 @@
         </div>
       </template>
       
-      <!-- Pagination slot -->
       <template #pagination="{ filteredCount, selectedCount }">
         <TablePagination
           :current-page="pageIndex"
@@ -62,7 +58,6 @@
       </template>
     </DataTable>
 
-    <!-- Dialogs -->
     <BuildingDialog
       :open="buildingDialogVisible"
       :building="selectedBuilding"
@@ -88,7 +83,7 @@ import { useBuildingStore } from '@/store/buildings'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Button } from '@/components/ui/button'
 import { PencilIcon, TrashIcon, ArrowUpDown } from 'lucide-vue-next'
-import { DataTable } from '@/components/ui/data-table'
+import DataTable from '@/components/common/DataTable.vue'
 import BuildingDialog from '@/components/buildings/BuildingDialog.vue'
 import ConfirmDeleteDialog from '@/components/dialogs/ConfirmDeleteDialog.vue'
 import { RouterLink } from 'vue-router'
@@ -107,7 +102,6 @@ import TablePagination from '@/components/common/table-pagination.vue'
 
 type Building = components['schemas']['Building']
 
-// States
 const buildingStore = useBuildingStore()
 const { toast } = useToast()
 const buildings = computed(() => buildingStore.buildings)
@@ -116,7 +110,6 @@ const pageIndex = ref(0)
 const pageSize = ref(10)
 const selectedRows = ref({})
 
-// Dialog states
 const buildingDialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
 const dialogLoading = ref(false)
@@ -125,18 +118,17 @@ const deleteDialogTitle = ref('')
 const deleteDialogDescription = ref('')
 const itemToDelete = ref<number | null>(null)
 
-// Define table columns
 const columns: ColumnDef<Building>[] = [
   {
     id: 'select',
     header: ({ table }) => h(Checkbox, {
       'modelValue': table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate'),
-      'onUpdate:modelValue': value => table.toggleAllPageRowsSelected(!!value),
+      'onUpdate:modelValue': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
       'ariaLabel': 'Select all',
     }),
     cell: ({ row }) => h(Checkbox, {
       'modelValue': row.getIsSelected(),
-      'onUpdate:modelValue': value => row.toggleSelected(!!value),
+      'onUpdate:modelValue': (value: boolean) => row.toggleSelected(!!value),
       'ariaLabel': 'Select row',
     }),
     enableSorting: false,
@@ -190,7 +182,6 @@ const columns: ColumnDef<Building>[] = [
   },
 ]
 
-// Event handlers
 const onSearchChange = (value: string) => {
   searchTerm.value = value
   pageIndex.value = 0 // Reset to first page on search
@@ -204,25 +195,22 @@ const onSelectionChange = (selection: Record<string, boolean>) => {
   selectedRows.value = selection
 }
 
-// Debug logs to check data flow
 onMounted(async () => {
   await buildingStore.fetchBuildings()
 })
 
-// Dialog handlers
 function openBuildingDialog(building?: Building) {
   selectedBuilding.value = building ? { ...building } : null
   buildingDialogVisible.value = true
 }
 
 function confirmDeleteBuilding(building: Building) {
-  itemToDelete.value = building.id
+  itemToDelete.value = building.id || null
   deleteDialogTitle.value = 'Delete Building'
   deleteDialogDescription.value = `Are you sure you want to delete "${building.name}"? This will also delete all rooms and equipment inside this building.`
   deleteDialogVisible.value = true
 }
 
-// Save building
 async function saveBuilding(buildingData: any) {
   dialogLoading.value = true
   try {
@@ -256,11 +244,9 @@ async function saveBuilding(buildingData: any) {
   } finally {
     dialogLoading.value = false
   }
-  // After successful save, refetch data
   await fetchData()
 }
 
-// Handle delete
 async function handleDelete() {
   if (!itemToDelete.value) return
   
@@ -281,7 +267,10 @@ async function handleDelete() {
   } finally {
     dialogLoading.value = false
   }
-  // After successful delete, refetch data if needed
   await fetchData()
+}
+
+const fetchData = async () => {
+  await buildingStore.fetchBuildings()
 }
 </script>

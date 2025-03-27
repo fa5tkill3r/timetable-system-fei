@@ -1,12 +1,10 @@
 <template>
   <div class="container py-6 space-y-6">
-    <!-- Loading state -->
     <div v-if="(!room || !building) && buildingStore.isLoading" class="flex justify-center py-8">
       <div class="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
     </div>
     
     <template v-else-if="building && room">
-      <!-- Breadcrumb navigation -->
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -32,7 +30,6 @@
         <Button @click="openEquipmentDialog()">Add New Equipment</Button>
       </div>
       
-      <!-- Room details -->
       <div class="p-4 border rounded-md bg-muted/40 space-y-2">
         <div class="grid gap-2">
           <div class="flex items-center gap-2">
@@ -51,7 +48,6 @@
         </div>
       </div>
       
-      <!-- Equipment table with DataTable component -->
       <DataTable
         ref="dataTable"
         :data="equipment"
@@ -67,12 +63,10 @@
         @update:search-term="onSearchChange"
         @selection-change="onSelectionChange"
       >
-        <!-- Empty state slot -->
         <template #empty>
           No equipment found. Add your first equipment to this room.
         </template>
         
-        <!-- Selection actions slot -->
         <template #selection-actions>
           <div class="space-x-2">
             <Button variant="outline" size="sm">
@@ -84,7 +78,6 @@
           </div>
         </template>
         
-        <!-- Pagination slot -->
         <template #pagination="{ filteredCount, selectedCount }">
           <TablePagination
             :current-page="pageIndex"
@@ -101,7 +94,6 @@
       Room not found
     </div>
 
-    <!-- Dialogs -->
     <RoomEquipmentDialog
       :open="equipmentDialogVisible"
       :room-equipment="selectedEquipment"
@@ -112,7 +104,6 @@
       @save="saveEquipment"
     />
 
-    <!-- Confirmation dialog -->
     <ConfirmDeleteDialog
       :open="deleteDialogVisible"
       :title="deleteDialogTitle"
@@ -132,7 +123,7 @@ import { useEquipmentStore } from '@/store/equipment'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { DataTable } from '@/components/ui/data-table'
+import DataTable from '@/components/common/DataTable.vue'
 import { 
   PencilIcon, TrashIcon, BuildingIcon, DoorOpen,
   ArrowUpDown 
@@ -152,16 +143,12 @@ import { components } from 'schema'
 import TablePagination from '@/components/common/table-pagination.vue'
 import { Checkbox } from '@/components/ui/checkbox'
 
-type Equipment = components['schemas']['Equipment']
-
-// Initialize store, route and toast
 const buildingStore = useBuildingStore()
 const route = useRoute()
 const router = useRouter()
 const { toast } = useToast()
 const dataTable = ref<any>(null)
 
-// States for table
 const searchTerm = ref('')
 const pageIndex = ref(0)
 const pageSize = ref(10)
@@ -176,16 +163,13 @@ const params = route.params as RouteParams;
 const buildingId = computed(() => parseInt(params.buildingId));
 const roomId = computed(() => parseInt(params.roomId));
 
-// Get data from store
 const building = computed(() => buildingStore.selectedBuilding)
 const room = computed(() => buildingStore.selectedRoom)
-const roomEquipment = computed(() => buildingStore.equipment)
+const roomEquipment = computed(() => buildingStore.roomEquipment)
 
-// Initialize the equipment store to access available equipment items
 const equipmentStore = useEquipmentStore()
 const availableEquipment = computed(() => equipmentStore.equipment)
 
-// Process equipment to include name from equipment store
 const equipment = computed(() => {
   return roomEquipment.value.map(item => {
     const equipDetails = availableEquipment.value.find(e => e.id === item.equipment);
@@ -199,7 +183,6 @@ const equipment = computed(() => {
   });
 });
 
-// Define table columns - without type column
 const columns: ColumnDef<any>[] = [
   {
     id: 'select',
@@ -256,10 +239,9 @@ const columns: ColumnDef<any>[] = [
   },
 ]
 
-// Simplified data fetching
 const fetchData = async () => {
   if (roomId.value) {
-    await buildingStore.fetchEquipment(roomId.value)
+    await buildingStore.fetchRoomEquipment(roomId.value) // Updated from fetchEquipment
     // Also fetch available equipment if not already loaded
     if (equipmentStore.equipment.length === 0) {
       await equipmentStore.fetchEquipment()
@@ -267,7 +249,6 @@ const fetchData = async () => {
   }
 }
 
-// Event handlers
 const onSearchChange = (value: string) => {
   searchTerm.value = value
   pageIndex.value = 0 // Reset to first page on search
@@ -281,9 +262,7 @@ const onSelectionChange = (selection: Record<string, boolean>) => {
   selectedRows.value = selection
 }
 
-// Load building, room and equipment
 async function loadData(buildingId: number, roomId: number) {
-  // Load building if not already loaded or if different
   if (!building.value || building.value.id !== buildingId) {
     const buildingData = await buildingStore.getBuilding(buildingId)
     if (!buildingData) {
@@ -309,8 +288,7 @@ async function loadData(buildingId: number, roomId: number) {
     return
   }
   
-  // Verify room belongs to this building
-  if (parseInt(roomData.building as string) !== buildingId) {
+  if (parseInt(String(roomData.building)) !== buildingId) {
     toast({
       title: "Room not in this building",
       description: "The room you're trying to access doesn't belong to this building.",
@@ -320,11 +298,9 @@ async function loadData(buildingId: number, roomId: number) {
     return
   }
   
-  // Load equipment with pagination
   await fetchData()
 }
 
-// Watch for route changes
 watch(
   () => [params.buildingId, params.roomId],
   async ([newBuildingId, newRoomId]) => {
@@ -338,29 +314,27 @@ watch(
   { immediate: true }
 )
 
-// Dialog handlers
 function openEquipmentDialog(item?: any) {
   selectedEquipment.value = item ? { ...item } : null
   equipmentDialogVisible.value = true
 }
 
-// Confirm delete handlers
 function confirmDeleteEquipment(item: any) {
+  console.log('Deleting', item)
   itemToDelete.value = item.id
   deleteDialogTitle.value = 'Delete Equipment'
   deleteDialogDescription.value = `Are you sure you want to delete "${item.name}"?`
   deleteDialogVisible.value = true
 }
 
-// Save equipment
 async function saveEquipment(equipmentData: any) {
   dialogLoading.value = true
   try {
     if (selectedEquipment.value?.id) {
       // Update
-      const result = await buildingStore.updateEquipment(selectedEquipment.value.id, {
-        equipment_id: equipmentData.equipment_id,
-        room_id: roomId.value,
+      const result = await buildingStore.updateRoomEquipment(selectedEquipment.value.id, {
+        equipment: equipmentData.equipment_id || equipmentData.equipment,
+        room: roomId.value,
         count: equipmentData.count
       })
       if (result) {
@@ -373,9 +347,9 @@ async function saveEquipment(equipmentData: any) {
       }
     } else {
       // Create
-      const result = await buildingStore.createEquipment(roomId.value, {
-        equipment_id: equipmentData.equipment_id,
-        room_id: roomId.value,
+      const result = await buildingStore.createRoomEquipment(roomId.value, {
+        equipment: equipmentData.equipment_id || equipmentData.equipment,
+        room: roomId.value,
         count: equipmentData.count
       })
       if (result) {
@@ -398,13 +372,13 @@ async function saveEquipment(equipmentData: any) {
   }
 }
 
-// Handle delete
 async function handleDelete() {
+  console.log('Deleting', itemToDelete.value)
   if (!itemToDelete.value) return
   
   dialogLoading.value = true
   try {
-    const success = await buildingStore.deleteEquipment(itemToDelete.value, roomId.value)
+    const success = await buildingStore.deleteRoomEquipment(itemToDelete.value, roomId.value)
     
     if (success) {
       toast({ title: "Equipment deleted successfully" })
@@ -422,8 +396,15 @@ async function handleDelete() {
   }
 }
 
-// Load available equipment on mount
 onMounted(async () => {
   await equipmentStore.fetchEquipment()
 })
+
+const equipmentDialogVisible = ref(false)
+const deleteDialogVisible = ref(false)
+const dialogLoading = ref(false)
+const selectedEquipment = ref<any | null>(null)
+const deleteDialogTitle = ref('')
+const deleteDialogDescription = ref('')
+const itemToDelete = ref<number | null>(null)
 </script>
