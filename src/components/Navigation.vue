@@ -7,6 +7,10 @@
       text: 'Dashboard',
     },
     {
+      to: '/timetables',
+      text: 'Timetables',
+    },
+    {
       to: '/timetable',
       text: 'Timetable editor',
     },
