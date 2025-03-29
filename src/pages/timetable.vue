@@ -7,6 +7,7 @@ import { useTimetableStore } from '@/store/timetables'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { useSubjectStore } from '@/store/subjects'
 import { useBuildingStore } from '@/store/buildings'
+import { getColorFromString } from '@/lib/utils'
 import {
   Tabs,
   TabsContent,
@@ -199,6 +200,11 @@ async function fetchTimetableEvents(timetableId: number) {
   }
 }
 
+function getEventTypeLabel(eventType: number | null): string {
+  if (eventType === 1) return 'Lecture'
+  if (eventType === 2) return 'Lab'
+  return 'Other'
+}
 
 function processTimetableEvents() {
 
@@ -218,11 +224,8 @@ function processTimetableEvents() {
       event.weeks_bitmask !== null &&
       event.weeks_bitmask !== 0) {
 
-
-
       const startTime = event.start_time.substring(0, 5)
       const endTime = calculateEndTime(startTime, event.duration)
-
 
       const roomDetail = buildingStore.rooms.find(r => r.id === event.room);
       const roomName = event.room_name || (roomDetail ? roomDetail.name : `Room ${event.room}`);
@@ -234,7 +237,6 @@ function processTimetableEvents() {
         fromStore: roomDetail?.name
       });
 
-
       const title = subjectName || event.subject_name || `Event ${event.id}`;
       const shortcut = subjectCode || (title ? title.substring(0, 3).toUpperCase() : `E${event.id}`);
 
@@ -245,7 +247,7 @@ function processTimetableEvents() {
         endTime: endTime,
         title: title,
         shortcut: shortcut,
-        color: getRandomColor(),
+        color: getColorFromString(title),
         roomId: event.room,
         roomName: roomName,
         subjectId: event.subject,
@@ -254,8 +256,6 @@ function processTimetableEvents() {
     } else {
 
       const title = subjectName || event.subject_name || `Event ${event.id}`
-
-
 
       const existingTemplate = eventTemplates.value.find(t =>
         t.title === title &&
@@ -270,7 +270,7 @@ function processTimetableEvents() {
           id: `template-${event.id}`,
           title: title,
           duration: event.duration || 1,
-          color: getEventTypeColor(event.event_type),
+          color: getColorFromString(title),
           quantity: 1,
           subjectId: event.subject,
           originalEventId: event.id,
@@ -306,40 +306,11 @@ function calculateEndTime(startTime: string, duration: number): string {
 }
 
 
-function getRandomColor(): string {
-  const colors = [
-    '#e3f2fd', '#f3e5f5', '#e8f5e9', '#a7d6a4', '#a4cdd6',
-    '#fff8e1', '#ffebee', '#f1f8e9', '#e1f5fe', '#fce4ec'
-  ]
-  return colors[Math.floor(Math.random() * colors.length)]
-}
-
-
 function getSubjectName(subjectId?: number | null): string | null {
   if (!subjectId) return null
 
   const subject = subjectStore.subjects.find(s => s.id === subjectId)
   return subject ? subject.name : null
-}
-
-
-function getEventTypeColor(eventType: number | null): string {
-
-  if (eventType === 1) {
-    return '#e3f2fd'
-  } else if (eventType === 2) {
-    return '#f3e5f5'
-  } else {
-
-    return getRandomColor()
-  }
-}
-
-
-function getEventTypeLabel(eventType: number | null): string {
-  if (eventType === 1) return 'Lecture'
-  if (eventType === 2) return 'Lab'
-  return 'Other'
 }
 
 
@@ -637,7 +608,6 @@ const isValidEventPlacement = (position: { day: string, time: TimeSlot }, durati
   const timeIndex = timeSlots.findIndex(slot => slot.from === position.time.from)
   const newEndIndex = timeIndex + duration - 1
   
-  // Check if the event fits within available time slots
   return timeIndex >= 0 && newEndIndex < timeSlots.length
 }
 
@@ -661,7 +631,6 @@ const handleDrop = async (event: DragEvent) => {
   if (draggedTemplate.value) {
     const duration = draggedTemplate.value.duration || 1
     
-    // Check if the placement is valid before proceeding
     if (!isValidEventPlacement(position, duration)) {
       toast({
         title: "Invalid Placement",
@@ -703,7 +672,6 @@ const handleDrop = async (event: DragEvent) => {
   } else if (draggedEvent.value) {
     const duration = getEventDuration(draggedEvent.value!)
     
-    // Check if the placement is valid before proceeding
     if (!isValidEventPlacement(position, duration)) {
       toast({
         title: "Invalid Placement",

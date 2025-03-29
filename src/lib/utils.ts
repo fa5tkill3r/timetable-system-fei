@@ -28,19 +28,55 @@ export function valueUpdater<T>(
   }
 }
 
-export function computeColorFromName(name: string): string {
+/**
+ * Generates a color from a string input. 
+ * The same string will always generate the same color.
+ * 
+ * @param name - String to generate the color from
+ * @param style - Color style: 'default', 'pastel', or 'bright'
+ * @returns A hex color code
+ */
+export function getColorFromString(name: string, style: 'default' | 'pastel' | 'bright' = 'pastel'): string {
+  // Generate a hash from the string
   let hash = 0
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash)
   }
-  let color = '#'
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff
-    color += ('00' + value.toString(16)).slice(-2)
+  
+  // Convert hash to RGB values
+  const r = (hash & 0xFF0000) >> 16
+  const g = (hash & 0x00FF00) >> 8
+  const b = (hash & 0x0000FF)
+  
+  // Apply the requested style
+  if (style === 'pastel') {
+    // Mix with white for pastel colors (lighter)
+    const pastelR = Math.round((r + 255) / 2)
+    const pastelG = Math.round((g + 255) / 2)
+    const pastelB = Math.round((b + 255) / 2)
+    
+    return `#${(pastelR << 16 | pastelG << 8 | pastelB).toString(16).padStart(6, '0')}`
+  } 
+  else if (style === 'bright') {
+    // Increase brightness for bright colors
+    const brightness = 0.299 * r + 0.587 * g + 0.114 * b
+    const minBrightness = 160
+    
+    if (brightness < minBrightness) {
+      const factor = Math.min(2, minBrightness / (brightness + 0.1))
+      const brightR = Math.min(255, Math.round(r * factor))
+      const brightG = Math.min(255, Math.round(g * factor))
+      const brightB = Math.min(255, Math.round(b * factor))
+      
+      return `#${(brightR << 16 | brightG << 8 | brightB).toString(16).padStart(6, '0')}`
+    }
   }
-  return color
+  
+  // Default: return the normal color
+  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`
 }
 
+// This function can be useful for other purposes, so we'll keep it
 export function calculateBrightness(color: string): number {
   const rgb = parseInt(color.slice(1), 16)
   const r = (rgb >> 16) & 0xff
