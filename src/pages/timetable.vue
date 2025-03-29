@@ -631,6 +631,16 @@ const handleMenuDrop = async (event: DragEvent) => {
   isOverMenu.value = false
 }
 
+const isValidEventPlacement = (position: { day: string, time: TimeSlot }, duration: number): boolean => {
+  if (!position) return false
+  
+  const timeIndex = timeSlots.findIndex(slot => slot.from === position.time.from)
+  const newEndIndex = timeIndex + duration - 1
+  
+  // Check if the event fits within available time slots
+  return timeIndex >= 0 && newEndIndex < timeSlots.length
+}
+
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault()
 
@@ -638,7 +648,6 @@ const handleDrop = async (event: DragEvent) => {
   if (!position || (!draggedEvent.value && !draggedTemplate.value)) return
 
   console.log("Preferred room selected:", preferredRoom.value)
-
 
   if (draggedTemplate.value && !preferredRoom.value) {
     toast({
@@ -650,60 +659,81 @@ const handleDrop = async (event: DragEvent) => {
   }
 
   if (draggedTemplate.value) {
-    const newStartIndex = timeSlots.findIndex(
-      (slot) => slot.from === position.time.from,
-    )
-    const newEndIndex = newStartIndex + draggedTemplate.value.duration - 1
-
-    if (newEndIndex <= timeSlots.length) {
-
-      const eventToPlace = {
-
-        id: draggedTemplate.value.originalEventId || -nextEventId++,
-        day: position.day,
-        startTime: timeSlots[newStartIndex].from,
-        endTime: timeSlots[newEndIndex].to,
-        title: draggedTemplate.value.title,
-        color: draggedTemplate.value.color,
-        subjectId: draggedTemplate.value.subjectId,
-        eventType: draggedTemplate.value.eventType
-      }
-
-      events.value.push(eventToPlace)
-
-      const template = eventTemplates.value.find(
-        (t) => t.id === draggedTemplate.value?.id,
-      )
-      if (template && template.quantity > 0) {
-        template.quantity--
-      }
-
-
-      await saveEventPlacement(eventToPlace)
+    const duration = draggedTemplate.value.duration || 1
+    
+    // Check if the placement is valid before proceeding
+    if (!isValidEventPlacement(position, duration)) {
+      toast({
+        title: "Invalid Placement",
+        description: "Event cannot be placed in this position as it would exceed available time slots.",
+        variant: "destructive"
+      })
+      draggedTemplate.value = null
+      draggedOverDay.value = null
+      draggedOverTime.value = null
+      return
     }
+    
+    const newStartIndex = timeSlots.findIndex((slot) => slot.from === position.time.from)
+    const newEndIndex = newStartIndex + duration - 1
+
+    const eventToPlace = {
+      id: draggedTemplate.value.originalEventId || -nextEventId++,
+      day: position.day,
+      startTime: timeSlots[newStartIndex].from,
+      endTime: timeSlots[newEndIndex].to,
+      title: draggedTemplate.value.title,
+      color: draggedTemplate.value.color,
+      subjectId: draggedTemplate.value.subjectId,
+      eventType: draggedTemplate.value.eventType,
+      shortcut: draggedTemplate.value.title.substring(0, 3).toUpperCase()
+    }
+
+    events.value.push(eventToPlace)
+
+    const template = eventTemplates.value.find(
+      (t) => t.id === draggedTemplate.value?.id,
+    )
+    if (template && template.quantity > 0) {
+      template.quantity--
+    }
+
+    await saveEventPlacement(eventToPlace)
+    
   } else if (draggedEvent.value) {
     const duration = getEventDuration(draggedEvent.value!)
+    
+    // Check if the placement is valid before proceeding
+    if (!isValidEventPlacement(position, duration)) {
+      toast({
+        title: "Invalid Placement",
+        description: "Event cannot be placed in this position as it would exceed available time slots.",
+        variant: "destructive"
+      })
+      draggedEvent.value = null
+      draggedOverDay.value = null
+      draggedOverTime.value = null
+      return
+    }
+    
     const newStartIndex = timeSlots.findIndex(
       (slot) => slot.from === position.time.from,
     )
     const newEndIndex = newStartIndex + duration - 1
 
-    if (newEndIndex <= timeSlots.length) {
-      const eventIndex = events.value.findIndex(
-        (e) => e.id === draggedEvent.value!.id,
-      )
-      if (eventIndex !== -1) {
-        const updatedEvent = {
-          ...events.value[eventIndex],
-          day: position.day,
-          startTime: timeSlots[newStartIndex]?.from,
-          endTime: timeSlots[newEndIndex]?.to,
-        }
-        events.value[eventIndex] = updatedEvent
-
-
-        await saveEventPlacement(updatedEvent)
+    const eventIndex = events.value.findIndex(
+      (e) => e.id === draggedEvent.value!.id,
+    )
+    if (eventIndex !== -1) {
+      const updatedEvent = {
+        ...events.value[eventIndex],
+        day: position.day,
+        startTime: timeSlots[newStartIndex]?.from,
+        endTime: timeSlots[newEndIndex]?.to,
       }
+      events.value[eventIndex] = updatedEvent
+
+      await saveEventPlacement(updatedEvent)
     }
   }
 
