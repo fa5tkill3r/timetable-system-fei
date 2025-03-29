@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { defineProps } from 'vue'
+  import { defineProps, defineEmits, watch } from 'vue'
   import { Button } from '@/components/ui/button'
   import {
     Command,
@@ -53,6 +53,8 @@
     },
   })
 
+  const emit = defineEmits(['update:selection'])
+
   const formSchema = toTypedSchema(
     z.object({
       selection: z.any({
@@ -63,6 +65,11 @@
 
   const { handleSubmit, setFieldValue, values } = useForm({
     validationSchema: formSchema,
+  })
+
+  // Watch for changes to the selection and emit them to parent
+  watch(() => values.selection, (newValue) => {
+    emit('update:selection', newValue)
   })
 </script>
 
