@@ -406,20 +406,98 @@ const getEventDuration = (event: CalendarEvent): number => {
   return endIndex - startIndex + 1
 }
 
+const getEventPositions = () => {
+  // Group events by day
+  const eventsByDay = _.groupBy(events.value, 'day')
+  const eventPositions = new Map()
+  
+  Object.entries(eventsByDay).forEach(([day, dayEvents]) => {
+    // Sort events by start time
+    const sortedEvents = [...dayEvents].sort((a, b) => {
+      const timeA = timeSlots.findIndex(slot => slot.from === a.startTime)
+      const timeB = timeSlots.findIndex(slot => slot.from === b.startTime)
+      return timeA - timeB
+    })
+    
+    // Track occupied time slots for each row
+    const rows: { endTime: string; event: CalendarEvent }[][] = []
+    
+    sortedEvents.forEach(event => {
+      const startIndex = timeSlots.findIndex(slot => slot.from === event.startTime)
+      
+      // Find a row where this event can fit
+      let rowIndex = 0
+      let foundRow = false
+      
+      while (!foundRow) {
+        if (!rows[rowIndex]) {
+          rows[rowIndex] = []
+          foundRow = true
+        } else {
+          // Check if any event in this row overlaps
+          const overlaps = rows[rowIndex].some(occupiedSlot => {
+            const occupiedEndIndex = timeSlots.findIndex(slot => slot.to === occupiedSlot.event.endTime)
+            return startIndex <= occupiedEndIndex
+          })
+          
+          if (!overlaps) {
+            foundRow = true
+          } else {
+            rowIndex++
+          }
+        }
+      }
+      
+      // Add event to the row
+      rows[rowIndex].push({ endTime: event.endTime, event })
+      eventPositions.set(event.id, { row: rowIndex, maxRows: 0 })
+    })
+    
+    // Set maxRows for all events in this day
+    const maxRows = rows.length
+    sortedEvents.forEach(event => {
+      const position = eventPositions.get(event.id)
+      if (position) {
+        position.maxRows = maxRows
+      }
+    })
+  })
+  
+  return eventPositions
+}
+
 
 const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const dayIndex = days.indexOf(event.day)
+  const dayPositions = getDayRowPositions()
+  
   const startIndex = timeSlots.findIndex(
     (slot) => slot.from === event.startTime,
   )
   const duration = getEventDuration(event)
-
+  
+  // Get position data for stacking
+  const eventPositions = getEventPositions()
+  const position = eventPositions.get(event.id)
+  
+  // Calculate row position if this event needs to be stacked
+  const rowPosition = position ? position.row : 0
+  const totalRows = position ? position.maxRows : 1
+  
+  // Keep consistent event height regardless of stacking
+  const eventHeight = CELL_HEIGHT - 4
+  
+  // Calculate vertical position within the expanded cell
+  // This spaces events evenly within the expanded cell
+  const rowSpacing = totalRows > 1 ? (CELL_HEIGHT * totalRows - eventHeight * totalRows) / (totalRows + 1) : 0
+  const topOffset = rowPosition * (eventHeight + rowSpacing)
+  
   return {
     position: 'absolute',
     left: `${DAY_COLUMN_WIDTH + CELL_WIDTH * startIndex}px`,
-    top: `${HEADER_HEIGHT + CELL_HEIGHT * dayIndex}px`,
+    top: `${dayPositions[dayIndex] + topOffset}px`,
     width: `${CELL_WIDTH * duration - 4}px`,
-    height: `${CELL_HEIGHT - 4}px`,
+    height: `${eventHeight}px`,
     backgroundColor: event.color,
     borderRadius: '4px',
     padding: '8px',
@@ -431,17 +509,41 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
 }
 
 const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
+  const eventPositions = getEventPositions()
+  const dayEvents = events.value.filter(e => e.day === days[dayIndex])
+  const dayPositions = getDayRowPositions()
+  
+  const hasOverlappingEvents = dayEvents.some(e => {
+    const position = eventPositions.get(e.id)
+    return position && position.maxRows > 1
+  })
+  
+  // Get max rows for this day if any
+  let maxRows = 1
+  if (hasOverlappingEvents) {
+    const positions = Array.from(eventPositions.values())
+      .filter((_, i) => dayEvents.some((e, j) => eventPositions.get(e.id)?.maxRows > 1))
+    
+    if (positions.length > 0) {
+      maxRows = Math.max(...positions.map(p => p.maxRows))
+    }
+  }
+  
+  // Adjust cell height based on number of events
+  const cellHeight = hasOverlappingEvents ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+    
   return {
     position: 'absolute',
     left: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeIndex}px`,
-    top: `${HEADER_HEIGHT + CELL_HEIGHT * dayIndex}px`,
+    top: `${dayPositions[dayIndex]}px`, // Use calculated position
     width: `${CELL_WIDTH}px`,
-    height: `${CELL_HEIGHT}px`,
+    height: `${cellHeight}px`,
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
     boxSizing: 'border-box',
     zIndex: 1,
     backgroundColor: (() => {
+      // Same highlighting logic as before
       if (!draggedEvent.value && !draggedTemplate.value) return 'transparent'
 
       const duration = draggedEvent.value
@@ -492,13 +594,62 @@ const getHeaderStyle = (index: number): CSSProperties => {
   }
 }
 
+const getDayRowPositions = () => {
+  const positions: number[] = Array(days.length).fill(0)
+  const eventPositions = getEventPositions()
+  
+  let currentTop = HEADER_HEIGHT
+  
+  // Calculate position for each day based on expanded heights of previous days
+  days.forEach((day, index) => {
+    positions[index] = currentTop
+    
+    // Calculate height for this day based on max rows
+    const dayEvents = events.value.filter(e => e.day === day)
+    let maxRows = 1
+    
+    if (dayEvents.length > 0) {
+      const dayPositions = dayEvents
+        .map(e => eventPositions.get(e.id))
+        .filter(Boolean) as { row: number, maxRows: number }[]
+      
+      if (dayPositions.length > 0) {
+        maxRows = Math.max(...dayPositions.map(p => p.maxRows || 1))
+      }
+    }
+    
+    // Add this day's height to the running total
+    currentTop += maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+  })
+  
+  return positions
+}
+
 const getDayStyle = (index: number): CSSProperties => {
+  const eventPositions = getEventPositions()
+  const dayEvents = events.value.filter(e => e.day === days[index])
+  const dayPositions = getDayRowPositions()
+  
+  // Get max rows for this day if any
+  let maxRows = 1
+  if (dayEvents.length > 0) {
+    const positions = dayEvents.map(e => eventPositions.get(e.id))
+      .filter(Boolean) as { row: number, maxRows: number }[]
+    
+    if (positions.length > 0) {
+      maxRows = Math.max(...positions.map(p => p.maxRows || 1))
+    }
+  }
+  
+  // Adjust day row height based on number of events
+  const rowHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+  
   return {
     position: 'absolute',
     left: '0',
-    top: `${HEADER_HEIGHT + CELL_HEIGHT * index}px`,
+    top: `${dayPositions[index]}px`, // Use calculated position
     width: `${DAY_COLUMN_WIDTH}px`,
-    height: `${CELL_HEIGHT}px`,
+    height: `${rowHeight}px`,
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
     backgroundColor: '#f5f5f5',
@@ -509,6 +660,8 @@ const getDayStyle = (index: number): CSSProperties => {
     fontWeight: 'bold',
   }
 }
+
+
 
 const cornerCellStyle: CSSProperties = {
   position: 'absolute',
@@ -522,15 +675,39 @@ const cornerCellStyle: CSSProperties = {
   boxSizing: 'border-box',
 }
 
-const containerStyle = computed<CSSProperties>(() => ({
-  position: 'relative',
-  width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
-  height: `${HEADER_HEIGHT + CELL_HEIGHT * days.length}px`,
-  border: '1px solid #e0e0e0',
-  borderBottom: 'none',
-  borderRight: 'none',
-  fontFamily: 'Arial, sans-serif',
-}))
+const containerStyle = computed<CSSProperties>(() => {
+  const dayPositions = getDayRowPositions()
+  const eventPositions = getEventPositions()
+  
+  // Calculate total container height by finding the bottom position of the last day
+  const lastDayIndex = days.length - 1
+  let lastDayHeight = CELL_HEIGHT
+  
+  // Get max rows for last day
+  const lastDayEvents = events.value.filter(e => e.day === days[lastDayIndex])
+  if (lastDayEvents.length > 0) {
+    const positions = lastDayEvents.map(e => eventPositions.get(e.id))
+      .filter(Boolean) as { row: number, maxRows: number }[]
+    
+    if (positions.length > 0) {
+      const maxRows = Math.max(...positions.map(p => p.maxRows || 1))
+      lastDayHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+    }
+  }
+  
+  // Total height is position of last day plus its height
+  const totalHeight = dayPositions[lastDayIndex] + lastDayHeight
+  
+  return {
+    position: 'relative',
+    width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
+    height: `${totalHeight}px`,
+    border: '1px solid #e0e0e0',
+    borderBottom: 'none',
+    borderRight: 'none',
+    fontFamily: 'Arial, sans-serif',
+  }
+})
 
 
 const handleDragStart = (
@@ -555,7 +732,22 @@ const getMousePosition = (
   const x = event.clientX - rect.left
   const y = event.clientY - rect.top
 
-  const dayIndex = Math.floor((y - HEADER_HEIGHT) / CELL_HEIGHT)
+  // Use the day row positions to determine which day we're hovering over
+  const dayPositions = getDayRowPositions()
+  let dayIndex = -1;
+  
+  // Find which day row contains our current mouse position
+  for (let i = 0; i < days.length; i++) {
+    const nextDayIndex = i + 1;
+    const currentDayTop = dayPositions[i];
+    const nextDayTop = nextDayIndex < days.length ? dayPositions[nextDayIndex] : Infinity;
+    
+    if (y >= currentDayTop && y < nextDayTop) {
+      dayIndex = i;
+      break;
+    }
+  }
+  
   const timeIndex = Math.floor((x - DAY_COLUMN_WIDTH) / CELL_WIDTH)
 
   if (
@@ -958,6 +1150,7 @@ function handleDragEnd() {
               <ContextMenuTrigger>
                 <div :style="getEventStyle(event)"
                   class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
+                  :class="{'text-xs': getEventPositions().get(event.id)?.maxRows > 1}"
                   draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
                   <div class="flex justify-between items-center">
                     <div class="event-title font-semibold text-gray-800 truncate">
