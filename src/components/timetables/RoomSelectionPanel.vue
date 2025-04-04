@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Building, X as XIcon } from 'lucide-vue-next'
 import RoomFilter from '@/components/common/ComboBoxFilter.vue'
+import CapacitySliderFilter from '@/components/common/CapacitySliderFilter.vue'
 
 const props = defineProps<{
   selectedRoomId: number | null
@@ -20,13 +21,14 @@ const buildingStore = useBuildingStore()
 const selectedBuildingIds = ref<(string | number)[]>([])
 const selectedRoomGroups = ref<(string | number)[]>([])
 const searchQuery = ref('')
+const capacityRange = ref<[number, number]>([0, 200])
 
 // Prepare filter options
 const buildingOptions = computed(() => {
   return buildingStore.buildings.map(building => ({
     label: `${building.name} (${building.abbrev})`,
     value: building.id,
-    count: buildingStore.rooms.filter(room => room.building_id === building.id).length
+    count: buildingStore.rooms.filter(room => room.building === building.id).length
   }))
 })
 
@@ -39,7 +41,9 @@ const roomGroupOptions = [
 const isFiltered = computed(() => 
   selectedBuildingIds.value.length > 0 || 
   selectedRoomGroups.value.length > 0 ||
-  searchQuery.value.trim() !== ''
+  searchQuery.value.trim() !== '' ||
+  capacityRange.value[0] > 0 ||
+  capacityRange.value[1] < 200
 )
 
 const filteredRooms = computed(() => {
@@ -49,12 +53,12 @@ const filteredRooms = computed(() => {
     const query = searchQuery.value.toLowerCase()
     rooms = rooms.filter(room => 
       room.name.toLowerCase().includes(query) || 
-      (room.description && room.description.toLowerCase().includes(query))
+      (room.capacity && String(room.capacity).includes(query))
     )
   }
   
   if (selectedBuildingIds.value.length > 0) {
-    rooms = rooms.filter(room => selectedBuildingIds.value.includes(room.building_id))
+    rooms = rooms.filter(room => selectedBuildingIds.value.includes(room.building))
   }
   
   if (selectedRoomGroups.value.length > 0) {
@@ -73,6 +77,14 @@ const filteredRooms = computed(() => {
     })
   }
   
+  // Filter by capacity range
+  if (capacityRange.value[0] > 0 || capacityRange.value[1] < 200) {
+    rooms = rooms.filter(room => 
+      room.capacity >= capacityRange.value[0] && 
+      room.capacity <= capacityRange.value[1]
+    )
+  }
+  
   return rooms
 })
 
@@ -88,6 +100,7 @@ function resetAll() {
   selectedBuildingIds.value = []
   selectedRoomGroups.value = []
   searchQuery.value = ''
+  capacityRange.value = [0, 300]
   clearRoom()
 }
 </script>
@@ -96,7 +109,7 @@ function resetAll() {
   <div class="h-full flex flex-col">
     <div class="p-3 border-b">
       <div class="flex items-center mb-3">
-<h3 class="text-lg font-semibold mr-4">Room Selection</h3>
+        <h3 class="text-lg font-semibold mr-4">Room Selection</h3>
         <div class="flex flex-1 items-center space-x-2">
           <Input
             placeholder="Search rooms..."
@@ -113,6 +126,9 @@ function resetAll() {
             :options="roomGroupOptions"
             v-model="selectedRoomGroups"
           />
+          <CapacitySliderFilter
+            v-model="capacityRange"
+          />
           
           <Button
             v-if="isFiltered"
@@ -124,7 +140,7 @@ function resetAll() {
             <XIcon class="ml-2 h-4 w-4" />
           </Button>
         </div>
-              </div>
+      </div>
       
       <!-- Selected room display -->
       <div v-if="selectedRoomId" class="mt-1">
