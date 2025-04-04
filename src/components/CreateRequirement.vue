@@ -65,7 +65,7 @@
     CollapsibleContent,
     CollapsibleTrigger,
   } from '@/components/ui/collapsible'
-  import ComboBox from '@/components/ComboBox.vue'
+  import ComboBox from '@/components/common/ComboBox.vue'
   import { Switch } from '@/components/ui/switch'
   import { Textarea } from '@/components/ui/textarea'
 

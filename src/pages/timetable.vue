@@ -51,8 +51,9 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from '@/components/ui/skeleton'
 
-import ComboBox from '@/components/ComboBox.vue'
+import ComboBox from '@/components/common/ComboBox.vue'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
 
 
 interface TimeSlot {
@@ -1207,21 +1208,7 @@ function handleDragEnd() {
         <ResizablePanel :default-size="20">
 
           <!-- Room selection panel -->
-          <!-- <div class="h-full p-4 overflow-y-auto">
-            <h3 class="text-lg font-semibold mb-3">Room Selection</h3>
-            <div class="mb-4">
-              <ComboBox :options="roomOptions" title="Preferred Room" search-placeholder="Select preferred room..."
-                @update:selection="preferredRoom = $event" />
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 mt-4">
-              <div v-for="room in roomOptions.slice(0, 8)" :key="room.id"
-                class="p-2 border rounded hover:bg-gray-100 cursor-pointer text-center"
-                :class="{ 'bg-primary/20 border-primary': preferredRoom === room.id }" @click="preferredRoom = room.id">
-                <div class="font-medium text-sm">{{ room.name }}</div>
-              </div>
-            </div>
-          </div> -->
+          <RoomSelectionPanel v-model:selectedRoomId="preferredRoom" />
         </ResizablePanel>
       </ResizablePanelGroup>
     </ResizablePanel>
