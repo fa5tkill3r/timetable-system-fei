@@ -49,6 +49,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Skeleton } from '@/components/ui/skeleton'
+
 import ComboBox from '@/components/ComboBox.vue'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
@@ -123,6 +125,12 @@ const searchQuery = ref('')
 const events = ref<CalendarEvent[]>([])
 const eventTemplates = ref<EventTemplate[]>([])
 
+const isResizing = ref(false)
+
+// Resize handler function
+function resize(dragging: boolean) {
+  isResizing.value = dragging
+}
 
 const roomOptions = computed(() => {
   return buildingStore.rooms.map(room => ({
@@ -411,7 +419,7 @@ const getEventPositions = () => {
   // Group events by day
   const eventsByDay = _.groupBy(events.value, 'day')
   const eventPositions = new Map()
-  
+
   Object.entries(eventsByDay).forEach(([day, dayEvents]) => {
     // Sort events by start time
     const sortedEvents = [...dayEvents].sort((a, b) => {
@@ -419,17 +427,17 @@ const getEventPositions = () => {
       const timeB = timeSlots.findIndex(slot => slot.from === b.startTime)
       return timeA - timeB
     })
-    
+
     // Track occupied time slots for each row
     const rows: { endTime: string; event: CalendarEvent }[][] = []
-    
+
     sortedEvents.forEach(event => {
       const startIndex = timeSlots.findIndex(slot => slot.from === event.startTime)
-      
+
       // Find a row where this event can fit
       let rowIndex = 0
       let foundRow = false
-      
+
       while (!foundRow) {
         if (!rows[rowIndex]) {
           rows[rowIndex] = []
@@ -440,7 +448,7 @@ const getEventPositions = () => {
             const occupiedEndIndex = timeSlots.findIndex(slot => slot.to === occupiedSlot.event.endTime)
             return startIndex <= occupiedEndIndex
           })
-          
+
           if (!overlaps) {
             foundRow = true
           } else {
@@ -448,12 +456,12 @@ const getEventPositions = () => {
           }
         }
       }
-      
+
       // Add event to the row
       rows[rowIndex].push({ endTime: event.endTime, event })
       eventPositions.set(event.id, { row: rowIndex, maxRows: 0 })
     })
-    
+
     // Set maxRows for all events in this day
     const maxRows = rows.length
     sortedEvents.forEach(event => {
@@ -463,7 +471,7 @@ const getEventPositions = () => {
       }
     })
   })
-  
+
   return eventPositions
 }
 
@@ -471,28 +479,28 @@ const getEventPositions = () => {
 const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const dayIndex = days.indexOf(event.day)
   const dayPositions = getDayRowPositions()
-  
+
   const startIndex = timeSlots.findIndex(
     (slot) => slot.from === event.startTime,
   )
   const duration = getEventDuration(event)
-  
+
   // Get position data for stacking
   const eventPositions = getEventPositions()
   const position = eventPositions.get(event.id)
-  
+
   // Calculate row position if this event needs to be stacked
   const rowPosition = position ? position.row : 0
   const totalRows = position ? position.maxRows : 1
-  
+
   // Keep consistent event height regardless of stacking
   const eventHeight = CELL_HEIGHT - 4
-  
+
   // Calculate vertical position within the expanded cell
   // This spaces events evenly within the expanded cell
   const rowSpacing = totalRows > 1 ? (CELL_HEIGHT * totalRows - eventHeight * totalRows) / (totalRows + 1) : 0
   const topOffset = rowPosition * (eventHeight + rowSpacing)
-  
+
   return {
     position: 'absolute',
     left: `${DAY_COLUMN_WIDTH + CELL_WIDTH * startIndex}px`,
@@ -513,26 +521,26 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
   const eventPositions = getEventPositions()
   const dayEvents = events.value.filter(e => e.day === days[dayIndex])
   const dayPositions = getDayRowPositions()
-  
+
   const hasOverlappingEvents = dayEvents.some(e => {
     const position = eventPositions.get(e.id)
     return position && position.maxRows > 1
   })
-  
+
   // Get max rows for this day if any
   let maxRows = 1
   if (hasOverlappingEvents) {
     const positions = Array.from(eventPositions.values())
       .filter((_, i) => dayEvents.some((e, j) => eventPositions.get(e.id)?.maxRows > 1))
-    
+
     if (positions.length > 0) {
       maxRows = Math.max(...positions.map(p => p.maxRows))
     }
   }
-  
+
   // Adjust cell height based on number of events
   const cellHeight = hasOverlappingEvents ? CELL_HEIGHT * maxRows : CELL_HEIGHT
-    
+
   return {
     position: 'absolute',
     left: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeIndex}px`,
@@ -598,31 +606,31 @@ const getHeaderStyle = (index: number): CSSProperties => {
 const getDayRowPositions = () => {
   const positions: number[] = Array(days.length).fill(0)
   const eventPositions = getEventPositions()
-  
+
   let currentTop = HEADER_HEIGHT
-  
+
   // Calculate position for each day based on expanded heights of previous days
   days.forEach((day, index) => {
     positions[index] = currentTop
-    
+
     // Calculate height for this day based on max rows
     const dayEvents = events.value.filter(e => e.day === day)
     let maxRows = 1
-    
+
     if (dayEvents.length > 0) {
       const dayPositions = dayEvents
         .map(e => eventPositions.get(e.id))
         .filter(Boolean) as { row: number, maxRows: number }[]
-      
+
       if (dayPositions.length > 0) {
         maxRows = Math.max(...dayPositions.map(p => p.maxRows || 1))
       }
     }
-    
+
     // Add this day's height to the running total
     currentTop += maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
   })
-  
+
   return positions
 }
 
@@ -630,21 +638,21 @@ const getDayStyle = (index: number): CSSProperties => {
   const eventPositions = getEventPositions()
   const dayEvents = events.value.filter(e => e.day === days[index])
   const dayPositions = getDayRowPositions()
-  
+
   // Get max rows for this day if any
   let maxRows = 1
   if (dayEvents.length > 0) {
     const positions = dayEvents.map(e => eventPositions.get(e.id))
       .filter(Boolean) as { row: number, maxRows: number }[]
-    
+
     if (positions.length > 0) {
       maxRows = Math.max(...positions.map(p => p.maxRows || 1))
     }
   }
-  
+
   // Adjust day row height based on number of events
   const rowHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
-  
+
   return {
     position: 'absolute',
     left: '0',
@@ -679,26 +687,26 @@ const cornerCellStyle: CSSProperties = {
 const containerStyle = computed<CSSProperties>(() => {
   const dayPositions = getDayRowPositions()
   const eventPositions = getEventPositions()
-  
+
   // Calculate total container height by finding the bottom position of the last day
   const lastDayIndex = days.length - 1
   let lastDayHeight = CELL_HEIGHT
-  
+
   // Get max rows for last day
   const lastDayEvents = events.value.filter(e => e.day === days[lastDayIndex])
   if (lastDayEvents.length > 0) {
     const positions = lastDayEvents.map(e => eventPositions.get(e.id))
       .filter(Boolean) as { row: number, maxRows: number }[]
-    
+
     if (positions.length > 0) {
       const maxRows = Math.max(...positions.map(p => p.maxRows || 1))
       lastDayHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
     }
   }
-  
+
   // Total height is position of last day plus its height
   const totalHeight = dayPositions[lastDayIndex] + lastDayHeight
-  
+
   return {
     position: 'relative',
     width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
@@ -736,19 +744,19 @@ const getMousePosition = (
   // Use the day row positions to determine which day we're hovering over
   const dayPositions = getDayRowPositions()
   let dayIndex = -1;
-  
+
   // Find which day row contains our current mouse position
   for (let i = 0; i < days.length; i++) {
     const nextDayIndex = i + 1;
     const currentDayTop = dayPositions[i];
     const nextDayTop = nextDayIndex < days.length ? dayPositions[nextDayIndex] : Infinity;
-    
+
     if (y >= currentDayTop && y < nextDayTop) {
       dayIndex = i;
       break;
     }
   }
-  
+
   const timeIndex = Math.floor((x - DAY_COLUMN_WIDTH) / CELL_WIDTH)
 
   if (
@@ -797,10 +805,10 @@ const handleMenuDrop = async (event: DragEvent) => {
 
 const isValidEventPlacement = (position: { day: string, time: TimeSlot }, duration: number): boolean => {
   if (!position) return false
-  
+
   const timeIndex = timeSlots.findIndex(slot => slot.from === position.time.from)
   const newEndIndex = timeIndex + duration - 1
-  
+
   return timeIndex >= 0 && newEndIndex < timeSlots.length
 }
 
@@ -823,7 +831,7 @@ const handleDrop = async (event: DragEvent) => {
 
   if (draggedTemplate.value) {
     const duration = draggedTemplate.value.duration || 1
-    
+
     if (!isValidEventPlacement(position, duration)) {
       toast({
         title: "Invalid Placement",
@@ -835,7 +843,7 @@ const handleDrop = async (event: DragEvent) => {
       draggedOverTime.value = null
       return
     }
-    
+
     const newStartIndex = timeSlots.findIndex((slot) => slot.from === position.time.from)
     const newEndIndex = newStartIndex + duration - 1
 
@@ -861,10 +869,10 @@ const handleDrop = async (event: DragEvent) => {
     }
 
     await saveEventPlacement(eventToPlace)
-    
+
   } else if (draggedEvent.value) {
     const duration = getEventDuration(draggedEvent.value!)
-    
+
     if (!isValidEventPlacement(position, duration)) {
       toast({
         title: "Invalid Placement",
@@ -876,7 +884,7 @@ const handleDrop = async (event: DragEvent) => {
       draggedOverTime.value = null
       return
     }
-    
+
     const newStartIndex = timeSlots.findIndex(
       (slot) => slot.from === position.time.from,
     )
@@ -1015,7 +1023,6 @@ async function toggleEventPlacement(event: CalendarEvent) {
 
 
 function handleDragEnd() {
-  console.log("Drag ended")
   draggedEvent.value = null
   draggedTemplate.value = null
   draggedOverDay.value = null
@@ -1024,233 +1031,273 @@ function handleDragEnd() {
 </script>
 
 <template>
+  <ResizablePanelGroup direction="horizontal" class="rounded-lg border h-[calc(100vh-180px)]">
+    <ResizablePanel :default-size="75">
+      <ResizablePanelGroup direction="vertical">
+        <ResizablePanel :default-size="80">
+          <div class="flex flex-col">
+            <div class="flex items-center">
+              <div class="flex flex-col gap-4 w-full">
+                <div class="flex justify-center">
+                  <div class="inline-flex gap-4 " role="group">
+                    <Button variant="outline" size="sm"
+                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Parallels' }"
+                      @click="viewType = 'Parallels'">
+                      Parallels
+                    </Button>
+                    <Button variant="outline" size="sm"
+                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Rooms' }"
+                      @click="viewType = 'Rooms'">
+                      Rooms
+                    </Button>
+                    <Button variant="outline" size="sm"
+                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Teacher' }"
+                      @click="viewType = 'Teacher'">
+                      Teacher
+                    </Button>
+                    <Button variant="outline" size="sm"
+                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Student' }"
+                      @click="viewType = 'Student'">
+                      Student
+                    </Button>
+                  </div>
+                </div>
 
-  <div class="flex flex-col">
-    <div class="flex items-center pr-80">
-      <div class="flex flex-col gap-4 w-full">
-        <div class="flex justify-center">
-          <div class="inline-flex gap-4 " role="group">
-            <Button variant="outline" size="sm"
-              :class="{ 'bg-primary text-primary-foreground': viewType === 'Parallels' }"
-              @click="viewType = 'Parallels'">
-              Parallels
-            </Button>
-            <Button variant="outline" size="sm" :class="{ 'bg-primary text-primary-foreground': viewType === 'Rooms' }"
-              @click="viewType = 'Rooms'">
-              Rooms
-            </Button>
-            <Button variant="outline" size="sm"
-              :class="{ 'bg-primary text-primary-foreground': viewType === 'Teacher' }" @click="viewType = 'Teacher'">
-              Teacher
-            </Button>
-            <Button variant="outline" size="sm"
-              :class="{ 'bg-primary text-primary-foreground': viewType === 'Student' }" @click="viewType = 'Student'">
-              Student
-            </Button>
+                <div class="flex flex-wrap justify-center gap-3 items-center">
+                  <TimetableSwitcher :timetables="timetableStore.timetables" :selected-id="selectedTimetable"
+                    :selected-name="selectedTimetableName" @select="selectedTimetable = $event" />
+
+                  <!-- <Select :v-model="String(subjectId)">
+                    <SelectTrigger class="w-[180px]">
+                      <SelectValue :placeholder="subjectId ? 'Subject filter active' : 'Filter by subject'" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem :value="String(null)">All subjects</SelectItem>
+                      <SelectItem v-for="subject in subjectOptions" :key="subject.id" :value="String(subject.id)">
+                        {{ subject.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select> -->
+
+                  <!-- <Select :v-model="String(roomId)">
+                    <SelectTrigger class="w-[180px]">
+                      <SelectValue :placeholder="roomId ? 'Room filter active' : 'Filter by room'" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem :value="String(null)">All rooms</SelectItem>
+                      <SelectItem v-for="room in []" :key="room.id" :value="room.id">
+                        {{ room.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select> -->
+
+                  <div v-if="subjectId || roomId" class="flex gap-2 items-center">
+                    <Badge variant="outline" v-if="subjectId">
+                      Subject: {{ getSubjectName(subjectId) || subjectId }}
+                      <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="subjectId = null">
+                        <span class="sr-only">Remove</span>
+                        &times;
+                      </Button>
+                    </Badge>
+                    <Badge variant="outline" v-if="roomId">
+                      Room ID: {{ roomId }}
+                      <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="roomId = null">
+                        <span class="sr-only">Remove</span>
+                        &times;
+                      </Button>
+                    </Badge>
+                  </div>
+                </div>
+
+                <div v-if="selectedTimetable && timetableStore.selectedTimetable?.status"
+                  class="flex justify-between pb-2 pr-3">
+                  <div class="flex gap-2 items-end pl-10">
+                    <Badge :variant="timetableStore.selectedTimetable?.status === 'PUBLISHED' ? 'default' :
+                      timetableStore.selectedTimetable?.status === 'WIP' ? 'secondary' : 'destructive'
+                      ">
+                      {{ timetableStore.selectedTimetable?.status }}
+                    </Badge>
+
+                    <Badge variant="outline" v-if="timetableStore.selectedTimetable?.owner">
+                      Owner: {{ timetableStore.selectedTimetable?.owner }}
+                    </Badge>
+
+                    <Badge variant="outline" v-if="timetableStore.selectedTimetable?.program">
+                      Program: {{ timetableStore.selectedTimetable?.program }}
+                    </Badge>
+                  </div>
+                  <!-- <div class="min-w-[150px]">
+                    <ComboBox :options="roomOptions" title="Preferred Room"
+                      search-placeholder="Select preferred room..." @update:selection="preferredRoom = $event" />
+                  </div> -->
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="flex flex-wrap justify-center gap-3 items-center">
-          <TimetableSwitcher :timetables="timetableStore.timetables" :selected-id="selectedTimetable"
-            :selected-name="selectedTimetableName" @select="selectedTimetable = $event" />
+          <ScrollArea class="overflow-auto p-1">
+            <div :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
+              class="bg-white rounded-lg shadow-md overflow-hidden mb-2 mx-auto">
+              <div :style="cornerCellStyle"></div>
 
-          <Select :v-model="String(subjectId)">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue :placeholder="subjectId ? 'Subject filter active' : 'Filter by subject'" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem :value="String(null)">All subjects</SelectItem>
-              <SelectItem v-for="subject in subjectOptions" :key="subject.id" :value="String(subject.id)">
-                {{ subject.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+              <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
+                class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+                {{ time.from }} - {{ time.to }}
+              </div>
 
-          <Select :v-model="String(roomId)">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue :placeholder="roomId ? 'Room filter active' : 'Filter by room'" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem :value="null">All rooms</SelectItem>
-              <SelectItem v-for="room in []" :key="room.id" :value="room.id">
-                {{ room.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+              <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
+                {{ day }}
+              </div>
 
-          <div v-if="subjectId || roomId" class="flex gap-2 items-center">
-            <Badge variant="outline" v-if="subjectId">
-              Subject: {{ getSubjectName(subjectId) || subjectId }}
-              <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="subjectId = null">
-                <span class="sr-only">Remove</span>
-                &times;
-              </Button>
-            </Badge>
-            <Badge variant="outline" v-if="roomId">
-              Room ID: {{ roomId }}
-              <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="roomId = null">
-                <span class="sr-only">Remove</span>
-                &times;
-              </Button>
-            </Badge>
-          </div>
-        </div>
+              <template v-if="isResizing">
+                <!-- Replace the four separate skeletons with a single one covering the entire timetable -->
+                <div class="absolute inset-0 z-10 overflow-hidden">
+                  <Skeleton class="absolute w-full h-full" :style="{
+                    width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
+                    height: containerStyle.height
+                  }" />
+                </div>
+              </template>
+              <div v-else v-for="(day, dayIndex) in days" :key="day">
+                <div v-for="(time, timeIndex) in timeSlots" :key="`${day}-${time}`"
+                  :style="getCellStyle(dayIndex, timeIndex)" />
+              </div>
 
-        <div v-if="selectedTimetable && timetableStore.selectedTimetable?.status"
-          class="flex justify-between pb-2 pr-3">
-          <div class="flex gap-2 items-end pl-10">
-            <Badge :variant="timetableStore.selectedTimetable?.status === 'PUBLISHED' ? 'default' :
-              timetableStore.selectedTimetable?.status === 'WIP' ? 'secondary' : 'destructive'
-              ">
-              {{ timetableStore.selectedTimetable?.status }}
-            </Badge>
+              <div v-if="!isResizing" v-for="event in events" :key="event.id" class="relative group">
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <div :style="getEventStyle(event)"
+                      class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
+                      :class="{ 'text-xs': getEventPositions().get(event.id)?.maxRows > 1 }" draggable="true"
+                      @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
+                      <div class="flex justify-between items-center">
+                        <div class="event-title font-semibold text-gray-800 truncate">
+                          {{ event.shortcut }}
+                          <span class="sr-only">{{ event.title }}</span>
+                        </div>
+                        <MoreVertical
+                          class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                      </div>
+                      <div class="flex justify-between text-sm text-gray-600">
+                        <div>{{ event.startTime }} - {{ event.endTime }}</div>
+                        <div v-if="event.roomName"
+                          class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
+                          <Building class="w-4 h-4" /> {{ event.roomName }}
+                        </div>
+                      </div>
+                    </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent class="w-64">
+                    <ContextMenuLabel>{{ event.title }}</ContextMenuLabel>
+                    <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
+                    <ContextMenuItem @click="deleteCalendarEvent(event)">Delete</ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem @click="duplicateEvent(event)">Duplicate</ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
+              </div>
+            </div>
 
-            <Badge variant="outline" v-if="timetableStore.selectedTimetable?.owner">
-              Owner: {{ timetableStore.selectedTimetable?.owner }}
-            </Badge>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </ResizablePanel>
 
-            <Badge variant="outline" v-if="timetableStore.selectedTimetable?.program">
-              Program: {{ timetableStore.selectedTimetable?.program }}
-            </Badge>
-          </div>
-          <div class="min-w-[150px]">
-            <ComboBox :options="roomOptions" title="Preferred Room" search-placeholder="Select preferred room..."
-              @update:selection="preferredRoom = $event" />
-          </div>
-        </div>
+        <ResizableHandle @dragging="resize($event)" with-handle />
+
+        <ResizablePanel :default-size="20">
+
+          <!-- Room selection panel -->
+          <!-- <div class="h-full p-4 overflow-y-auto">
+            <h3 class="text-lg font-semibold mb-3">Room Selection</h3>
+            <div class="mb-4">
+              <ComboBox :options="roomOptions" title="Preferred Room" search-placeholder="Select preferred room..."
+                @update:selection="preferredRoom = $event" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-4">
+              <div v-for="room in roomOptions.slice(0, 8)" :key="room.id"
+                class="p-2 border rounded hover:bg-gray-100 cursor-pointer text-center"
+                :class="{ 'bg-primary/20 border-primary': preferredRoom === room.id }" @click="preferredRoom = room.id">
+                <div class="font-medium text-sm">{{ room.name }}</div>
+              </div>
+            </div>
+          </div> -->
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </ResizablePanel>
+
+    <ResizableHandle @dragging="resize($event)" with-handle />
+
+    <ResizablePanel :default-size="25">
+      <!-- Event selection panel -->
+      <div class="h-full bg-white p-4" :class="{ 'bg-gray-50': isOverMenu }" @dragover="handleMenuDragOver"
+        @dragleave="handleMenuDragLeave" @drop="handleMenuDrop">
+
+        <Tabs default-value="events" class="h-full">
+          <TabsList class="w-full">
+            <TabsTrigger value="events" class="w-full">Unplaced Events</TabsTrigger>
+            <TabsTrigger value="requirements" class="w-full">Requirements</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="events" class="h-[calc(100%-40px)] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold">Unplaced Events</h3>
+              <Badge>{{ filteredEventTemplates.length }}</Badge>
+            </div>
+
+            <Input v-model="searchQuery" type="text" class="mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Search events..." />
+
+            <div class="space-y-3">
+              <div v-for="template in filteredEventTemplates" :key="template.id" v-show="template.quantity > 0"
+                class="p-3 rounded-lg cursor-move relative group" :style="{ backgroundColor: template.color }"
+                draggable="true" @dragstart="handleDragStart($event, template, true)" @dragend="handleDragEnd">
+                <div class="font-medium">{{ template.title }}</div>
+                <div class="flex justify-between items-center text-sm text-gray-600">
+                  <span>{{ getEventTypeLabel(template.eventType) }}</span>
+                  <span>Duration: {{ template.duration }}h</span>
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  <span class="ml-auto">Remaining: {{ template.quantity }}</span>
+                </div>
+                <div v-if="template.originalEventId" class="text-xs text-gray-500 mt-1">
+                  ID: {{ template.originalEventId }}
+                </div>
+              </div>
+            </div>
+
+            <div v-if="filteredEventTemplates.length === 0" class="text-center py-8 text-muted-foreground">
+              No unplaced events found.
+            </div>
+
+            <div v-if="eventTemplates.length === 0 && !timetableEventStore.isLoading"
+              class="mb-4 text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
+              No unplaced events found. Check if events exist in the timetable.
+            </div>
+
+            <div v-if="timetableEventStore.isLoading" class="flex justify-center py-4">
+              <div class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
+            </div>
+
+            <div v-if="isOverMenu"
+              class="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50 bg-opacity-50 rounded pointer-events-none flex items-center justify-center">
+              <div class="flex items-center text-blue-600">
+                <Trash2 class="w-5 h-5 mr-2" />
+                <span>Drop to remove event</span>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="requirements">
+            <div class="space-y-4 pt-2">
+              <h3 class="text-lg font-semibold">Timetable Requirements</h3>
+              <div class="text-sm text-muted-foreground">
+                Configure additional constraints and requirements for this timetable.
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
-    </div>
-  </div>
-
-  <div class="flex justify-center items-start">
-    <div class="flex flex-col">
-
-
-      <ScrollArea class="overflow-auto max-w-[calc(100vw-theme(space.10))] p-1"
-        :class="{ 'max-w-[calc(100vw-theme(space.8)-theme(space.10))]': isMenuOpen }">
-        <div :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
-          class="flex-shrink-0 bg-white rounded-lg shadow-md overflow-hidden mb-2" :class="{ 'mr-80': isMenuOpen }">
-          <div :style="cornerCellStyle"></div>
-
-          <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
-            class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-            {{ time.from }} - {{ time.to }}
-          </div>
-
-          <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
-            {{ day }}
-          </div>
-
-          <div v-for="(day, dayIndex) in days" :key="day">
-            <div v-for="(time, timeIndex) in timeSlots" :key="`${day}-${time}`"
-              :style="getCellStyle(dayIndex, timeIndex)" />
-          </div>
-
-          <div v-for="event in events" :key="event.id" class="relative group">
-            <ContextMenu>
-              <ContextMenuTrigger>
-                <div :style="getEventStyle(event)"
-                  class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
-                  :class="{'text-xs': getEventPositions().get(event.id)?.maxRows > 1}"
-                  draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
-                  <div class="flex justify-between items-center">
-                    <div class="event-title font-semibold text-gray-800 truncate">
-                      {{ event.shortcut }}
-                      <span class="sr-only">{{ event.title }}</span>
-                    </div>
-                    <MoreVertical
-                      class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                  </div>
-                  <div class="flex justify-between text-sm text-gray-600">
-                    <div>{{ event.startTime }} - {{ event.endTime }}</div>
-                    <div v-if="event.roomName"
-                      class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-                      <Building class="w-4 h-4" /> {{ event.roomName }}
-                    </div>
-                  </div>
-                </div>
-              </ContextMenuTrigger>
-              <ContextMenuContent class="w-64">
-                <ContextMenuLabel>{{ event.title }}</ContextMenuLabel>
-                <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
-                <ContextMenuItem @click="deleteCalendarEvent(event)">Delete</ContextMenuItem>
-                <ContextMenuSeparator />
-                <ContextMenuItem @click="duplicateEvent(event)">Duplicate</ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
-          </div>
-        </div>
-
-        <div v-if="isMenuOpen"
-          class="bg-white border-l border-t border-b border-gray-200 p-4 fixed top-0 right-0 max-w-full w-80 h-full z-10"
-          :class="{ 'bg-gray-50': isOverMenu }" @dragover="handleMenuDragOver" @dragleave="handleMenuDragLeave"
-          @drop="handleMenuDrop">
-          <Tabs default-value="events">
-            <TabsList class="w-full">
-              <TabsTrigger value="events" class="w-full">Unplaced Events</TabsTrigger>
-              <TabsTrigger value="requirements" class="w-full">Requirements</TabsTrigger>
-            </TabsList>
-            <TabsContent value="events">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Unplaced Events</h3>
-                <Badge>{{ filteredEventTemplates.length }}</Badge>
-              </div>
-
-              <Input v-model="searchQuery" type="text" class="mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Search events..." />
-
-              <div class="space-y-3">
-                <div v-for="template in filteredEventTemplates" :key="template.id" v-show="template.quantity > 0"
-                  class="p-3 rounded-lg cursor-move relative group" :style="{ backgroundColor: template.color }"
-                  draggable="true" @dragstart="handleDragStart($event, template, true)" @dragend="handleDragEnd">
-                  <div class="font-medium">{{ template.title }}</div>
-                  <div class="flex justify-between items-center text-sm text-gray-600">
-                    <span>{{ getEventTypeLabel(template.eventType) }}</span>
-                    <span>Duration: {{ template.duration }}h</span>
-                  </div>
-                  <div class="text-sm text-gray-600 mt-1">
-                    <span class="ml-auto">Remaining: {{ template.quantity }}</span>
-                  </div>
-                  <div v-if="template.originalEventId" class="text-xs text-gray-500 mt-1">
-                    ID: {{ template.originalEventId }}
-                  </div>
-                </div>
-              </div>
-
-              <div v-if="filteredEventTemplates.length === 0" class="text-center py-8 text-muted-foreground">
-                No unplaced events found.
-              </div>
-
-              <div v-if="eventTemplates.length === 0 && !timetableEventStore.isLoading"
-                class="mb-4 text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
-                No unplaced events found. Check if events exist in the timetable.
-              </div>
-
-              <div v-if="timetableEventStore.isLoading" class="flex justify-center py-4">
-                <div class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
-              </div>
-
-              <div v-if="isOverMenu"
-                class="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50 bg-opacity-50 rounded pointer-events-none flex items-center justify-center">
-                <div class="flex items-center text-blue-600">
-                  <Trash2 class="w-5 h-5 mr-2" />
-                  <span>Drop to remove event</span>
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="requirements">
-              <div class="space-y-4 pt-2">
-                <h3 class="text-lg font-semibold">Timetable Requirements</h3>
-                <div class="text-sm text-muted-foreground">
-                  Configure additional constraints and requirements for this timetable.
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        <ScrollBar orientation="horizontal" :class="{ 'mr-80': isMenuOpen }" />
-      </ScrollArea>
-    </div>
-  </div>
+    </ResizablePanel>
+  </ResizablePanelGroup>
 </template>
