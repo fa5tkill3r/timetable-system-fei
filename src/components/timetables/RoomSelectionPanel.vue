@@ -24,7 +24,7 @@ const searchQuery = ref('')
 // Prepare filter options
 const buildingOptions = computed(() => {
   return buildingStore.buildings.map(building => ({
-    label: building.name,
+    label: `${building.name} (${building.abbrev})`,
     value: building.id,
     count: buildingStore.rooms.filter(room => room.building_id === building.id).length
   }))
