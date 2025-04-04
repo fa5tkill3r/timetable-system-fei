@@ -50,6 +50,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import ComboBox from '@/components/ComboBox.vue'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 
 interface TimeSlot {
@@ -1053,19 +1054,19 @@ function handleDragEnd() {
           <TimetableSwitcher :timetables="timetableStore.timetables" :selected-id="selectedTimetable"
             :selected-name="selectedTimetableName" @select="selectedTimetable = $event" />
 
-          <Select v-model="subjectId">
+          <Select :v-model="String(subjectId)">
             <SelectTrigger class="w-[180px]">
               <SelectValue :placeholder="subjectId ? 'Subject filter active' : 'Filter by subject'" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem :value="null">All subjects</SelectItem>
-              <SelectItem v-for="subject in subjectOptions" :key="subject.id" :value="subject.id">
+              <SelectItem :value="String(null)">All subjects</SelectItem>
+              <SelectItem v-for="subject in subjectOptions" :key="subject.id" :value="String(subject.id)">
                 {{ subject.name }}
               </SelectItem>
             </SelectContent>
           </Select>
 
-          <Select v-model="roomId">
+          <Select :v-model="String(roomId)">
             <SelectTrigger class="w-[180px]">
               <SelectValue :placeholder="roomId ? 'Room filter active' : 'Filter by room'" />
             </SelectTrigger>
