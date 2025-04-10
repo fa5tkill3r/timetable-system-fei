@@ -22,13 +22,13 @@
             />
           </div>
           
-          <!-- Description -->
+          <!-- Program -->
           <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="description" class="text-right">Description</Label>
+            <Label for="program" class="text-right">Program</Label>
             <Textarea
-              id="description"
-              v-model="form.description"
-              placeholder="Timetable description"
+              id="program"
+              v-model="form.program"
+              placeholder="Timetable program"
               class="col-span-3"
               :disabled="isLoading"
             />
@@ -42,9 +42,9 @@
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="WIP">WIP</SelectItem>
+                <SelectItem value="PUBLISHED">Pending</SelectItem>
+                <SelectItem value="HIDDEN">Hidden</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -74,7 +74,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2Icon } from 'lucide-vue-next'
 import { components } from 'schema'
 
-type Timetable = components['schemas']['Timetable']
+type Timetable = components['schemas']['TT']
+type TimetableRequest = components['schemas']['TTRequest']
 
 // Props and emits
 const props = defineProps<{
@@ -85,14 +86,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'save': [timetable: any]
+  'save': [timetable: TimetableRequest]
 }>()
 
 // Form state
-const form = ref({
+const form = ref<TimetableRequest>({
   name: '',
-  description: '',
-  status: 'draft',
+  program: '',
+  status: 'WIP',
+  owner: 111407, // TODO: Replace with logged-in user ID
 })
 
 // Reset form when dialog opens or timetable changes
@@ -102,12 +104,12 @@ watch(
     if (props.open) {
       if (props.timetable) {
         form.value.name = props.timetable.name || ''
-        form.value.description = props.timetable.description || ''
-        form.value.status = props.timetable.status || 'draft'
+        form.value.program = props.timetable.program || ''
+        form.value.status = props.timetable.status || 'WIP'
       } else {
         form.value.name = ''
-        form.value.description = ''
-        form.value.status = 'draft'
+        form.value.program = ''
+        form.value.status = 'WIP'
       }
     }
   },
@@ -118,8 +120,9 @@ watch(
 const handleSubmit = () => {
   emit('save', {
     name: form.value.name,
-    description: form.value.description,
+    program: form.value.program,
     status: form.value.status,
+    owner: form.value.owner,
   })
 }
 </script>

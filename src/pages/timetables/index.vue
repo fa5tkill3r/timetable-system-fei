@@ -59,7 +59,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { type ColumnDef } from '@tanstack/vue-table'
 import { components } from 'schema'
 import TablePagination from '@/components/common/table-pagination.vue'
-import { Badge } from '@/components/ui/badge'
+import { Badge, BadgeVariants } from '@/components/ui/badge'
 
 type Timetable = components['schemas']['TT']
 
@@ -119,13 +119,13 @@ const columns: ColumnDef<Timetable>[] = [
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const status = row.getValue('status')
+      const status = row.getValue('status') as Timetable['status']
 
       // Example status rendering with badges
-      let variant = 'default'
-      if (status === 'published') variant = 'success'
-      if (status === 'draft') variant = 'secondary'
-      if (status === 'pending') variant = 'warning'
+      let variant = 'default' as BadgeVariants['variant']
+      if (status === 'PUBLISHED') variant = 'default'
+      if (status === 'WIP') variant = 'secondary'
+      if (status === 'HIDDEN') variant = 'outline'
 
       return h(Badge, { variant }, () => status)
     },
