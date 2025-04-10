@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "api": "npx openapi-typescript http://localhost:8000/public/spec -o ./schema.d.ts"
+    "api": "npx openapi-typescript http://localhost:8000/api/schema/ -o ./schema.d.ts"
   },
   "dependencies": {
     "@formkit/drag-and-drop": "^0.2.6",

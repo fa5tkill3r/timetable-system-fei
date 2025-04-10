@@ -384,6 +384,26 @@ export interface paths {
         patch: operations["room_equipment_partial_update"];
         trace?: never;
     };
+    "/api/room-group-counts/all_groups/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Room Group Counts
+         * @description Returns a list of all unique RoomGroup names with counts.
+         */
+        get: operations["room_group_counts_all_groups_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/room-groups/": {
         parameters: {
             query?: never;
@@ -625,6 +645,23 @@ export interface paths {
         patch: operations["subject_groups_partial_update"];
         trace?: never;
     };
+    "/api/subject-groups/groups/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get list of unique subject groups with their counts */
+        get: operations["subject_groups_groups_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/subject-user-collisions/": {
         parameters: {
             query?: never;
@@ -632,10 +669,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
+        /** @description List subject user collisions */
         get: operations["subject_user_collisions_list"];
         put?: never;
         post?: never;
@@ -889,6 +923,62 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ttetype/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all objects
+         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+         */
+        get: operations["ttetype_list"];
+        put?: never;
+        /**
+         * Create new object
+         * @description Creates a new object with the provided data. Returns the created object.
+         */
+        post: operations["ttetype_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ttetype/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get single object
+         * @description Retrieves a specific object by its unique identifier (ID).
+         */
+        get: operations["ttetype_retrieve"];
+        /**
+         * Update object
+         * @description Fully updates an existing object. All fields must be provided.
+         */
+        put: operations["ttetype_update"];
+        post?: never;
+        /**
+         * Delete object
+         * @description Permanently removes the specified object from the database.
+         */
+        delete: operations["ttetype_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial update object
+         * @description Partially updates an existing object. Only specified fields will be modified.
+         */
+        patch: operations["ttetype_partial_update"];
+        trace?: never;
+    };
     "/api/ttevent/": {
         parameters: {
             query?: never;
@@ -1007,14 +1097,14 @@ export interface components {
     schemas: {
         /** @description Serializer for AIS terms */
         AISObdobie: {
-            id: number;
+            readonly id?: number;
             /**
              * @description * `ZS` - Zimny
              *     * `LS` - Letny
              * @enum {string}
              */
             semester: "ZS" | "LS";
-            year_start: string;
+            year_start: number;
             phd?: boolean;
             department: string;
             prev?: number | null;
@@ -1027,14 +1117,12 @@ export interface components {
         /** @description Base serializer that automatically handles nested serialization with caching */
         Allowance: {
             readonly id?: number;
-            subject: number;
-            event_type: number;
+            tta: number;
             amount?: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         AllowanceRequest: {
-            subject: number;
-            event_type: number;
+            tta: number;
             amount?: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
@@ -1069,7 +1157,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-18T22:31:22.656803
+             * @default 2025-04-10T19:18:34.692987
              */
             timestamp: string;
         };
@@ -1078,7 +1166,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-18T22:31:22.656875
+             * @default 2025-04-10T19:18:34.693350
              */
             timestamp: string;
         };
@@ -1087,7 +1175,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-03-18T22:31:22.656875
+             * @default 2025-04-10T19:18:34.693350
              */
             timestamp: string;
         };
@@ -1108,8 +1196,7 @@ export interface components {
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedAllowanceRequest: {
-            subject?: number;
-            event_type?: number;
+            tta?: number;
             amount?: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
@@ -1130,12 +1217,12 @@ export interface components {
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedRoomGroupRequest: {
             name?: string;
+            room?: number;
         };
-        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedRoomRequest: {
             name?: string;
             capacity?: number;
-            building?: number;
+            building?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedSubjectGroupRequest: {
@@ -1147,25 +1234,28 @@ export interface components {
             name?: string;
             code?: string;
             nominal_semester?: number | null;
+            building?: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedSubjectUserRoleRequest: {
             user?: number;
             subject?: number;
-            name?: string;
+            role?: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTEventRequest: {
-            tt?: number;
-            subject?: number;
-            event_type?: number;
+            tta?: number;
             day_of_week?: number | null;
+            /** Format: int64 */
+            weeks_bitmask?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
             room?: number;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        PatchedTTEventTypeRequest: {
+            name?: string;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTRequest: {
@@ -1195,15 +1285,15 @@ export interface components {
             end_date?: string | null;
             is_active?: boolean;
         };
-        /** @description Base serializer that automatically handles nested serialization with caching */
         Room: {
             readonly id?: number;
             name: string;
             capacity: number;
-            building: number;
+            building: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         RoomEquipment: {
+            readonly id?: number;
             room: number;
             equipment: number;
             count: number;
@@ -1218,17 +1308,21 @@ export interface components {
         RoomGroup: {
             readonly id?: number;
             name: string;
-            readonly owner?: components["schemas"]["User"];
+            room: number;
+        };
+        RoomGroupNameCount: {
+            name: string;
+            count: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         RoomGroupRequest: {
             name: string;
+            room: number;
         };
-        /** @description Base serializer that automatically handles nested serialization with caching */
         RoomRequest: {
             name: string;
             capacity: number;
-            building: number;
+            building: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         Subject: {
@@ -1236,13 +1330,20 @@ export interface components {
             name: string;
             code: string;
             nominal_semester: number | null;
-            readonly building?: number;
+            building: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectGroup: {
             readonly id?: number;
             subject: number;
             name: string;
+        };
+        /** @description Serializer for subject groups */
+        SubjectGroupCounts: {
+            /** @description Name of the subject group */
+            name: string;
+            /** @description Number of subjects in this group */
+            count: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectGroupRequest: {
@@ -1254,18 +1355,19 @@ export interface components {
             name: string;
             code: string;
             nominal_semester: number | null;
+            building: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectUserRole: {
             user: number;
             subject: number;
-            name: string;
+            role: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectUserRoleRequest: {
             user: number;
             subject: number;
-            name: string;
+            role: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         TT: {
@@ -1288,29 +1390,34 @@ export interface components {
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTEvent: {
             readonly id?: number;
-            tt: number;
-            subject: number;
-            event_type: number;
+            tta: number;
             day_of_week?: number | null;
+            /** Format: int64 */
+            weeks_bitmask?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
             room: number;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTEventRequest: {
-            tt: number;
-            subject: number;
-            event_type: number;
+            tta: number;
             day_of_week?: number | null;
+            /** Format: int64 */
+            weeks_bitmask?: number | null;
             /** Format: time */
             start_time?: string | null;
             duration?: number | null;
             room: number;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        TTEventType: {
+            readonly id?: number;
+            name: string;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        TTEventTypeRequest: {
+            name: string;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTRequest: {
@@ -1384,14 +1491,12 @@ export interface operations {
     allowence_list: {
         parameters: {
             query?: {
-                /** @description Filter by event type ID (1=Lecture, 2=Exercise, 2=Seminar, etc.) */
-                event_type?: number;
+                amount?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                /** @description Filter by subject ID */
-                subject?: number;
+                tta?: number;
             };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
@@ -1797,7 +1902,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this equipment. */
+                /** @description A unique integer value identifying this equipment. */
                 id: number;
             };
             cookie?: never;
@@ -1822,7 +1927,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this equipment. */
+                /** @description A unique integer value identifying this equipment. */
                 id: number;
             };
             cookie?: never;
@@ -1853,7 +1958,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this equipment. */
+                /** @description A unique integer value identifying this equipment. */
                 id: number;
             };
             cookie?: never;
@@ -1877,7 +1982,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this equipment. */
+                /** @description A unique integer value identifying this equipment. */
                 id: number;
             };
             cookie?: never;
@@ -2114,10 +2219,10 @@ export interface operations {
                 semester__in?: string[];
                 /** @description Filter by exact year (e.g., 2023/2024) */
                 year_start?: string;
-                year_start__gte?: string;
+                year_start__gte?: number;
                 /** @description Multiple values may be separated by commas. */
-                year_start__in?: string[];
-                year_start__lte?: string;
+                year_start__in?: number[];
+                year_start__lte?: number;
                 /** @description Filter by partial year (e.g., 2023) */
                 year_start_contains?: string;
             };
@@ -2142,7 +2247,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description A unique value identifying this AIS obdobie. */
+                /** @description A unique integer value identifying this AIS obdobie. */
                 id: number;
             };
             cookie?: never;
@@ -2442,6 +2547,37 @@ export interface operations {
             };
         };
     };
+    room_group_counts_all_groups_retrieve: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A list of all unique RoomGroup names with counts. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomGroupNameCount"][];
+                };
+            };
+            "!200": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
     room_groups_list: {
         parameters: {
             query?: {
@@ -2455,12 +2591,27 @@ export interface operations {
                 name__iregex?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                owner?: number;
+                room?: number;
+                room__building?: number;
+                room__building__abbrev?: string;
+                room__building__abbrev__icontains?: string;
+                room__building__abbrev__iregex?: string;
                 /** @description Multiple values may be separated by commas. */
-                owner__in?: number[];
-                owner__username?: string;
-                owner__username__icontains?: string;
-                owner__username__iregex?: string;
+                room__building__in?: number[];
+                room__building__name?: string;
+                room__building__name__icontains?: string;
+                room__building__name__iregex?: string;
+                room__equipment?: number[];
+                /** @description Multiple values may be separated by commas. */
+                room__equipment__in?: number[];
+                room__equipment__name?: string;
+                room__equipment__name__icontains?: string;
+                room__equipment__name__iregex?: string;
+                /** @description Multiple values may be separated by commas. */
+                room__in?: number[];
+                room__name?: string;
+                room__name__icontains?: string;
+                room__name__iregex?: string;
             };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
@@ -2520,7 +2671,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room group. */
+                /** @description A unique integer value identifying this room group. */
                 id: number;
             };
             cookie?: never;
@@ -2545,7 +2696,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room group. */
+                /** @description A unique integer value identifying this room group. */
                 id: number;
             };
             cookie?: never;
@@ -2576,7 +2727,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room group. */
+                /** @description A unique integer value identifying this room group. */
                 id: number;
             };
             cookie?: never;
@@ -2600,7 +2751,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room group. */
+                /** @description A unique integer value identifying this room group. */
                 id: number;
             };
             cookie?: never;
@@ -2713,7 +2864,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room. */
+                /** @description A unique integer value identifying this room. */
                 id: number;
             };
             cookie?: never;
@@ -2738,7 +2889,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room. */
+                /** @description A unique integer value identifying this room. */
                 id: number;
             };
             cookie?: never;
@@ -2769,7 +2920,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room. */
+                /** @description A unique integer value identifying this room. */
                 id: number;
             };
             cookie?: never;
@@ -2793,7 +2944,7 @@ export interface operations {
                 "X-Term": string;
             };
             path: {
-                /** @description A unique value identifying this room. */
+                /** @description A unique integer value identifying this room. */
                 id: number;
             };
             cookie?: never;
@@ -3157,6 +3308,35 @@ export interface operations {
             };
         };
     };
+    subject_groups_groups_list: {
+        parameters: {
+            query?: {
+                /** @description Filter groups with at least this many subjects */
+                count_gte?: number;
+                /** @description Filter group names by regex pattern (case insensitive) */
+                name_regex?: string;
+                /** @description Order by count (use - for descending) */
+                order?: "-count" | "count";
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupCounts"][];
+                };
+            };
+        };
+    };
     subject_user_collisions_list: {
         parameters: {
             query?: {
@@ -3187,13 +3367,23 @@ export interface operations {
     subject_user_roles_list: {
         parameters: {
             query?: {
+                count__gte?: number;
+                count__lte?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
-                name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                role?: string;
+                role__name?: string;
+                /** @description Multiple values may be separated by commas. */
+                role_id__in?: number[];
                 subject?: number;
+                subject__name?: string;
+                /** @description Multiple values may be separated by commas. */
+                subject_id__in?: number[];
                 user?: number;
+                /** @description Multiple values may be separated by commas. */
+                user__in?: number[];
             };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
@@ -3815,6 +4005,177 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTEvent"][];
+                };
+            };
+        };
+    };
+    ttetype_list: {
+        parameters: {
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+                /** @description Case-insensitive search for event type name */
+                name?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventType"][];
+                };
+            };
+        };
+    };
+    ttetype_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTEventTypeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRequest"];
+                "multipart/form-data": components["schemas"]["TTEventTypeRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventType"];
+                };
+            };
+        };
+    };
+    ttetype_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventType"];
+                };
+            };
+        };
+    };
+    ttetype_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTEventTypeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRequest"];
+                "multipart/form-data": components["schemas"]["TTEventTypeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventType"];
+                };
+            };
+        };
+    };
+    ttetype_destroy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ttetype_partial_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTTEventTypeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTEventTypeRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTTEventTypeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventType"];
                 };
             };
         };
