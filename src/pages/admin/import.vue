@@ -128,7 +128,7 @@
 
   // Navigate to schema page
   function moveToNextStep() {
-    router.push('/admin/schema')
+    router.push('/admin/schemas')
   }
 
   function reset() {
