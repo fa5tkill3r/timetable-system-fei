@@ -335,6 +335,40 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
+  const fetchRoomEquipmentByEquipment = async (equipmentId: number) => {
+    if (!schemaStore.activeSchema?.id) {
+      roomEquipment.value = []
+      return []
+    }
+    
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await client.GET('/api/room-equipment/', {
+        params: {
+          header: schemaStore.termHeader,
+          query: { equipment: equipmentId }
+        }
+      })
+      
+      if (response.data) {
+        roomEquipment.value = response.data
+        return response.data
+      } else {
+        error.value = 'Failed to fetch equipment'
+        roomEquipment.value = []
+        return []
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      roomEquipment.value = []
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const createRoomEquipment = async (roomId: number, equipmentData: RoomEquipmentRequest) => {
     isLoading.value = true
     error.value = null
@@ -440,6 +474,7 @@ export const useBuildingStore = defineStore('buildings', () => {
     fetchRooms,
     getRoom,
     fetchRoomEquipment,
+    fetchRoomEquipmentByEquipment,
     createBuilding,
     updateBuilding,
     deleteBuilding,

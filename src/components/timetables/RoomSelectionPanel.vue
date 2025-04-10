@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useBuildingStore } from '@/store/buildings'
+import { useEquipmentStore } from '@/store/equipment'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -18,17 +19,25 @@ const emit = defineEmits<{
 }>()
 
 const buildingStore = useBuildingStore()
+const equipmentStore = useEquipmentStore()
 const selectedBuildingIds = ref<(string | number)[]>([])
 const selectedRoomGroups = ref<(string | number)[]>([])
+const selectedEquipmentIds = ref<(string | number)[]>([])
 const searchQuery = ref('')
-const capacityRange = ref<[number, number]>([0, 200])
+const capacityRange = ref<[number, number]>([0, 300])
 
 // Prepare filter options
 const buildingOptions = computed(() => {
   return buildingStore.buildings.map(building => ({
     label: `${building.name} (${building.abbrev})`,
     value: building.id,
-    count: buildingStore.rooms.filter(room => room.building === building.id).length
+  }))
+})
+
+const equipmentOptions = computed(() => {
+  return equipmentStore.equipment.map(item => ({
+    label: item.name,
+    value: item.id,
   }))
 })
 
@@ -41,10 +50,45 @@ const roomGroupOptions = [
 const isFiltered = computed(() => 
   selectedBuildingIds.value.length > 0 || 
   selectedRoomGroups.value.length > 0 ||
+  selectedEquipmentIds.value.length > 0 ||
   searchQuery.value.trim() !== '' ||
   capacityRange.value[0] > 0 ||
-  capacityRange.value[1] < 200
+  capacityRange.value[1] < 300
 )
+
+// Map to store rooms that have specific equipment (our cache)
+const roomsWithEquipment = ref(new Map<number, Set<number>>())
+// Track previous equipment selections to detect changes
+const previousEquipmentIds = ref<(string | number)[]>([])
+
+// Watch for equipment selection changes to update roomEquipment data
+watch(selectedEquipmentIds, async (newValues, oldValues) => {
+  // Find newly added equipment IDs that need to be fetched
+  const added = newValues.filter(id => !previousEquipmentIds.value.includes(id))
+  
+  // Fetch data for newly added equipment
+  for (const equipmentId of added) {
+    const numericId = Number(equipmentId)
+    
+    // Check if we already have this equipment in cache
+    if (!roomsWithEquipment.value.has(numericId)) {
+      // Fetch and cache the data
+      const equipmentResults = await buildingStore.fetchRoomEquipmentByEquipment(numericId)
+      
+      // Store the room associations for this equipment
+      const roomSet = new Set<number>()
+      for (const item of equipmentResults) {
+        roomSet.add(item.room)
+      }
+      
+      // Add to our cache
+      roomsWithEquipment.value.set(numericId, roomSet)
+    }
+  }
+  
+  // Update tracking of previous selections
+  previousEquipmentIds.value = [...newValues]
+}, { immediate: true })
 
 const filteredRooms = computed(() => {
   let rooms = buildingStore.rooms
@@ -78,11 +122,27 @@ const filteredRooms = computed(() => {
   }
   
   // Filter by capacity range
-  if (capacityRange.value[0] > 0 || capacityRange.value[1] < 200) {
+  if (capacityRange.value[0] > 0 || capacityRange.value[1] < 300) {
     rooms = rooms.filter(room => 
       room.capacity >= capacityRange.value[0] && 
       room.capacity <= capacityRange.value[1]
     )
+  }
+  
+  // Filter by equipment (AND logic - room must have ALL selected equipment)
+  if (selectedEquipmentIds.value.length > 0) {
+    rooms = rooms.filter(room => {
+      if (!room.id) return false
+      
+      // Check if the room has ALL selected equipment items
+      for (const equipmentId of selectedEquipmentIds.value) {
+        const roomsWithThisEquipment = roomsWithEquipment.value.get(Number(equipmentId))
+        if (!roomsWithThisEquipment || !roomsWithThisEquipment.has(room.id)) {
+          return false // Room is missing at least one required equipment
+        }
+      }
+      return true // Room has all required equipment
+    })
   }
   
   return rooms
@@ -99,8 +159,11 @@ function clearRoom() {
 function resetAll() {
   selectedBuildingIds.value = []
   selectedRoomGroups.value = []
+  selectedEquipmentIds.value = []
+  previousEquipmentIds.value = []
   searchQuery.value = ''
   capacityRange.value = [0, 300]
+  // We keep the cache intact since it's still valid
   clearRoom()
 }
 </script>
@@ -125,6 +188,11 @@ function resetAll() {
             title="Room Types" 
             :options="roomGroupOptions"
             v-model="selectedRoomGroups"
+          />
+          <RoomFilter 
+            title="Equipment" 
+            :options="equipmentOptions"
+            v-model="selectedEquipmentIds"
           />
           <CapacitySliderFilter
             v-model="capacityRange"
