@@ -92,7 +92,7 @@ const timetableEventStore = useTimetableEventStore()
 const subjectStore = useSubjectStore()
 const buildingStore = useBuildingStore()
 const { toast } = useToast()
-const route = useRoute()
+const route = useRoute('/timetables/[id]')
 const router = useRouter()
 
 
@@ -101,7 +101,10 @@ const subjectId = ref<number | null>(null)
 const roomId = ref<number | null>(null)
 
 
-const selectedTimetable = ref<number | null>(null)
+const timetableId = computed(() => {
+  return route.params.id ? parseInt(route.params.id as string) : null
+})
+
 const selectedTimetableName = ref<string>('')
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -151,7 +154,6 @@ function getSubjectCode(subjectId?: number | null): string | null {
 
 
 onMounted(async () => {
-
   await subjectStore.fetchSubjects()
   await buildingStore.fetchRooms()
 
@@ -162,7 +164,6 @@ onMounted(async () => {
     roomId.value = parseInt(route.query.room as string)
   }
 
-
   loadTimetableData()
 })
 
@@ -171,17 +172,23 @@ async function loadTimetableData() {
   try {
     await timetableStore.fetchTimetables()
 
-
-    if (selectedTimetable.value) {
-      await fetchTimetableEvents(selectedTimetable.value)
-    } else if (timetableStore.timetables.length > 0) {
-      selectedTimetable.value = timetableStore.timetables[0].id
-      selectedTimetableName.value = timetableStore.timetables[0].name
+    if (timetableId.value) {
+      const timetable = await timetableStore.getTimetable(timetableId.value)
+      if (timetable) {
+        selectedTimetableName.value = timetable.name
+        await fetchTimetableEvents(timetableId.value)
+      } else {
+        toast({
+          title: "Timetable not found",
+          description: "The requested timetable does not exist.",
+          variant: "destructive"
+        })
+      }
     }
   } catch (error) {
     toast({
       title: "Error loading data",
-      description: "Failed to load timetables. Please try again.",
+      description: "Failed to load timetable. Please try again.",
       variant: "destructive"
     })
   }
@@ -332,23 +339,8 @@ const subjectOptions = computed(() => {
 })
 
 
-watch(selectedTimetable, async (newTimetableId) => {
-  if (newTimetableId) {
-
-    const timetable = await timetableStore.getTimetable(newTimetableId)
-    if (timetable) {
-      selectedTimetableName.value = timetable.name
-
-
-      await fetchTimetableEvents(newTimetableId)
-    }
-  }
-})
-
-
 watch([subjectId, roomId, viewType], async () => {
-  if (selectedTimetable.value) {
-
+  if (timetableId.value) {
     const query = { ...route.query }
 
     if (subjectId.value) {
@@ -363,15 +355,15 @@ watch([subjectId, roomId, viewType], async () => {
       delete query.room
     }
 
-
     router.replace({
       path: route.path,
       query
     })
 
-    await fetchTimetableEvents(selectedTimetable.value)
+    await fetchTimetableEvents(timetableId.value)
   }
 })
+
 
 
 const filteredEventTemplates = computed(() =>
@@ -915,15 +907,14 @@ const handleDrop = async (event: DragEvent) => {
 
 
 async function saveEventPlacement(event: CalendarEvent) {
-  if (!selectedTimetable.value) {
+  if (!timetableId.value) {
     toast({
       title: "Error",
-      description: "No timetable selected. Please select a timetable first.",
+      description: "No timetable ID found. Please check the URL.",
       variant: "destructive"
     })
     return
   }
-
 
   if (draggedTemplate.value && !preferredRoom.value) {
     toast({
@@ -935,9 +926,7 @@ async function saveEventPlacement(event: CalendarEvent) {
   }
 
   try {
-
     const dayOfWeek = days.indexOf(event.day) + 1
-
 
     const eventData = {
       day_of_week: dayOfWeek,
@@ -950,13 +939,11 @@ async function saveEventPlacement(event: CalendarEvent) {
 
     let result
     if (event.id && event.id > 0) {
-
       result = await timetableEventStore.updateEvent(event.id, eventData)
     } else {
-
       const fullEventData = {
         ...eventData,
-        timetable: selectedTimetable.value,
+        timetable: timetableId.value,
         subject: event.subjectId,
         subject_name: event.title,
         duration: getEventDuration(event),
@@ -971,7 +958,7 @@ async function saveEventPlacement(event: CalendarEvent) {
         description: "Event has been placed in the timetable."
       })
 
-      await fetchTimetableEvents(selectedTimetable.value)
+      await fetchTimetableEvents(timetableId.value)
     }
   } catch (error) {
     console.error("Error saving event placement:", error)
@@ -985,16 +972,14 @@ async function saveEventPlacement(event: CalendarEvent) {
 
 
 async function toggleEventPlacement(event: CalendarEvent) {
-  if (!selectedTimetable.value || !event.id) return
+  if (!timetableId.value || !event.id) return
 
   try {
-
     const currentEvent = timetableEventStore.events.find(e => e.id === event.id)
     if (!currentEvent) return
 
-
     const eventData = {
-      timetable: selectedTimetable.value,
+      timetable: timetableId.value,
       subject: event.subjectId || null,
       subject_name: event.title,
       day_of_week: null,
@@ -1002,7 +987,6 @@ async function toggleEventPlacement(event: CalendarEvent) {
       duration: getEventDuration(event),
       room: null,
       weeks_bitmask: 0,
-
     }
 
     const result = await timetableEventStore.updateEvent(event.id, eventData)
@@ -1011,7 +995,7 @@ async function toggleEventPlacement(event: CalendarEvent) {
         title: "Success",
         description: "Event has been moved to unplaced events."
       })
-      await fetchTimetableEvents(selectedTimetable.value)
+      await fetchTimetableEvents(timetableId.value)
     }
   } catch (error) {
     toast({
@@ -1065,32 +1049,7 @@ function handleDragEnd() {
                 </div>
 
                 <div class="flex flex-wrap justify-center gap-3 items-center">
-                  <TimetableSwitcher :timetables="timetableStore.timetables" :selected-id="selectedTimetable"
-                    :selected-name="selectedTimetableName" @select="selectedTimetable = $event" />
 
-                  <!-- <Select :v-model="String(subjectId)">
-                    <SelectTrigger class="w-[180px]">
-                      <SelectValue :placeholder="subjectId ? 'Subject filter active' : 'Filter by subject'" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem :value="String(null)">All subjects</SelectItem>
-                      <SelectItem v-for="subject in subjectOptions" :key="subject.id" :value="String(subject.id)">
-                        {{ subject.name }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select> -->
-
-                  <!-- <Select :v-model="String(roomId)">
-                    <SelectTrigger class="w-[180px]">
-                      <SelectValue :placeholder="roomId ? 'Room filter active' : 'Filter by room'" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem :value="String(null)">All rooms</SelectItem>
-                      <SelectItem v-for="room in []" :key="room.id" :value="room.id">
-                        {{ room.name }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select> -->
 
                   <div v-if="subjectId || roomId" class="flex gap-2 items-center">
                     <Badge variant="outline" v-if="subjectId">
@@ -1110,7 +1069,7 @@ function handleDragEnd() {
                   </div>
                 </div>
 
-                <div v-if="selectedTimetable && timetableStore.selectedTimetable?.status"
+                <div v-if="timetableId && timetableStore.selectedTimetable?.status"
                   class="flex justify-between pb-2 pr-3">
                   <div class="flex gap-2 items-end pl-10">
                     <Badge :variant="timetableStore.selectedTimetable?.status === 'PUBLISHED' ? 'default' :

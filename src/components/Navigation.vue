@@ -11,10 +11,6 @@
       text: 'Timetables',
     },
     {
-      to: '/timetable',
-      text: 'Timetable editor',
-    },
-    {
       to: '/requirements',
       text: 'Requirements',
     },
