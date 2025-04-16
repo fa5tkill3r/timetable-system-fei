@@ -875,7 +875,7 @@ const handleDrop = async (event: DragEvent) => {
 
     const newStartIndex = timeSlots.findIndex((slot) => slot.from === position.time.from)
     const newEndIndex = newStartIndex + duration - 1
-
+    
     const eventToPlace = {
       id: draggedTemplate.value.originalEventId || -nextEventId++,
       day: position.day,
@@ -885,7 +885,7 @@ const handleDrop = async (event: DragEvent) => {
       color: draggedTemplate.value.color,
       subjectId: draggedTemplate.value.subjectId,
       eventType: draggedTemplate.value.eventType,
-      shortcut: draggedTemplate.value.title.substring(0, 3).toUpperCase()
+      shortcut: getSubjectCode(draggedTemplate.value.subjectId)
     }
 
     events.value.push(eventToPlace)
