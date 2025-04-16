@@ -7,6 +7,7 @@ import { useTimetableStore } from '@/store/timetables'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { useSubjectStore } from '@/store/subjects'
 import { useBuildingStore } from '@/store/buildings'
+import { useTTEventTypeStore } from '@/store/ttEventTypes'
 import { getColorFromString } from '@/lib/utils'
 import {
   Tabs,
@@ -91,6 +92,7 @@ const timetableStore = useTimetableStore()
 const timetableEventStore = useTimetableEventStore()
 const subjectStore = useSubjectStore()
 const buildingStore = useBuildingStore()
+const ttEventTypeStore = useTTEventTypeStore()
 const { toast } = useToast()
 const route = useRoute('/timetables/[id]/')
 const router = useRouter()
@@ -153,9 +155,17 @@ function getSubjectCode(subjectId?: number | null): string | null {
 }
 
 
+function getEventTypeLabel(eventType: number | null): string {
+  if (!eventType) return 'Other';
+  
+  const eventTypeObj = eventType ? ttEventTypeStore.getEventTypeById(eventType) : null;
+  return eventTypeObj?.name || `Type ${eventType}`;
+}
+
 onMounted(async () => {
   await subjectStore.fetchSubjects()
   await buildingStore.fetchRooms()
+  await ttEventTypeStore.fetchEventTypes()
 
   if (route.query.subject) {
     subjectId.value = parseInt(route.query.subject as string)
@@ -217,12 +227,6 @@ async function fetchTimetableEvents(timetableId: number) {
   }
 }
 
-function getEventTypeLabel(eventType: number | null): string {
-  if (eventType === 1) return 'Lecture'
-  if (eventType === 2) return 'Lab'
-  return 'Other'
-}
-
 function processTimetableEvents() {
 
   events.value = []
@@ -231,8 +235,12 @@ function processTimetableEvents() {
 
   timetableEventStore.events.forEach(event => {
 
-    const subjectName = getSubjectName(event.subject)
-    const subjectCode = getSubjectCode(event.subject)
+    const ttaData = event.tta as any
+    const subjectId = ttaData?.subject
+    const eventType = ttaData?.event_type
+
+    const subjectName = getSubjectName(subjectId)
+    const subjectCode = getSubjectCode(subjectId)
 
 
     if (event.start_time !== null &&
@@ -267,8 +275,8 @@ function processTimetableEvents() {
         color: getColorFromString(title),
         roomId: event.room,
         roomName: roomName,
-        subjectId: event.subject,
-        eventType: event.event_type
+        subjectId: subjectId,
+        eventType: eventType
       })
     } else {
 
@@ -277,7 +285,7 @@ function processTimetableEvents() {
       const existingTemplate = eventTemplates.value.find(t =>
         t.title === title &&
         t.duration === event.duration &&
-        t.eventType === event.event_type
+        t.eventType === eventType
       )
 
       if (existingTemplate) {
@@ -289,9 +297,9 @@ function processTimetableEvents() {
           duration: event.duration || 1,
           color: getColorFromString(title),
           quantity: 1,
-          subjectId: event.subject,
+          subjectId: subjectId,
           originalEventId: event.id,
-          eventType: event.event_type
+          eventType: eventType
         })
       }
     }
@@ -944,10 +952,11 @@ async function saveEventPlacement(event: CalendarEvent) {
       const fullEventData = {
         ...eventData,
         timetable: timetableId.value,
-        subject: event.subjectId,
-        subject_name: event.title,
+        tta: {
+          subject: event.subjectId,
+          event_type: event.eventType || 1
+        },
         duration: getEventDuration(event),
-        event_type: event.eventType || 1,
       }
       result = await timetableEventStore.createEvent(fullEventData)
     }
@@ -980,8 +989,10 @@ async function toggleEventPlacement(event: CalendarEvent) {
 
     const eventData = {
       timetable: timetableId.value,
-      subject: event.subjectId || null,
-      subject_name: event.title,
+      tta: {
+        subject: event.subjectId || null,
+        event_type: event.eventType || null
+      },
       day_of_week: null,
       start_time: null,
       duration: getEventDuration(event),
