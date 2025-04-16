@@ -55,11 +55,22 @@ import { Skeleton } from '@/components/ui/skeleton'
 import ComboBox from '@/components/common/ComboBox.vue'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
+import { Room } from '@/types'
 
+
+// Time system configuration
+const TIME_CONFIG = {
+  WINDOWS_COUNT: 9,           // Number of time slots in a day
+  WINDOW_DURATION: 50,        // Duration of each slot in minutes
+  BREAK_DURATION: 10,         // Duration of breaks between slots in minutes
+  START_HOUR: 9,              // Starting hour (24-hour format)
+  START_MINUTE: 0             // Starting minute
+}
 
 interface TimeSlot {
-  from: string
-  to: string
+  from: string               // Display time (e.g., "9:00")
+  to: string                 // Display time (e.g., "9:50")
+  index: number              // 0-based index for the time slot
 }
 
 interface EventTemplate {
@@ -78,6 +89,7 @@ interface CalendarEvent {
   day: string
   startTime: string
   endTime: string
+  startIndex?: number  // Add index reference
   title: string
   shortcut: string
   color: string
@@ -110,20 +122,47 @@ const timetableId = computed(() => {
 const selectedTimetableName = ref<string>('')
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-const timeSlots: TimeSlot[] = [
-  { from: '9:00', to: '9:50' },
-  { from: '10:00', to: '10:50' },
-  { from: '11:00', to: '11:50' },
-  { from: '12:00', to: '12:50' },
-  { from: '13:00', to: '13:50' },
-  { from: '14:00', to: '14:50' },
-  { from: '15:00', to: '15:50' },
-  { from: '16:00', to: '16:50' },
-  { from: '17:00', to: '17:50' },
-]
+
+// Generate time slots dynamically based on configuration
+const timeSlots: TimeSlot[] = (() => {
+  const slots: TimeSlot[] = []
+  let currentHour = TIME_CONFIG.START_HOUR
+  let currentMinute = TIME_CONFIG.START_MINUTE
+  
+  for (let i = 0; i < TIME_CONFIG.WINDOWS_COUNT; i++) {
+    // Format start time
+    const fromHour = currentHour.toString().padStart(2, '0')
+    const fromMinute = currentMinute.toString().padStart(2, '0')
+    const from = `${fromHour}:${fromMinute}`
+    
+    // Calculate end time
+    let endHour = currentHour
+    let endMinute = currentMinute + TIME_CONFIG.WINDOW_DURATION
+    
+    if (endMinute >= 60) {
+      endHour += Math.floor(endMinute / 60)
+      endMinute = endMinute % 60
+    }
+    
+    const toHour = endHour.toString().padStart(2, '0')
+    const toMinute = endMinute.toString().padStart(2, '0')
+    const to = `${toHour}:${toMinute}`
+    
+    // Add to slots
+    slots.push({ from, to, index: i })
+    
+    // Calculate next start time (after break)
+    currentMinute += TIME_CONFIG.WINDOW_DURATION + TIME_CONFIG.BREAK_DURATION
+    if (currentMinute >= 60) {
+      currentHour += Math.floor(currentMinute / 60)
+      currentMinute = currentMinute % 60
+    }
+  }
+  
+  return slots
+})()
 
 
-const isMenuOpen = ref(true)
 const isOverMenu = ref(false)
 const searchQuery = ref('')
 
@@ -228,13 +267,10 @@ async function fetchTimetableEvents(timetableId: number) {
 }
 
 function processTimetableEvents() {
-
   events.value = []
   eventTemplates.value = []
 
-
   timetableEventStore.events.forEach(event => {
-
     const ttaData = event.tta as any
     const subjectId = ttaData?.subject
     const eventType = ttaData?.event_type
@@ -242,39 +278,30 @@ function processTimetableEvents() {
     const subjectName = getSubjectName(subjectId)
     const subjectCode = getSubjectCode(subjectId)
 
-
     if (event.start_time !== null &&
       event.day_of_week !== null &&
       event.room !== null &&
       event.weeks_bitmask !== null &&
       event.weeks_bitmask !== 0) {
 
-      const startTime = event.start_time.substring(0, 5)
+      // Convert numeric time index to display time
+      const timeIndex = Math.min(Math.max(event.start_time as number, 0), timeSlots.length - 1)
+      const startTime = timeSlots[timeIndex].from
       const endTime = calculateEndTime(startTime, event.duration)
 
-      const roomDetail = buildingStore.rooms.find(r => r.id === event.room);
-      const roomName = event.room_name || (roomDetail ? roomDetail.name : `Room ${event.room}`);
-
-      console.log("Event room info:", {
-        id: event.room,
-        name: roomName,
-        fromAPI: event.room_name,
-        fromStore: roomDetail?.name
-      });
-
-      const title = subjectName || event.subject_name || `Event ${event.id}`;
-      const shortcut = subjectCode || (title ? title.substring(0, 3).toUpperCase() : `E${event.id}`);
+      const room = event.room as any as Room
 
       events.value.push({
         id: event.id,
         day: getDayName(event.day_of_week),
         startTime: startTime,
         endTime: endTime,
-        title: title,
-        shortcut: shortcut,
-        color: getColorFromString(title),
-        roomId: event.room,
-        roomName: roomName,
+        startIndex: timeToIndex(startTime),
+        title: subjectName!,
+        shortcut: subjectCode!,
+        color: getColorFromString(subjectName!),
+        roomId: room.id,
+        roomName: room.name,
         subjectId: subjectId,
         eventType: eventType
       })
@@ -311,10 +338,16 @@ function getDayName(dayOfWeek: number): string {
   return days[dayOfWeek - 1] || 'Monday'
 }
 
+// Convert display time to index
+function timeToIndex(time: string): number {
+  const index = timeSlots.findIndex(slot => slot.from === time)
+  return index >= 0 ? index : 0
+}
+
 
 function calculateEndTime(startTime: string, duration: number): string {
 
-  const startIndex = timeSlots.findIndex(slot => slot.from === startTime)
+  const startIndex = timeToIndex(startTime)
 
 
   if (startIndex === -1) {
@@ -395,18 +428,6 @@ const draggedTemplate = ref<EventTemplate | null>(null)
 const draggedOverDay = ref<string | null>(null)
 const draggedOverTime = ref<TimeSlot | null>(null)
 
-
-const getTimeFromPosition = (x: number): TimeSlot | null => {
-  const timeIndex = Math.floor((x - DAY_COLUMN_WIDTH) / CELL_WIDTH)
-  return timeIndex >= 0 && timeIndex < timeSlots.length
-    ? timeSlots[timeIndex]
-    : null
-}
-
-const getDayFromPosition = (y: number): string | null => {
-  const dayIndex = Math.floor((y - HEADER_HEIGHT) / CELL_HEIGHT)
-  return dayIndex >= 0 && dayIndex < days.length ? days[dayIndex] : null
-}
 
 const getEventDuration = (event: CalendarEvent): number => {
   const startIndex = timeSlots.findIndex(
@@ -935,10 +956,12 @@ async function saveEventPlacement(event: CalendarEvent) {
 
   try {
     const dayOfWeek = days.indexOf(event.day) + 1
+    // Use the index of the time slot instead of the actual time
+    const startTimeIndex = timeToIndex(event.startTime)
 
     const eventData = {
       day_of_week: dayOfWeek,
-      start_time: event.startTime,
+      start_time: startTimeIndex, // Send index instead of time string
       room: preferredRoom.value || event.roomId || null,
       weeks_bitmask: 4095,
     }
@@ -1138,8 +1161,7 @@ function handleDragEnd() {
                 <ContextMenu>
                   <ContextMenuTrigger>
                     <div :style="getEventStyle(event)"
-                      class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
-                      :class="{ 'text-xs': getEventPositions().get(event.id)?.maxRows > 1 }" draggable="true"
+                      class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1" draggable="true"
                       @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
                       <div class="flex justify-between items-center">
                         <div class="event-title font-semibold text-gray-800 truncate">
