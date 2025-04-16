@@ -4,13 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Trash2, X as XIcon } from 'lucide-vue-next'
-import { useTimetableEventStore } from '@/store/timetableEvents'
 import { useTTEventTypeStore } from '@/store/ttEventTypes'
 import { getColorFromString } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import ComboBoxFilter from '@/components/common/ComboBoxFilter.vue'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 import { useSubjectStore } from '@/store/subjects'
+import { components } from 'schema'
 
 interface EventTemplate {
   id: string
@@ -22,6 +22,8 @@ interface EventTemplate {
   originalEventId?: number | null
   eventType?: number | null
 }
+
+type EventType = components['schemas']['TTEventType']
 
 const props = defineProps<{
   eventTemplates: EventTemplate[]
@@ -47,7 +49,7 @@ const selectedEventTypeIds = ref<(string | number)[]>([])
 const selectedGroupIds = ref<(string | number)[]>([])
 
 const eventTypeOptions = computed(() => {
-  return ttEventTypeStore.eventTypes.map(type => ({
+  return ttEventTypeStore.eventTypes.map((type: EventType) => ({
     label: type.name,
     value: type.id
   }))
@@ -164,6 +166,13 @@ function getAdjustedColor(template: EventTemplate): string {
   const brightnessAdjustment = template.eventType === 1 ? 0.9 : 1.1
   return getColorFromString(template.title, 'pastel', brightnessAdjustment)
 }
+
+function getSubjectCode(subjectId?: number | null): string | null {
+  if (!subjectId) return null
+  
+  const subject = subjectStore.subjects.find(s => s.id === subjectId)
+  return subject?.code || null
+}
 </script>
 
 <template>
@@ -222,16 +231,19 @@ function getAdjustedColor(template: EventTemplate): string {
           <div v-for="template in filteredEventTemplates" :key="template.id" v-show="template.quantity > 0"
             class="p-3 rounded-lg cursor-move relative group" :style="{ backgroundColor: getAdjustedColor(template) }"
             draggable="true" @dragstart="handleDragStart($event, template)" @dragend="handleDragEnd">
-            <div class="font-medium">{{ template.title }}</div>
+            <div class="font-medium truncate">
+              <!-- Show subject code always -->
+              <span class="font-semibold">{{ getSubjectCode(template.subjectId) || '' }}</span>
+              
+              <span class="ml-1">- {{ template.title }}</span>
+            </div>
+            
             <div class="flex justify-between items-center text-sm text-gray-600">
-              <span>{{ getEventTypeLabel(template.eventType) }}</span>
+              <span>{{ getEventTypeLabel(template.eventType ?? null) }}</span>
               <span>Duration: {{ template.duration }}h</span>
             </div>
             <div class="text-sm text-gray-600 mt-1">
               <span class="ml-auto">Remaining: {{ template.quantity }}</span>
-            </div>
-            <div v-if="template.originalEventId" class="text-xs text-gray-500 mt-1">
-              ID: {{ template.originalEventId }}
             </div>
           </div>
         </div>
