@@ -121,12 +121,17 @@ const filteredRooms = computed(() => {
     })
   }
   
-  // Filter by capacity range
   if (capacityRange.value[0] > 0 || capacityRange.value[1] < 300) {
-    rooms = rooms.filter(room => 
-      room.capacity >= capacityRange.value[0] && 
-      room.capacity <= capacityRange.value[1]
-    )
+    rooms = rooms.filter(room => {
+      if (room.capacity < capacityRange.value[0])
+       return false
+      
+      if (capacityRange.value[1] < 300) {
+        return room.capacity <= capacityRange.value[1]
+      }
+      
+      return true
+    })
   }
   
   // Filter by equipment (AND logic - room must have ALL selected equipment)

@@ -46,7 +46,7 @@ function updateRange(newRange: number[] | undefined) {
 }
 
 function formatCapacity(value: number): string {
-  if (value >= props.max) return `${value}+`
+  if (value >= props.max) return `${props.max}+`
   return value.toString()
 }
 </script>
