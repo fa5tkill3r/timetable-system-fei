@@ -5,12 +5,15 @@ import { useSchemaStore } from './schemas'
 import { components } from 'schema'
 
 type SubjectGroup = components['schemas']['SubjectGroup']
+type SubjectGroupCounts = components['schemas']['SubjectGroupCounts'] 
 type SubjectGroupRequest = components['schemas']['SubjectGroupRequest']
 
 export const useSubjectGroupStore = defineStore('subjectGroups', () => {
   const schemaStore = useSchemaStore()
   const subjectGroups = ref<SubjectGroup[]>([])
+  const subjectGroupGroups = ref<SubjectGroupCounts[]>([])
   const isLoading = ref(false)
+  const isLoadingGroups = ref(false)
   const error = ref<string | null>(null)
 
   // Get all subject groups
@@ -43,6 +46,39 @@ export const useSubjectGroupStore = defineStore('subjectGroups', () => {
       return []
     } finally {
       isLoading.value = false
+    }
+  }
+
+  // Get all subject group relations
+  const fetchSubjectGroupGroups = async () => {
+    if (!schemaStore.activeSchema?.id) {
+      subjectGroupGroups.value = []
+      return []
+    }
+    
+    isLoadingGroups.value = true
+    error.value = null
+    try {
+      const response = await client.GET('/api/subject-groups/groups/', {
+        params: {
+          header: schemaStore.termHeader
+        }
+      })
+      
+      if (response.data) {
+        subjectGroupGroups.value = response.data
+        return response.data
+      } else {
+        error.value = 'Failed to fetch subject group groups'
+        subjectGroupGroups.value = []
+        return []
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      subjectGroupGroups.value = []
+      return []
+    } finally {
+      isLoadingGroups.value = false
     }
   }
 
@@ -144,9 +180,12 @@ export const useSubjectGroupStore = defineStore('subjectGroups', () => {
 
   return {
     subjectGroups,
+    subjectGroupGroups,
     isLoading,
+    isLoadingGroups,
     error,
     fetchSubjectGroups,
+    fetchSubjectGroupGroups,
     createSubjectGroup,
     updateSubjectGroup,
     deleteSubjectGroup,

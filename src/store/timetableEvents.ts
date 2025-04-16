@@ -163,7 +163,7 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
     }
   }
 
-  const generateTimetableEvents = async (timetable: { id: number, name: string }, subjectGroupName: string, ttProgram: string) => {
+  const generateTimetableEvents = async (timetableId: number, subjectGroupName: string) => {
     isLoading.value = true
     error.value = null
     try {
@@ -172,9 +172,8 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
         params: {
           header: schemaStore.termHeader,
           query: {
-            tt_name: timetable.name, 
+            tt_id: timetableId, 
             subjectgroup_name: subjectGroupName,
-            tt_program: ttProgram
           }
         }
       })
