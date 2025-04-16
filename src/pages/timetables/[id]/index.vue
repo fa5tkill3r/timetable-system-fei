@@ -55,6 +55,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import ComboBox from '@/components/common/ComboBox.vue'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
+import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue'
 import { Room } from '@/types'
 
 
@@ -754,6 +755,12 @@ const handleDragStart = (
   event.dataTransfer!.effectAllowed = 'move'
 }
 
+// Handle event from EventSelectionPanel for template drag start
+function handleTemplateStart(event: DragEvent, template: EventTemplate) {
+  draggedTemplate.value = template
+  event.dataTransfer!.effectAllowed = 'move'
+}
+
 const getMousePosition = (
   event: DragEvent,
 ): { day: string; time: TimeSlot } | null => {
@@ -1208,75 +1215,15 @@ function handleDragEnd() {
     <ResizableHandle @dragging="resize($event)" with-handle />
 
     <ResizablePanel :default-size="25">
-      <!-- Event selection panel -->
-      <div class="h-full bg-white p-4" :class="{ 'bg-gray-50': isOverMenu }" @dragover="handleMenuDragOver"
-        @dragleave="handleMenuDragLeave" @drop="handleMenuDrop">
-
-        <Tabs default-value="events" class="h-full">
-          <TabsList class="w-full">
-            <TabsTrigger value="events" class="w-full">Unplaced Events</TabsTrigger>
-            <TabsTrigger value="requirements" class="w-full">Requirements</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="events" class="h-[calc(100%-40px)] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-semibold">Unplaced Events</h3>
-              <Badge>{{ filteredEventTemplates.length }}</Badge>
-            </div>
-
-            <Input v-model="searchQuery" type="text" class="mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Search events..." />
-
-            <div class="space-y-3">
-              <div v-for="template in filteredEventTemplates" :key="template.id" v-show="template.quantity > 0"
-                class="p-3 rounded-lg cursor-move relative group" :style="{ backgroundColor: template.color }"
-                draggable="true" @dragstart="handleDragStart($event, template, true)" @dragend="handleDragEnd">
-                <div class="font-medium">{{ template.title }}</div>
-                <div class="flex justify-between items-center text-sm text-gray-600">
-                  <span>{{ getEventTypeLabel(template.eventType) }}</span>
-                  <span>Duration: {{ template.duration }}h</span>
-                </div>
-                <div class="text-sm text-gray-600 mt-1">
-                  <span class="ml-auto">Remaining: {{ template.quantity }}</span>
-                </div>
-                <div v-if="template.originalEventId" class="text-xs text-gray-500 mt-1">
-                  ID: {{ template.originalEventId }}
-                </div>
-              </div>
-            </div>
-
-            <div v-if="filteredEventTemplates.length === 0" class="text-center py-8 text-muted-foreground">
-              No unplaced events found.
-            </div>
-
-            <div v-if="eventTemplates.length === 0 && !timetableEventStore.isLoading"
-              class="mb-4 text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
-              No unplaced events found. Check if events exist in the timetable.
-            </div>
-
-            <div v-if="timetableEventStore.isLoading" class="flex justify-center py-4">
-              <div class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
-            </div>
-
-            <div v-if="isOverMenu"
-              class="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50 bg-opacity-50 rounded pointer-events-none flex items-center justify-center">
-              <div class="flex items-center text-blue-600">
-                <Trash2 class="w-5 h-5 mr-2" />
-                <span>Drop to remove event</span>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="requirements">
-            <div class="space-y-4 pt-2">
-              <h3 class="text-lg font-semibold">Timetable Requirements</h3>
-              <div class="text-sm text-muted-foreground">
-                Configure additional constraints and requirements for this timetable.
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+      <EventSelectionPanel 
+        :event-templates="eventTemplates" 
+        :is-loading="timetableEventStore.isLoading"
+        @drag-start="handleTemplateStart"
+        @drag-end="handleDragEnd"
+        @menu-drag-over="handleMenuDragOver"
+        @menu-drag-leave="handleMenuDragLeave"
+        @menu-drop="handleMenuDrop"
+      />
     </ResizablePanel>
   </ResizablePanelGroup>
 </template>
