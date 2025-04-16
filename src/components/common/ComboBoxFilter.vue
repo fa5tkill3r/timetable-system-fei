@@ -112,7 +112,7 @@ const filteredOptionsCount = computed(() => {
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup>
-            <CommandItem v-for="option in displayedOptions" :key="option.value" :value="option"
+            <CommandItem v-for="option in displayedOptions" :key="option.value" :value="option.value"
               @select="() => toggleOption(option)">
               <div :class="cn(
                 'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
@@ -137,7 +137,7 @@ const filteredOptionsCount = computed(() => {
           <template v-if="selectedValues.size > 0">
             <CommandSeparator />
             <CommandGroup>
-              <CommandItem class="justify-center text-center" @select="clearFilters">
+              <CommandItem class="justify-center text-center" value="clear" @select="clearFilters">
                 Clear filters
               </CommandItem>
             </CommandGroup>
