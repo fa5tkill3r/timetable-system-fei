@@ -292,6 +292,8 @@ function processTimetableEvents() {
 
       const room = event.room as any as Room
 
+      const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
+
       events.value.push({
         id: event.id,
         day: getDayName(event.day_of_week),
@@ -300,7 +302,7 @@ function processTimetableEvents() {
         startIndex: timeToIndex(startTime),
         title: subjectName!,
         shortcut: subjectCode!,
-        color: getColorFromString(subjectName!),
+        color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
         roomId: room.id,
         roomName: room.name,
         subjectId: subjectId,
@@ -319,11 +321,13 @@ function processTimetableEvents() {
       if (existingTemplate) {
         existingTemplate.quantity += 1
       } else {
+        const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
+        
         eventTemplates.value.push({
           id: `template-${event.id}`,
           title: title,
           duration: event.duration || 1,
-          color: getColorFromString(title),
+          color: getColorFromString(title, 'pastel', brightnessAdjustment),
           quantity: 1,
           subjectId: subjectId,
           originalEventId: event.id,
@@ -876,13 +880,16 @@ const handleDrop = async (event: DragEvent) => {
     const newStartIndex = timeSlots.findIndex((slot) => slot.from === position.time.from)
     const newEndIndex = newStartIndex + duration - 1
     
+    // TODO: This may not be necessary cant test due to API issues
+    const brightnessAdjustment = draggedTemplate.value.eventType === 1 ? 0.9 : 1.1
+    
     const eventToPlace = {
       id: draggedTemplate.value.originalEventId || -nextEventId++,
       day: position.day,
       startTime: timeSlots[newStartIndex].from,
       endTime: timeSlots[newEndIndex].to,
       title: draggedTemplate.value.title,
-      color: draggedTemplate.value.color,
+      color: getColorFromString(draggedTemplate.value.title, 'pastel', brightnessAdjustment),
       subjectId: draggedTemplate.value.subjectId,
       eventType: draggedTemplate.value.eventType,
       shortcut: getSubjectCode(draggedTemplate.value.subjectId)

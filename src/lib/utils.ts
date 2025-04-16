@@ -34,9 +34,14 @@ export function valueUpdater<T>(
  * 
  * @param name - String to generate the color from
  * @param style - Color style: 'default', 'pastel', or 'bright'
+ * @param brightnessAdjustment - Factor to adjust brightness (< 1 for darker, > 1 for lighter)
  * @returns A hex color code
  */
-export function getColorFromString(name: string, style: 'default' | 'pastel' | 'bright' = 'pastel'): string {
+export function getColorFromString(
+  name: string, 
+  style: 'default' | 'pastel' | 'bright' = 'pastel',
+  brightnessAdjustment: number = 1.0
+): string {
   // Generate a hash from the string
   let hash = 0
   for (let i = 0; i < name.length; i++) {
@@ -55,7 +60,12 @@ export function getColorFromString(name: string, style: 'default' | 'pastel' | '
     const pastelG = Math.round((g + 255) / 2)
     const pastelB = Math.round((b + 255) / 2)
     
-    return `#${(pastelR << 16 | pastelG << 8 | pastelB).toString(16).padStart(6, '0')}`
+    // Apply brightness adjustment
+    const adjustedR = Math.min(255, Math.max(0, Math.round(pastelR * brightnessAdjustment)))
+    const adjustedG = Math.min(255, Math.max(0, Math.round(pastelG * brightnessAdjustment)))
+    const adjustedB = Math.min(255, Math.max(0, Math.round(pastelB * brightnessAdjustment)))
+    
+    return `#${(adjustedR << 16 | adjustedG << 8 | adjustedB).toString(16).padStart(6, '0')}`
   } 
   else if (style === 'bright') {
     // Increase brightness for bright colors
@@ -63,17 +73,28 @@ export function getColorFromString(name: string, style: 'default' | 'pastel' | '
     const minBrightness = 160
     
     if (brightness < minBrightness) {
-      const factor = Math.min(2, minBrightness / (brightness + 0.1))
+      const factor = Math.min(2, minBrightness / (brightness + 0.1)) * brightnessAdjustment
       const brightR = Math.min(255, Math.round(r * factor))
       const brightG = Math.min(255, Math.round(g * factor))
       const brightB = Math.min(255, Math.round(b * factor))
       
       return `#${(brightR << 16 | brightG << 8 | brightB).toString(16).padStart(6, '0')}`
     }
+    
+    // Apply brightness adjustment to default bright
+    const adjustedR = Math.min(255, Math.max(0, Math.round(r * brightnessAdjustment)))
+    const adjustedG = Math.min(255, Math.max(0, Math.round(g * brightnessAdjustment)))
+    const adjustedB = Math.min(255, Math.max(0, Math.round(b * brightnessAdjustment)))
+    
+    return `#${(adjustedR << 16 | adjustedG << 8 | adjustedB).toString(16).padStart(6, '0')}`
   }
   
-  // Default: return the normal color
-  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`
+  // Default with brightness adjustment
+  const adjustedR = Math.min(255, Math.max(0, Math.round(r * brightnessAdjustment)))
+  const adjustedG = Math.min(255, Math.max(0, Math.round(g * brightnessAdjustment)))
+  const adjustedB = Math.min(255, Math.max(0, Math.round(b * brightnessAdjustment)))
+  
+  return `#${(adjustedR << 16 | adjustedG << 8 | adjustedB).toString(16).padStart(6, '0')}`
 }
 
 // This function can be useful for other purposes, so we'll keep it

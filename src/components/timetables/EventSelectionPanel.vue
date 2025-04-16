@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Trash2 } from 'lucide-vue-next'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { useTTEventTypeStore } from '@/store/ttEventTypes'
+import { getColorFromString } from '@/lib/utils'
 
 interface EventTemplate {
   id: string
@@ -70,6 +71,12 @@ function handleMenuDragLeave() {
 function handleMenuDrop(event: DragEvent) {
   emit('menuDrop', event)
 }
+
+function getAdjustedColor(template: EventTemplate): string {
+  // Use more subtle brightness adjustment
+  const brightnessAdjustment = template.eventType === 1 ? 0.9 : 1.1
+  return getColorFromString(template.title, 'pastel', brightnessAdjustment)
+}
 </script>
 
 <template>
@@ -94,7 +101,7 @@ function handleMenuDrop(event: DragEvent) {
 
         <div class="space-y-3">
           <div v-for="template in filteredEventTemplates" :key="template.id" v-show="template.quantity > 0"
-            class="p-3 rounded-lg cursor-move relative group" :style="{ backgroundColor: template.color }"
+            class="p-3 rounded-lg cursor-move relative group" :style="{ backgroundColor: getAdjustedColor(template) }"
             draggable="true" @dragstart="handleDragStart($event, template)" @dragend="handleDragEnd">
             <div class="font-medium">{{ template.title }}</div>
             <div class="flex justify-between items-center text-sm text-gray-600">
