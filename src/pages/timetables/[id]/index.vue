@@ -1018,11 +1018,6 @@ async function toggleEventPlacement(event: CalendarEvent) {
     if (!currentEvent) return
 
     const eventData = {
-      timetable: timetableId.value,
-      tta: {
-        subject: event.subjectId || null,
-        event_type: event.eventType || null
-      },
       day_of_week: null,
       start_time: null,
       duration: getEventDuration(event),
