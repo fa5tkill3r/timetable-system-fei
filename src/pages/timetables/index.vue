@@ -150,6 +150,12 @@ const columns: ColumnDef<Timetable>[] = [
       const timetable = row.original
 
       return h('div', { class: 'flex justify-end space-x-2' }, [
+        h(RouterLink, {
+          to: `/timetables/${timetable.id}/activities`,
+        }, () => h(Button, {
+          variant: 'outline',
+          size: 'sm',
+        }, () => h(CalendarIcon, { class: 'h-4 w-4' }))),
         h(Button, {
           variant: 'outline',
           size: 'sm',

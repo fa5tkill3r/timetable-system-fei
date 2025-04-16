@@ -23,12 +23,13 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
     isLoading.value = true
     error.value = null
     try {
-      const queryParams = timetableId ? { tt: timetableId } : undefined
-
       const response = await client.GET('/api/ttevent/', {
         params: {
           header: schemaStore.termHeader,
-          query: queryParams
+          query: {
+            "max-level": 2,
+            tt: timetableId
+          }
         }
       })
       
@@ -162,6 +163,39 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
     }
   }
 
+  const generateTimetableEvents = async (timetable: { id: number, name: string }, subjectGroupName: string, ttProgram: string) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      // TODO: Backend needs to be updated to accept timetable ID instead of name
+      const response = await client.GET('/api/ttecontroller/generate-tte-events/', {
+        params: {
+          header: schemaStore.termHeader,
+          query: {
+            tt_name: timetable.name, 
+            subjectgroup_name: subjectGroupName,
+            tt_program: ttProgram
+          }
+        }
+      })
+      
+      if (response.data) {
+        // Refresh the events list after generation
+        await fetchEvents(timetable.id)
+        return { success: true, data: response.data }
+      } else {
+        error.value = 'Failed to generate timetable events'
+        return { success: false, error: 'No data returned from server' }
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value = errorMessage
+      return { success: false, error: errorMessage }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const clearSelection = () => {
     selectedEvent.value = null
   }
@@ -183,6 +217,7 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
     createEvent,
     updateEvent,
     deleteEvent,
-    clearSelection
+    clearSelection,
+    generateTimetableEvents
   }
 })

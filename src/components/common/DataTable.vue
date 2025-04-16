@@ -21,8 +21,8 @@
             v-for="column in table.getAllColumns().filter(column => column.getCanHide())"
             :key="column.id"
             class="capitalize"
-            :model-value="column.getIsVisible()"
-            @update:model-value="value => column.toggleVisibility(!!value)"
+            :checked="column.getIsVisible()"
+            @select="column.toggleVisibility()"
           >
             {{ column.id }}
           </DropdownMenuCheckboxItem>
@@ -133,6 +133,7 @@ const props = defineProps<{
   pageIndex?: number
   pageSize?: number
   searchTerm?: string
+  initialColumnVisibility?: VisibilityState  // Add this prop
   
   // Options
   enableSearch?: boolean
@@ -154,7 +155,7 @@ const emit = defineEmits<{
 // Table state
 const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
-const columnVisibility = ref<VisibilityState>({})
+const columnVisibility = ref<VisibilityState>(props.initialColumnVisibility || {})
 const rowSelection = ref<Record<string, boolean>>({})
 
 // Initialize the table with TanStack
@@ -176,7 +177,9 @@ const table = useVueTable({
   },
   onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
   onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
-  onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
+  onColumnVisibilityChange: updaterOrValue => {
+    valueUpdater(updaterOrValue, columnVisibility)
+  },
   onRowSelectionChange: updaterOrValue => {
     valueUpdater(updaterOrValue, rowSelection)
     emit('selectionChange', rowSelection.value)

@@ -92,7 +92,7 @@ const timetableEventStore = useTimetableEventStore()
 const subjectStore = useSubjectStore()
 const buildingStore = useBuildingStore()
 const { toast } = useToast()
-const route = useRoute('/timetables/[id]')
+const route = useRoute('/timetables/[id]/')
 const router = useRouter()
 
 
