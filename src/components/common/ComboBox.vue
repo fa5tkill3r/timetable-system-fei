@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { defineProps, defineEmits, watch } from 'vue'
+  import { defineProps, defineEmits, watch, ref } from 'vue'
   import { Button } from '@/components/ui/button'
   import {
     Command,
@@ -51,6 +51,10 @@
       type: String,
       default: 'Search options...',
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const emit = defineEmits(['update:selection'])
@@ -67,6 +71,13 @@
     validationSchema: formSchema,
   })
 
+  const isOpen = ref(false)
+  
+  const handleSelect = (optionId: any) => {
+    setFieldValue('selection', optionId)
+    isOpen.value = false
+  }
+
   // Watch for changes to the selection and emit them to parent
   watch(() => values.selection, (newValue) => {
     emit('update:selection', newValue)
@@ -77,7 +88,7 @@
   <FormField name="selection" class="w-full">
     <FormItem class="flex flex-col">
       <FormLabel>{{ title }}</FormLabel>
-      <Popover>
+      <Popover v-model:open="isOpen">
         <PopoverTrigger as-child>
           <FormControl>
             <Button
@@ -100,18 +111,21 @@
         <PopoverContent class="w-[var(--radix-popover-trigger-width)] p-0">
           <Command>
             <CommandInput :placeholder="searchPlaceholder" />
-            <CommandEmpty>
-              <slot name="empty">Nič sme nenašli</slot>
-            </CommandEmpty>
             <CommandList>
-              <CommandGroup>
+              <div v-if="loading" class="flex items-center justify-center p-2">
+                <div class="h-4 w-4 animate-spin mr-2" /> Loading...
+              </div>
+              <CommandEmpty v-else>
+                <slot name="empty">Nič sme nenašli</slot>
+              </CommandEmpty>
+              <CommandGroup v-if="!loading">
                 <CommandItem
                   v-for="option in options"
                   :key="option.id"
                   :value="option.name"
                   @select="
                     () => {
-                      setFieldValue('selection', option.id)
+                      handleSelect(option.id)
                     }
                   "
                 >
