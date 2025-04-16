@@ -3,10 +3,14 @@ import { ref, computed } from 'vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Trash2 } from 'lucide-vue-next'
+import { Trash2, X as XIcon } from 'lucide-vue-next'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { useTTEventTypeStore } from '@/store/ttEventTypes'
 import { getColorFromString } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import ComboBoxFilter from '@/components/common/ComboBoxFilter.vue'
+import { useSubjectGroupStore } from '@/store/subjectGroups'
+import { useSubjectStore } from '@/store/subjects'
 
 interface EventTemplate {
   id: string
@@ -35,13 +39,96 @@ const emit = defineEmits<{
 const isOverMenu = ref(false)
 const searchQuery = ref('')
 const ttEventTypeStore = useTTEventTypeStore()
+const subjectGroupStore = useSubjectGroupStore()
+const subjectStore = useSubjectStore()
 
-const filteredEventTemplates = computed(() =>
-  props.eventTemplates.filter((template) =>
-    template.title.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
-    template.quantity > 0
-  )
+// Filters
+const selectedEventTypeIds = ref<(string | number)[]>([])
+const selectedGroupIds = ref<(string | number)[]>([])
+
+const eventTypeOptions = computed(() => {
+  return ttEventTypeStore.eventTypes.map(type => ({
+    label: type.name,
+    value: type.id
+  }))
+})
+
+const groupOptions = computed(() => {
+  const groupsSet = new Set<string>()
+  const options: { label: string, value: string }[] = []
+  
+  // Extract unique subject IDs from templates
+  const subjectIds = new Set<number>()
+  props.eventTemplates.forEach(template => {
+    if (template.subjectId) {
+      subjectIds.add(template.subjectId)
+    }
+  })
+
+  // Get groups for each subject
+  subjectIds.forEach(subjectId => {
+    const groups = subjectGroupStore.getGroupsBySubject(subjectId)
+    groups.forEach(group => {
+      if (group.name && !groupsSet.has(group.name)) {
+        groupsSet.add(group.name)
+        options.push({
+          label: group.name,
+          value: group.name
+        })
+      }
+    })
+  })
+
+  return options
+})
+
+const isFiltered = computed(() => 
+  searchQuery.value.trim() !== '' ||
+  selectedEventTypeIds.value.length > 0 || 
+  selectedGroupIds.value.length > 0
 )
+
+function getSubjectGroups(subjectId: number | null | undefined) {
+  if (!subjectId) return []
+  return subjectGroupStore.getGroupsBySubject(subjectId)
+}
+
+const filteredEventTemplates = computed(() => {
+  let filtered = props.eventTemplates.filter((template) => template.quantity > 0)
+
+  // Text search filter
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(template => template.title.toLowerCase().includes(query))
+  }
+
+  // Event type filter
+  if (selectedEventTypeIds.value.length > 0) {
+    filtered = filtered.filter(template => 
+      template.eventType && selectedEventTypeIds.value.includes(template.eventType)
+    )
+  }
+
+  // Group filter
+  if (selectedGroupIds.value.length > 0) {
+    filtered = filtered.filter(template => {
+      if (!template.subjectId) return false
+      
+      const groups = getSubjectGroups(template.subjectId)
+      return groups.some(group => 
+        group.name && selectedGroupIds.value.includes(group.name)
+      )
+    })
+  }
+
+  return filtered
+})
+
+function resetFilters() {
+  searchQuery.value = ''
+  selectedEventTypeIds.value = []
+  selectedGroupIds.value = []
+}
 
 function getEventTypeLabel(eventType: number | null): string {
   if (!eventType) return 'Other';
@@ -96,8 +183,40 @@ function getAdjustedColor(template: EventTemplate): string {
           <Badge>{{ filteredEventTemplates.length }}</Badge>
         </div>
 
-        <Input v-model="searchQuery" type="text" class="mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Search events..." />
+        <!-- Filters section - stacked vertically -->
+        <div class="space-y-2 mb-4">
+          <!-- Search input first -->
+          <Input v-model="searchQuery" type="text" class="w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Search events..." />
+          
+          <!-- Filters below -->
+          <div class="flex flex-wrap gap-2">
+            <ComboBoxFilter 
+              title="Type" 
+              :options="eventTypeOptions"
+              v-model="selectedEventTypeIds"
+              class="h-8"
+            />
+            
+            <ComboBoxFilter 
+              title="Group" 
+              :options="groupOptions"
+              v-model="selectedGroupIds"
+              class="h-8"
+            />
+            
+            <Button
+              v-if="isFiltered"
+              variant="ghost"
+              size="sm"
+              class="h-8"
+              @click="resetFilters"
+            >
+              Reset
+              <XIcon class="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
 
         <div class="space-y-3">
           <div v-for="template in filteredEventTemplates" :key="template.id" v-show="template.quantity > 0"
