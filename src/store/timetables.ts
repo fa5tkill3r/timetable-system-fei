@@ -32,7 +32,7 @@ export const useTimetableStore = defineStore('timetables', () => {
       })
       
       if (response.data) {
-        timetables.value = response.data
+        timetables.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch timetables'

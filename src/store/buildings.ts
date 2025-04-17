@@ -37,7 +37,7 @@ export const useBuildingStore = defineStore('buildings', () => {
       })
       
       if (response.data) {
-        buildings.value = response.data
+        buildings.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch buildings'
@@ -175,7 +175,7 @@ export const useBuildingStore = defineStore('buildings', () => {
       })
       
       if (response.data) {
-        rooms.value = response.data
+        rooms.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch rooms'
@@ -319,7 +319,7 @@ export const useBuildingStore = defineStore('buildings', () => {
       })
       
       if (response.data) {
-        roomEquipment.value = response.data
+        roomEquipment.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch equipment'
@@ -353,7 +353,7 @@ export const useBuildingStore = defineStore('buildings', () => {
       })
       
       if (response.data) {
-        roomEquipment.value = response.data
+        roomEquipment.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch equipment'

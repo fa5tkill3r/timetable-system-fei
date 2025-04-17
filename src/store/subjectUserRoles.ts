@@ -30,7 +30,7 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
         },
       })
       if (response.data) {
-        subjectUserRoles.value = response.data
+        subjectUserRoles.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch subject user roles'
@@ -65,7 +65,7 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
         },
       })
       if (response.data) {
-        lecturers.value = response.data
+        lecturers.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch lecturers'

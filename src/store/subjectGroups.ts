@@ -33,7 +33,7 @@ export const useSubjectGroupStore = defineStore('subjectGroups', () => {
       })
       
       if (response.data) {
-        subjectGroups.value = response.data
+        subjectGroups.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch subject groups'
@@ -66,7 +66,7 @@ export const useSubjectGroupStore = defineStore('subjectGroups', () => {
       })
       
       if (response.data) {
-        subjectGroupGroups.value = response.data
+        subjectGroupGroups.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch subject group groups'

@@ -34,7 +34,7 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
       })
       
       if (response.data) {
-        events.value = response.data
+        events.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch timetable events'
@@ -181,7 +181,7 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
       if (response.data) {
         // Refresh the events list after generation
         await fetchEvents(timetable.id)
-        return { success: true, data: response.data }
+        return { success: true, data: response.data.results }
       } else {
         error.value = 'Failed to generate timetable events'
         return { success: false, error: 'No data returned from server' }

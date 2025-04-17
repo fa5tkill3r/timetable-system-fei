@@ -4,8 +4,8 @@ import { client } from '../lib/client'
 import { useSchemaStore } from './schemas'
 import { components } from 'schema'
 
-type TTEType = components['schemas']['TTEType']
-type TTETypeRequest = components['schemas']['TTETypeRequest']
+type TTEType = components['schemas']['TTEventType']
+type TTETypeRequest = components['schemas']['TTEventTypeRequest']
 
 export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
   const schemaStore = useSchemaStore()
@@ -30,7 +30,7 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
         },
       })
       if (response.data) {
-        eventTypes.value = response.data
+        eventTypes.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch event types'

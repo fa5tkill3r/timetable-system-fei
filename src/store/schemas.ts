@@ -18,7 +18,7 @@ export const useSchemaStore = defineStore('schemas', () => {
     try {
       const response = await client.GET('/api/schemas/', {})
       if (response.data) {
-        schemas.value = response.data
+        schemas.value = response.data.results
       } else {
         error.value = 'Failed to fetch schemas'
       }

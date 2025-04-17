@@ -30,7 +30,7 @@ export const useEquipmentStore = defineStore('equipment', () => {
         },
       })
       if (response.data) {
-        equipment.value = response.data
+        equipment.value = response.data.results
         return response.data
       } else {
         error.value = 'Failed to fetch equipment'

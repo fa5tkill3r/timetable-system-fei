@@ -30,7 +30,7 @@ export const useSubjectStore = defineStore('subjects', () => {
         },
       })
       if (response.data) {
-        subjects.value = response.data
+        subjects.value = response.data.results
       } else {
         error.value = 'Failed to fetch subjects'
       }

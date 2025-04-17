@@ -384,26 +384,6 @@ export interface paths {
         patch: operations["room_equipment_partial_update"];
         trace?: never;
     };
-    "/api/room-group-counts/all_groups/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Room Group Counts
-         * @description Returns a list of all unique RoomGroup names with counts.
-         */
-        get: operations["room_group_counts_all_groups_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/room-groups/": {
         parameters: {
             query?: never;
@@ -458,6 +438,23 @@ export interface paths {
          * @description Partially updates an existing object. Only specified fields will be modified.
          */
         patch: operations["room_groups_partial_update"];
+        trace?: never;
+    };
+    "/api/room-groups/list_groups/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Returns all unique room group names with counts of rooms in each group */
+        get: operations["room_groups_list_groups_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/rooms/": {
@@ -911,8 +908,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Import FEI dataset from DATA directory
-         * @description Import FEI exports from dir specified.
+         * Generate TTE events
+         * @description Generate TTE events for subjectgroup groups.e.g. subjectgroup=B-API, TT-id=1, it generates events for B-API subjectgroup into TT B-API-1_testX.If nominal_semester is not specified, all events are generated.
          */
         get: operations["ttecontroller_generate_tte_events_list"];
         put?: never;
@@ -1033,6 +1030,79 @@ export interface paths {
          * @description Partially updates an existing object. Only specified fields will be modified.
          */
         patch: operations["ttevent_partial_update"];
+        trace?: never;
+    };
+    "/api/ttgroup/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all objects
+         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+         */
+        get: operations["ttgroup_list"];
+        put?: never;
+        /**
+         * Create new object
+         * @description Creates a new object with the provided data. Returns the created object.
+         */
+        post: operations["ttgroup_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ttgroup/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get single object
+         * @description Retrieves a specific object by its unique identifier (ID).
+         */
+        get: operations["ttgroup_retrieve"];
+        /**
+         * Update object
+         * @description Fully updates an existing object. All fields must be provided.
+         */
+        put: operations["ttgroup_update"];
+        post?: never;
+        /**
+         * Delete object
+         * @description Permanently removes the specified object from the database.
+         */
+        delete: operations["ttgroup_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial update object
+         * @description Partially updates an existing object. Only specified fields will be modified.
+         */
+        patch: operations["ttgroup_partial_update"];
+        trace?: never;
+    };
+    "/api/ttgroup/groups/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get list of unique tt groups with their counts */
+        get: operations["ttgroup_groups_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/users/": {
@@ -1157,7 +1227,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-04-10T19:18:34.692987
+             * @default 2025-04-17T19:51:14.588755
              */
             timestamp: string;
         };
@@ -1166,7 +1236,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-04-10T19:18:34.693350
+             * @default 2025-04-17T19:51:14.588833
              */
             timestamp: string;
         };
@@ -1175,7 +1245,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-04-10T19:18:34.693350
+             * @default 2025-04-17T19:51:14.588833
              */
             timestamp: string;
         };
@@ -1193,6 +1263,291 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["AISObdobie"][];
+        };
+        PaginatedAllowanceList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Allowance"][];
+        };
+        PaginatedBuildingList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Building"][];
+        };
+        PaginatedCrossSubjectCollisionList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["CrossSubjectCollision"][];
+        };
+        PaginatedEquipmentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Equipment"][];
+        };
+        PaginatedRoomEquipmentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["RoomEquipment"][];
+        };
+        PaginatedRoomGroupList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["RoomGroup"][];
+        };
+        PaginatedRoomGroupNameCountList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["RoomGroupNameCount"][];
+        };
+        PaginatedRoomList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Room"][];
+        };
+        PaginatedSubjectGroupCountsList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["SubjectGroupCounts"][];
+        };
+        PaginatedSubjectGroupList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["SubjectGroup"][];
+        };
+        PaginatedSubjectList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Subject"][];
+        };
+        PaginatedSubjectUserRoleList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["SubjectUserRole"][];
+        };
+        PaginatedTTEventList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["TTEvent"][];
+        };
+        PaginatedTTEventTypeList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["TTEventType"][];
+        };
+        PaginatedTTGroupCountsList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["TTGroupCounts"][];
+        };
+        PaginatedTTGroupList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["TTGroup"][];
+        };
+        PaginatedTTList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["TT"][];
+        };
+        PaginatedUserList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["User"][];
+        };
+        PaginatedschemaList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["schema"][];
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedAllowanceRequest: {
@@ -1218,6 +1573,7 @@ export interface components {
         PatchedRoomGroupRequest: {
             name?: string;
             room?: number;
+            owner?: number | null;
         };
         PatchedRoomRequest: {
             name?: string;
@@ -1234,7 +1590,7 @@ export interface components {
             name?: string;
             code?: string;
             nominal_semester?: number | null;
-            building?: number;
+            building?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedSubjectUserRoleRequest: {
@@ -1248,19 +1604,25 @@ export interface components {
             day_of_week?: number | null;
             /** Format: int64 */
             weeks_bitmask?: number | null;
-            /** Format: time */
-            start_time?: string | null;
+            start_time?: number | null;
             duration?: number | null;
-            room?: number;
+            room?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTEventTypeRequest: {
             name?: string;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
+        PatchedTTGroupRequest: {
+            name?: string;
+            description?: string | null;
+            timetables?: number[];
+            owner?: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTRequest: {
             name?: string;
-            program?: string;
+            description?: string | null;
             owner?: number;
             /**
              * @description * `PUBLISHED` - Published
@@ -1309,6 +1671,7 @@ export interface components {
             readonly id?: number;
             name: string;
             room: number;
+            owner?: number | null;
         };
         RoomGroupNameCount: {
             name: string;
@@ -1318,6 +1681,7 @@ export interface components {
         RoomGroupRequest: {
             name: string;
             room: number;
+            owner?: number | null;
         };
         RoomRequest: {
             name: string;
@@ -1330,7 +1694,7 @@ export interface components {
             name: string;
             code: string;
             nominal_semester: number | null;
-            building: number;
+            building?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectGroup: {
@@ -1355,7 +1719,7 @@ export interface components {
             name: string;
             code: string;
             nominal_semester: number | null;
-            building: number;
+            building?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectUserRole: {
@@ -1373,7 +1737,7 @@ export interface components {
         TT: {
             readonly id?: number;
             name: string;
-            program: string;
+            description?: string | null;
             owner: number;
             /**
              * @description * `PUBLISHED` - Published
@@ -1394,10 +1758,9 @@ export interface components {
             day_of_week?: number | null;
             /** Format: int64 */
             weeks_bitmask?: number | null;
-            /** Format: time */
-            start_time?: string | null;
+            start_time?: number | null;
             duration?: number | null;
-            room: number;
+            room?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTEventRequest: {
@@ -1405,10 +1768,9 @@ export interface components {
             day_of_week?: number | null;
             /** Format: int64 */
             weeks_bitmask?: number | null;
-            /** Format: time */
-            start_time?: string | null;
+            start_time?: number | null;
             duration?: number | null;
-            room: number;
+            room?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTEventType: {
@@ -1420,9 +1782,30 @@ export interface components {
             name: string;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
+        TTGroup: {
+            readonly id?: number;
+            name: string;
+            description?: string | null;
+            timetables: number[];
+            owner: number;
+        };
+        TTGroupCounts: {
+            /** @description Name of the tt group */
+            name: string;
+            /** @description Number of tt in this group */
+            count: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        TTGroupRequest: {
+            name: string;
+            description?: string | null;
+            timetables: number[];
+            owner: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         TTRequest: {
             name: string;
-            program: string;
+            description?: string | null;
             owner: number;
             /**
              * @description * `PUBLISHED` - Published
@@ -1464,9 +1847,9 @@ export interface components {
         schema: {
             readonly id?: number;
             human_name: string;
-            readonly schema_name?: string;
             /** Format: date */
             start_date?: string | null;
+            readonly schema_name?: string;
             /** Format: date */
             end_date?: string | null;
             is_active?: boolean;
@@ -1492,8 +1875,12 @@ export interface operations {
         parameters: {
             query?: {
                 amount?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 tta?: number;
@@ -1512,7 +1899,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Allowance"][];
+                    "application/json": components["schemas"]["PaginatedAllowanceList"];
                 };
             };
         };
@@ -1663,9 +2050,13 @@ export interface operations {
         parameters: {
             query?: {
                 abbrev?: string;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
             };
@@ -1683,7 +2074,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Building"][];
+                    "application/json": components["schemas"]["PaginatedBuildingList"];
                 };
             };
         };
@@ -1836,11 +2227,15 @@ export interface operations {
                 id?: number;
                 /** @description Multiple values may be separated by commas. */
                 id__in?: number[];
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
                 name__icontains?: string;
                 name__iregex?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
             };
@@ -1858,7 +2253,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Equipment"][];
+                    "application/json": components["schemas"]["PaginatedEquipmentList"];
                 };
             };
         };
@@ -2366,8 +2761,12 @@ export interface operations {
                 equipment__name?: string;
                 equipment__name__icontains?: string;
                 equipment__name__iregex?: string;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 room?: number;
@@ -2400,7 +2799,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RoomEquipment"][];
+                    "application/json": components["schemas"]["PaginatedRoomEquipmentList"];
                 };
             };
         };
@@ -2547,50 +2946,29 @@ export interface operations {
             };
         };
     };
-    room_group_counts_all_groups_retrieve: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A list of all unique RoomGroup names with counts. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomGroupNameCount"][];
-                };
-            };
-            "!200": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
     room_groups_list: {
         parameters: {
             query?: {
                 id?: number;
                 /** @description Multiple values may be separated by commas. */
                 id__in?: number[];
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
                 name__icontains?: string;
                 name__iregex?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                owner?: number;
+                /** @description Multiple values may be separated by commas. */
+                owner__in?: number[];
+                owner__username?: string;
+                owner__username__icontains?: string;
+                owner__username__iregex?: string;
                 room?: number;
                 room__building?: number;
                 room__building__abbrev?: string;
@@ -2627,7 +3005,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RoomGroup"][];
+                    "application/json": components["schemas"]["PaginatedRoomGroupList"];
                 };
             };
         };
@@ -2774,6 +3152,33 @@ export interface operations {
             };
         };
     };
+    room_groups_list_groups_list: {
+        parameters: {
+            query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRoomGroupNameCountList"];
+                };
+            };
+        };
+    };
     rooms_list: {
         parameters: {
             query?: {
@@ -2798,11 +3203,15 @@ export interface operations {
                 id?: number;
                 /** @description Multiple values may be separated by commas. */
                 id__in?: number[];
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
                 name__icontains?: string;
                 name__iregex?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
             };
@@ -2820,7 +3229,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Room"][];
+                    "application/json": components["schemas"]["PaginatedRoomList"];
                 };
             };
         };
@@ -2969,7 +3378,12 @@ export interface operations {
     };
     schemas_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2981,7 +3395,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["schema"][];
+                    "application/json": components["schemas"]["PaginatedschemaList"];
                 };
             };
         };
@@ -3138,9 +3552,13 @@ export interface operations {
     subject_groups_list: {
         parameters: {
             query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 subject?: number;
@@ -3161,7 +3579,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubjectGroup"][];
+                    "application/json": components["schemas"]["PaginatedSubjectGroupList"];
                 };
             };
         };
@@ -3313,8 +3731,12 @@ export interface operations {
             query?: {
                 /** @description Filter groups with at least this many subjects */
                 count_gte?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Filter group names by regex pattern (case insensitive) */
                 name_regex?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Order by count (use - for descending) */
                 order?: "-count" | "count";
             };
@@ -3332,7 +3754,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubjectGroupCounts"][];
+                    "application/json": components["schemas"]["PaginatedSubjectGroupCountsList"];
                 };
             };
         };
@@ -3340,6 +3762,10 @@ export interface operations {
     subject_user_collisions_list: {
         parameters: {
             query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 subject_a?: number;
@@ -3359,7 +3785,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CrossSubjectCollision"][];
+                    "application/json": components["schemas"]["PaginatedCrossSubjectCollisionList"];
                 };
             };
         };
@@ -3369,8 +3795,12 @@ export interface operations {
             query?: {
                 count__gte?: number;
                 count__lte?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 role?: string;
@@ -3399,7 +3829,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubjectUserRole"][];
+                    "application/json": components["schemas"]["PaginatedSubjectUserRoleList"];
                 };
             };
         };
@@ -3550,10 +3980,14 @@ export interface operations {
         parameters: {
             query?: {
                 code?: string;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 name?: string;
                 nominal_semester?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
             };
@@ -3571,7 +4005,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Subject"][];
+                    "application/json": components["schemas"]["PaginatedSubjectList"];
                 };
             };
         };
@@ -3802,14 +4236,18 @@ export interface operations {
             query?: {
                 /** @description Filter by creation date (format: YYYY-MM-DD) */
                 created_at?: string;
+                /** @description Regex-based search for TT by description text */
+                description?: string;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 /** @description Case-insensitive search for timetable name */
                 name?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                /** @description Regex-based search for study program code (e.g., BIT, MIT) */
-                program?: string;
                 /** @description Filter by status: draft (initial), published (visible), archived (historical)
                  *
                  *     * `PUBLISHED` - Published
@@ -3833,7 +4271,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TT"][];
+                    "application/json": components["schemas"]["PaginatedTTList"];
                 };
             };
         };
@@ -3983,12 +4421,16 @@ export interface operations {
     ttecontroller_generate_tte_events_list: {
         parameters: {
             query: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Specifies the subjectgroup name */
                 subjectgroup_name: string;
-                /** @description Specifies the tt name */
-                tt_name: string;
-                /** @description Specifies the tt program */
-                tt_program: string;
+                /** @description Specifies subjects by nominal_semester */
+                subjects__nominal_semester?: string;
+                /** @description Specifies the tt by ID */
+                tt_id: string;
             };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
@@ -4004,7 +4446,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TTEvent"][];
+                    "application/json": components["schemas"]["PaginatedTTEventList"];
                 };
             };
         };
@@ -4012,10 +4454,14 @@ export interface operations {
     ttetype_list: {
         parameters: {
             query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
                 /** @description Case-insensitive search for event type name */
                 name?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
             };
@@ -4033,7 +4479,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TTEventType"][];
+                    "application/json": components["schemas"]["PaginatedTTEventTypeList"];
                 };
             };
         };
@@ -4189,8 +4635,12 @@ export interface operations {
                 duration?: number;
                 /** @description Filter by event type ID (lecture, lab, etc.) */
                 event_type?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description Filter by room ID */
@@ -4220,7 +4670,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TTEvent"][];
+                    "application/json": components["schemas"]["PaginatedTTEventList"];
                 };
             };
         };
@@ -4367,12 +4817,226 @@ export interface operations {
             };
         };
     };
+    ttgroup_list: {
+        parameters: {
+            query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+                /** @description Case-insensitive search for group name */
+                name?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description Filter by timetable ID */
+                timetables?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTTGroupList"];
+                };
+            };
+        };
+    };
+    ttgroup_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTGroupRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTGroupRequest"];
+                "multipart/form-data": components["schemas"]["TTGroupRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTGroup"];
+                };
+            };
+        };
+    };
+    ttgroup_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTGroup"];
+                };
+            };
+        };
+    };
+    ttgroup_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTGroupRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTGroupRequest"];
+                "multipart/form-data": components["schemas"]["TTGroupRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTGroup"];
+                };
+            };
+        };
+    };
+    ttgroup_destroy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ttgroup_partial_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt group. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTTGroupRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTGroupRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTTGroupRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTGroup"];
+                };
+            };
+        };
+    };
+    ttgroup_groups_list: {
+        parameters: {
+            query?: {
+                /** @description Filter groups with at least this many subjects */
+                count_gte?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description Filter group names by regex pattern (case insensitive) */
+                name_regex?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                /** @description Order by count (use - for descending) */
+                order?: "-count" | "count";
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTTGroupCountsList"];
+                };
+            };
+        };
+    };
     users_list: {
         parameters: {
             query?: {
                 full_name?: string;
+                /** @description Number of results to return per page. */
+                limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
                 "max-level"?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 username?: string;
@@ -4388,7 +5052,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["User"][];
+                    "application/json": components["schemas"]["PaginatedUserList"];
                 };
             };
         };
