@@ -111,7 +111,7 @@ const route = useRoute('/timetables/[id]/')
 const router = useRouter()
 
 
-const viewType = ref<string>('Parallels')
+const viewType = ref<string>('parallels')
 const subjectId = ref<number | null>(null)
 const roomId = ref<number | null>(null)
 
@@ -129,29 +129,29 @@ const timeSlots: TimeSlot[] = (() => {
   const slots: TimeSlot[] = []
   let currentHour = TIME_CONFIG.START_HOUR
   let currentMinute = TIME_CONFIG.START_MINUTE
-  
+
   for (let i = 0; i < TIME_CONFIG.WINDOWS_COUNT; i++) {
     // Format start time
     const fromHour = currentHour.toString().padStart(2, '0')
     const fromMinute = currentMinute.toString().padStart(2, '0')
     const from = `${fromHour}:${fromMinute}`
-    
+
     // Calculate end time
     let endHour = currentHour
     let endMinute = currentMinute + TIME_CONFIG.WINDOW_DURATION
-    
+
     if (endMinute >= 60) {
       endHour += Math.floor(endMinute / 60)
       endMinute = endMinute % 60
     }
-    
+
     const toHour = endHour.toString().padStart(2, '0')
     const toMinute = endMinute.toString().padStart(2, '0')
     const to = `${toHour}:${toMinute}`
-    
+
     // Add to slots
     slots.push({ from, to, index: i })
-    
+
     // Calculate next start time (after break)
     currentMinute += TIME_CONFIG.WINDOW_DURATION + TIME_CONFIG.BREAK_DURATION
     if (currentMinute >= 60) {
@@ -159,7 +159,7 @@ const timeSlots: TimeSlot[] = (() => {
       currentMinute = currentMinute % 60
     }
   }
-  
+
   return slots
 })()
 
@@ -197,7 +197,7 @@ function getSubjectCode(subjectId?: number | null): string | null {
 
 function getEventTypeLabel(eventType: number | null): string {
   if (!eventType) return 'Other';
-  
+
   const eventTypeObj = eventType ? ttEventTypeStore.getEventTypeById(eventType) : null;
   return eventTypeObj?.name || `Type ${eventType}`;
 }
@@ -322,7 +322,7 @@ function processTimetableEvents() {
         existingTemplate.quantity += 1
       } else {
         const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
-        
+
         eventTemplates.value.push({
           id: `template-${event.id}`,
           title: title,
@@ -410,6 +410,9 @@ watch([subjectId, roomId, viewType], async () => {
   }
 })
 
+watch([viewType], async () => {
+  console.log(`View changed to: ${viewType.value}`)
+})
 
 
 const filteredEventTemplates = computed(() =>
@@ -879,10 +882,10 @@ const handleDrop = async (event: DragEvent) => {
 
     const newStartIndex = timeSlots.findIndex((slot) => slot.from === position.time.from)
     const newEndIndex = newStartIndex + duration - 1
-    
+
     // TODO: This may not be necessary cant test due to API issues
     const brightnessAdjustment = draggedTemplate.value.eventType === 1 ? 0.9 : 1.1
-    
+
     const eventToPlace = {
       id: draggedTemplate.value.originalEventId || -nextEventId++,
       day: position.day,
@@ -1067,28 +1070,40 @@ function handleDragEnd() {
             <div class="flex items-center">
               <div class="flex flex-col gap-4 w-full">
                 <div class="flex justify-center">
-                  <div class="inline-flex gap-4 " role="group">
-                    <Button variant="outline" size="sm"
-                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Parallels' }"
-                      @click="viewType = 'Parallels'">
-                      Parallels
-                    </Button>
-                    <Button variant="outline" size="sm"
-                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Rooms' }"
-                      @click="viewType = 'Rooms'">
-                      Rooms
-                    </Button>
-                    <Button variant="outline" size="sm"
-                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Teacher' }"
-                      @click="viewType = 'Teacher'">
-                      Teacher
-                    </Button>
-                    <Button variant="outline" size="sm"
-                      :class="{ 'bg-primary text-primary-foreground': viewType === 'Student' }"
-                      @click="viewType = 'Student'">
-                      Student
-                    </Button>
-                  </div>
+                  <!-- Replace separate buttons with proper tabs implementation -->
+                  <Tabs v-model="viewType" default-value="parallels" class="w-full">
+                    <TabsList class="w-fit mx-auto">
+                      <TabsTrigger value="parallels">Parallels</TabsTrigger>
+                      <TabsTrigger value="rooms">Rooms</TabsTrigger>
+                      <TabsTrigger value="teacher">Teacher</TabsTrigger>
+                      <TabsTrigger value="student">Student</TabsTrigger>
+                    </TabsList>
+                    
+                    <!-- Content specific to each tab view -->
+                    <div class="mt-2">
+                      <TabsContent value="parallels">
+                        <!-- Parallels view content (main timetable grid) -->
+                      </TabsContent>
+                      
+                      <TabsContent value="rooms">
+                        <div class="p-4 text-center text-muted-foreground">
+                          Room view shows timetable organized by rooms
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="teacher">
+                        <div class="p-4 text-center text-muted-foreground">
+                          Teacher view shows schedules organized by teaching staff
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="student">
+                        <div class="p-4 text-center text-muted-foreground">
+                          Student view shows schedules organized by student groups
+                        </div>
+                      </TabsContent>
+                    </div>
+                  </Tabs>
                 </div>
 
                 <div class="flex flex-wrap justify-center gap-3 items-center">
@@ -1139,7 +1154,8 @@ function handleDragEnd() {
           </div>
 
           <ScrollArea class="overflow-auto p-1">
-            <div :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
+            <!-- Only show the timetable grid when in parallels view -->
+            <div v-if="viewType === 'parallels'" :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
               class="bg-white rounded-lg shadow-md overflow-hidden mb-2 mx-auto">
               <div :style="cornerCellStyle"></div>
 
@@ -1170,8 +1186,8 @@ function handleDragEnd() {
                 <ContextMenu>
                   <ContextMenuTrigger>
                     <div :style="getEventStyle(event)"
-                      class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1" draggable="true"
-                      @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
+                      class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
+                      draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
                       <div class="flex justify-between items-center">
                         <div class="event-title font-semibold text-gray-800 truncate">
                           {{ event.shortcut }}
@@ -1217,15 +1233,9 @@ function handleDragEnd() {
     <ResizableHandle @dragging="resize($event)" with-handle />
 
     <ResizablePanel :default-size="25">
-      <EventSelectionPanel 
-        :event-templates="eventTemplates" 
-        :is-loading="timetableEventStore.isLoading"
-        @drag-start="handleTemplateStart"
-        @drag-end="handleDragEnd"
-        @menu-drag-over="handleMenuDragOver"
-        @menu-drag-leave="handleMenuDragLeave"
-        @menu-drop="handleMenuDrop"
-      />
+      <EventSelectionPanel :event-templates="eventTemplates" :is-loading="timetableEventStore.isLoading"
+        @drag-start="handleTemplateStart" @drag-end="handleDragEnd" @menu-drag-over="handleMenuDragOver"
+        @menu-drag-leave="handleMenuDragLeave" @menu-drop="handleMenuDrop" />
     </ResizablePanel>
   </ResizablePanelGroup>
 </template>
