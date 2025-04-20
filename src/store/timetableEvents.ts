@@ -172,7 +172,7 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
         params: {
           header: schemaStore.termHeader,
           query: {
-            tt_id: timetableId, 
+            tt_id: String(timetableId), 
             subjectgroup_name: subjectGroupName,
           }
         }
@@ -181,7 +181,7 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
       if (response.data) {
         // Refresh the events list after generation
         await fetchEvents(timetable.id)
-        return { success: true, data: response.data.results }
+        return { success: true, data: response.data }
       } else {
         error.value = 'Failed to generate timetable events'
         return { success: false, error: 'No data returned from server' }
