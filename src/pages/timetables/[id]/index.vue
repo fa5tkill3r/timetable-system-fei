@@ -57,11 +57,8 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
 import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue'
 import { Room } from '@/types'
-
-// Import the subject groups store
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 
-// Time system configuration
 const TIME_CONFIG = {
   WINDOWS_COUNT: 9,           // Number of time slots in a day
   WINDOW_DURATION: 50,        // Duration of each slot in minutes
@@ -92,7 +89,7 @@ interface CalendarEvent {
   day: string
   startTime: string
   endTime: string
-  startIndex?: number  // Add index reference
+  startIndex?: number
   title: string
   shortcut: string
   color: string
@@ -102,18 +99,14 @@ interface CalendarEvent {
   eventType?: number | null
 }
 
-// Add new refs for the filter selections
-const selectedSemester = ref<string>('LS')  // Default to LS (summer semester)
-const selectedYear = ref<string>('1bc')     // Default to 1bc (first year bachelor)
+const selectedSemester = ref<string>('LS')
+const selectedYear = ref<string>('1bc')
 const selectedSubjectGroup = ref<string | null>(null)
 
-// Semester options
 const semesterOptions = [
   { id: 'LS', name: 'Summer Semester (LS)' },
   { id: 'ZS', name: 'Winter Semester (ZS)' }
 ]
-
-// Year options
 const yearOptions = [
   { id: '1bc', name: '1. Bachelor' },
   { id: '2bc', name: '2. Bachelor' },
@@ -127,7 +120,7 @@ const timetableEventStore = useTimetableEventStore()
 const subjectStore = useSubjectStore()
 const buildingStore = useBuildingStore()
 const ttEventTypeStore = useTTEventTypeStore()
-const subjectGroupStore = useSubjectGroupStore() // Add subject group store
+const subjectGroupStore = useSubjectGroupStore()
 const { toast } = useToast()
 const route = useRoute('/timetables/[id]/')
 const router = useRouter()
@@ -169,7 +162,6 @@ const timeSlots: TimeSlot[] = (() => {
     const toMinute = endMinute.toString().padStart(2, '0')
     const to = `${toHour}:${toMinute}`
 
-    // Add to slots
     slots.push({ from, to, index: i })
 
     // Calculate next start time (after break)
@@ -184,25 +176,18 @@ const timeSlots: TimeSlot[] = (() => {
 })()
 
 const isOverMenu = ref(false)
-const searchQuery = ref('')
 
 const events = ref<CalendarEvent[]>([])
 const eventTemplates = ref<EventTemplate[]>([])
 
 const isResizing = ref(false)
 
-// Resize handler function
 function resize(dragging: boolean) {
   isResizing.value = dragging
 }
 
-const roomOptions = computed(() => {
-  return buildingStore.rooms.map(room => ({
-    id: room.id,
-    name: room.name
-  }))
-})
-const preferredRoom = ref<number | null>(null)
+const preferredRoom = ref<number | undefined>(undefined)
+const overrideRooms = ref<boolean>(false)
 
 function getSubjectCode(subjectId?: number | null): string | null {
   if (!subjectId) return null
@@ -211,47 +196,35 @@ function getSubjectCode(subjectId?: number | null): string | null {
   return subject ? subject.code : null
 }
 
-function getEventTypeLabel(eventType: number | null): string {
-  if (!eventType) return 'Other';
-
-  const eventTypeObj = eventType ? ttEventTypeStore.getEventTypeById(eventType) : null;
-  return eventTypeObj?.name || `Type ${eventType}`;
-}
-
-// Compute nominal semester based on selected semester and year
 const nominalSemester = computed(() => {
   const isSummer = selectedSemester.value === 'LS'
-  
+
   if (selectedYear.value === '1bc') return isSummer ? 2 : 1
   if (selectedYear.value === '2bc') return isSummer ? 4 : 3
   if (selectedYear.value === '3bc') return isSummer ? 6 : 5
   if (selectedYear.value === '1i') return isSummer ? 2 : 1
   if (selectedYear.value === '2i') return isSummer ? 4 : 3
-  
+
   return null
 })
 
-// Check if a subject is bachelor-level based on its code
 const isBachelorSubject = (code: string | null) => {
-  if (!code) return true // Include if no code
+  if (!code) return true
   return code.startsWith('B-') || !code.startsWith('I-')
 }
 
-// Check if a subject is master-level based on its code
 const isMasterSubject = (code: string | null) => {
-  if (!code) return true // Include if no code
+  if (!code) return true
   return code.startsWith('I-') || !code.startsWith('B-')
 }
 
-// Fetch subject groups on component mount
 onMounted(async () => {
   await subjectStore.fetchSubjects()
   await buildingStore.fetchRooms()
   await ttEventTypeStore.fetchEventTypes()
-  await subjectGroupStore.fetchSubjectGroups() // Fetch detailed subject-group relations
-  await subjectGroupStore.fetchSubjectGroupGroups() // Fetch group counts
-  
-  // Set default selections and apply filters
+  await subjectGroupStore.fetchSubjectGroups()
+  await subjectGroupStore.fetchSubjectGroupGroups()
+
   if (subjectGroupStore.subjectGroupGroups.length > 0) {
     selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0].name
   }
@@ -266,16 +239,13 @@ onMounted(async () => {
   loadTimetableData()
 })
 
-// Helper function to check if a subject belongs to a group
 const subjectMatchesGroup = (subjectId: number | null, groupName: string | null): boolean => {
   if (!subjectId || !groupName) return true
-  
-  // Find all subject groups that contain this subject ID
-  const matchingGroups = subjectGroupStore.subjectGroups.filter(group => 
-    // In a many-to-many relationship, we need to check if the subject is in the subjects array
+
+  const matchingGroups = subjectGroupStore.subjectGroups.filter(group =>
     Array.isArray(group.subjects) ? group.subjects.includes(subjectId) : group.subject === subjectId
   )
-  
+
   // Check if any of those groups have the specified name
   return matchingGroups.some(group => group.name === groupName)
 }
@@ -403,7 +373,6 @@ function getDayName(dayOfWeek: number): string {
   return days[dayOfWeek - 1] || 'Monday'
 }
 
-// Convert display time to index
 function timeToIndex(time: string): number {
   const index = timeSlots.findIndex(slot => slot.from === time)
   return index >= 0 ? index : 0
@@ -431,13 +400,6 @@ function getSubjectName(subjectId?: number | null): string | null {
   const subject = subjectStore.subjects.find(s => s.id === subjectId)
   return subject ? subject.name : null
 }
-
-const subjectOptions = computed(() => {
-  return subjectStore.subjects.map(subject => ({
-    id: subject.id,
-    name: subject.name
-  }))
-})
 
 watch([subjectId, roomId, viewType], async () => {
   if (timetableId.value) {
@@ -468,49 +430,54 @@ watch([viewType], async () => {
   console.log(`View changed to: ${viewType.value}`)
 })
 
-// Add this function to apply the same filtering logic to any item with a subjectId
 const applyParallelsFilter = (item: { subjectId?: number | null }) => {
   if (!item.subjectId) return false
-  
+
   const subject = subjectStore.subjects.find(s => s.id === item.subjectId)
   if (!subject) return false
-  
+
   const subjectCode = subject.code || null
-  
-  // Filter by study level (bachelor/master)
+
   const isBachelor = selectedYear.value.includes('bc')
-  const isCorrectLevel = isBachelor 
+  const isCorrectLevel = isBachelor
     ? isBachelorSubject(subjectCode)
     : isMasterSubject(subjectCode)
-  
-  // Filter by nominal semester
+
   const isCorrectSemester = subject.nominal_semester === nominalSemester.value
-  
-  // Filter by subject group using actual relations data
-  const isInSelectedGroup = !selectedSubjectGroup.value || 
+
+  const isInSelectedGroup = !selectedSubjectGroup.value ||
     subjectMatchesGroup(item.subjectId, selectedSubjectGroup.value)
-  
+
   return isCorrectLevel && isCorrectSemester && isInSelectedGroup
 }
 
-// Update filteredEvents to use the generic filter function
 const filteredEvents = computed(() => {
-  if (viewType.value !== 'parallels') {
-    return events.value // Only apply filters in parallels view
+  if (viewType.value === 'parallels') {
+    return events.value.filter(applyParallelsFilter)
+  } else if (viewType.value === 'rooms') {
+    // In rooms view, filter events by the selected room
+    if (!preferredRoom.value) {
+      return [] // If no room selected, show no events
+    }
+    return events.value.filter(event => event.roomId === preferredRoom.value)
   }
-  
-  return events.value.filter(applyParallelsFilter)
+
+  // Default case - return all events
+  return events.value
 })
 
-// Add a filteredEventTemplates computed property that applies the same filter
+// Update filteredEventTemplates to always show all unplaced templates
 const filteredEventTemplates = computed(() => {
-  if (viewType.value !== 'parallels') {
-    return eventTemplates.value // Only apply filters in parallels view
+  // Always show events with quantity > 0
+  const templates = eventTemplates.value.filter(template => template.quantity > 0)
+
+  // Only apply additional filtering in parallels view
+  if (viewType.value === 'parallels') {
+    return templates.filter(applyParallelsFilter)
   }
-  
-  return eventTemplates.value.filter(template => 
-    template.quantity > 0 && applyParallelsFilter(template)
-  )
+
+  // For rooms view and other views, show all unplaced events
+  return templates
 })
 
 // Add watcher for filter changes
@@ -541,7 +508,7 @@ const getEventDuration = (event: CalendarEvent): number => {
 
 const getEventPositions = () => {
   // Use filteredEvents instead of events.value for layout calculations
-  const eventsByDay = _.groupBy(viewType.value === 'parallels' ? filteredEvents.value : events.value, 'day')
+  const eventsByDay = _.groupBy(filteredEvents.value, 'day')
   const eventPositions = new Map()
 
   Object.entries(eventsByDay).forEach(([day, dayEvents]) => {
@@ -643,7 +610,7 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
 const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
   const eventPositions = getEventPositions()
   // Use filteredEvents instead of events.value
-  const dayEvents = (viewType.value === 'parallels' ? filteredEvents.value : events.value).filter(e => e.day === days[dayIndex])
+  const dayEvents = filteredEvents.value.filter(e => e.day === days[dayIndex])
   const dayPositions = getDayRowPositions()
 
   const hasOverlappingEvents = dayEvents.some(e => {
@@ -739,7 +706,7 @@ const getDayRowPositions = () => {
 
     // Calculate height for this day based on max rows
     // Use filteredEvents instead of events.value
-    const dayEvents = (viewType.value === 'parallels' ? filteredEvents.value : events.value).filter(e => e.day === day)
+    const dayEvents = filteredEvents.value.filter(e => e.day === day)
     let maxRows = 1
 
     if (dayEvents.length > 0) {
@@ -762,7 +729,7 @@ const getDayRowPositions = () => {
 const getDayStyle = (index: number): CSSProperties => {
   const eventPositions = getEventPositions()
   // Use filteredEvents instead of events.value
-  const dayEvents = (viewType.value === 'parallels' ? filteredEvents.value : events.value).filter(e => e.day === days[index])
+  const dayEvents = filteredEvents.value.filter(e => e.day === days[index])
   const dayPositions = getDayRowPositions()
 
   // Get max rows for this day if any
@@ -820,7 +787,7 @@ const containerStyle = computed<CSSProperties>(() => {
   // Use filteredEvents instead of events.value
   const lastDayEvents = (viewType.value === 'parallels' ? filteredEvents.value : events.value)
     .filter(e => e.day === days[lastDayIndex])
-  
+
   if (lastDayEvents.length > 0) {
     const positions = lastDayEvents.map(e => eventPositions.get(e.id))
       .filter(Boolean) as { row: number, maxRows: number }[]
@@ -1071,10 +1038,18 @@ async function saveEventPlacement(event: CalendarEvent) {
     // Use the index of the time slot instead of the actual time
     const startTimeIndex = timeToIndex(event.startTime)
 
+    // Determine which room to use based on the overrideRooms setting
+    const roomToUse = overrideRooms.value || !event.roomId
+      ? preferredRoom.value
+      : event.roomId
+
+    console.log("Room to use:", roomToUse);
+
+
     const eventData = {
       day_of_week: dayOfWeek,
       start_time: startTimeIndex, // Send index instead of time string
-      room: preferredRoom.value || event.roomId || null,
+      room: roomToUse,
       weeks_bitmask: 4095,
     }
 
@@ -1161,64 +1136,61 @@ function handleDragEnd() {
         <ResizablePanel :default-size="80">
           <div class="flex flex-col">
             <div class="flex items-center">
-              <div class="flex flex-col gap-4 w-full">
+              <div class="flex flex-col w-full">
                 <div class="flex justify-center">
                   <!-- Replace separate buttons with proper tabs implementation -->
-                  <Tabs v-model="viewType" default-value="parallels" class="w-full">
-                    <TabsList class="w-fit mx-auto">
+                  <Tabs v-model="viewType" default-value="parallels"
+                    class="w-full h-[100px] flex flex-row justify-between items-center">
+                    <TabsList class="h-fit">
                       <TabsTrigger value="parallels">Parallels</TabsTrigger>
                       <TabsTrigger value="rooms">Rooms</TabsTrigger>
                       <TabsTrigger value="teacher">Teacher</TabsTrigger>
                       <TabsTrigger value="student">Student</TabsTrigger>
                     </TabsList>
-                    
+
                     <!-- Content specific to each tab view -->
-                    <div class="mt-2">
+                    <div class="mr-2">
                       <TabsContent value="parallels">
                         <!-- Add filtering controls for parallels view -->
-                        <div class="flex flex-wrap gap-3 justify-center mb-4">
-                          <ComboBox 
-                            :options="semesterOptions" 
-                            title="Semester" 
-                            search-placeholder="Select semester..."
-                            @update:selection="selectedSemester = $event" 
-                          />
-                          
-                          <ComboBox 
-                            :options="yearOptions" 
-                            title="Year" 
-                            search-placeholder="Select year..."
-                            @update:selection="selectedYear = $event" 
-                          />
-                          
-                          <ComboBox 
-                            :options="subjectGroupStore.subjectGroupGroups.map(g => ({
-                              id: g.name,
-                              name: g.name
-                            }))" 
-                            title="Subject Group" 
-                            search-placeholder="Select subject group..."
-                            @update:selection="selectedSubjectGroup = $event" 
-                          />
-                          
-                          <Badge variant="outline">
+                        <div class="flex flex-wrap gap-3 justify-center items-center">
+                          <ComboBox :options="semesterOptions" title="Semester" search-placeholder="Select semester..."
+                            @update:selection="selectedSemester = $event" />
+
+                          <ComboBox :options="yearOptions" title="Year" search-placeholder="Select year..."
+                            @update:selection="selectedYear = $event" />
+
+                          <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(g => ({
+                            id: g.name,
+                            name: g.name
+                          }))" title="Subject Group" search-placeholder="Select subject group..."
+                            @update:selection="selectedSubjectGroup = $event" />
+
+                          <Badge class="h-fit" variant="outline">
                             Nominal Semester: {{ nominalSemester }}
                           </Badge>
                         </div>
                       </TabsContent>
-                      
+
                       <TabsContent value="rooms">
-                        <div class="p-4 text-center text-muted-foreground">
-                          Room view shows timetable organized by rooms
+                        <div class="flex flex-col items-center gap-4 p-4">
+                          <div v-if="!preferredRoom" class="text-center text-muted-foreground">
+                            Please select a room from bottom panel to view its timetable.
+                          </div>
+                          <div v-else>
+                            Now showing timetable for room:
+                            <Badge variant="default">
+                              {{buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+                            </Badge>
+                          </div>
                         </div>
                       </TabsContent>
-                      
+
                       <TabsContent value="teacher">
                         <div class="p-4 text-center text-muted-foreground">
                           Teacher view shows schedules organized by teaching staff
                         </div>
                       </TabsContent>
-                      
+
                       <TabsContent value="student">
                         <div class="p-4 text-center text-muted-foreground">
                           Student view shows schedules organized by student groups
@@ -1276,10 +1248,18 @@ function handleDragEnd() {
           </div>
 
           <ScrollArea class="overflow-auto p-1">
-            <!-- Only show the timetable grid when in parallels view -->
-            <div v-if="viewType === 'parallels'" :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
+            <!-- Show the timetable grid for both parallels and rooms views -->
+            <div :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
               class="bg-white rounded-lg shadow-md overflow-hidden mb-2 mx-auto">
               <div :style="cornerCellStyle"></div>
+
+              <!-- Show placeholder message when no room is selected in rooms view -->
+              <div v-if="viewType.value === 'rooms' && !preferredRoom.value"
+                class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
+                <div class="text-lg text-gray-500 font-medium">
+                  Please select a room to view its schedule
+                </div>
+              </div>
 
               <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
                 class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
@@ -1348,7 +1328,7 @@ function handleDragEnd() {
         <ResizablePanel :default-size="20">
 
           <!-- Room selection panel -->
-          <RoomSelectionPanel v-model:selectedRoomId="preferredRoom" />
+          <RoomSelectionPanel v-model:selected-room-id="preferredRoom" v-model:override-rooms="overrideRooms" />
         </ResizablePanel>
       </ResizablePanelGroup>
     </ResizablePanel>
@@ -1356,15 +1336,9 @@ function handleDragEnd() {
     <ResizableHandle @dragging="resize($event)" with-handle />
 
     <ResizablePanel :default-size="25">
-      <EventSelectionPanel 
-        :event-templates="filteredEventTemplates" 
-        :is-loading="timetableEventStore.isLoading"
-        @drag-start="handleTemplateStart" 
-        @drag-end="handleDragEnd" 
-        @menu-drag-over="handleMenuDragOver"
-        @menu-drag-leave="handleMenuDragLeave" 
-        @menu-drop="handleMenuDrop" 
-      />
+      <EventSelectionPanel :event-templates="filteredEventTemplates" :is-loading="timetableEventStore.isLoading"
+        @drag-start="handleTemplateStart" @drag-end="handleDragEnd" @menu-drag-over="handleMenuDragOver"
+        @menu-drag-leave="handleMenuDragLeave" @menu-drop="handleMenuDrop" />
     </ResizablePanel>
   </ResizablePanelGroup>
 </template>
