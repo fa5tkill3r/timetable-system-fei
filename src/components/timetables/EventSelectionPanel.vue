@@ -302,13 +302,6 @@
         </div>
 
         <div
-          v-if="eventTemplates.length === 0 && !isLoading"
-          class="mb-4 rounded bg-yellow-50 p-2 text-sm text-yellow-600"
-        >
-          No unplaced events found. Check if events exist in the timetable.
-        </div>
-
-        <div
           v-if="isLoading"
           class="flex justify-center py-4"
         >
