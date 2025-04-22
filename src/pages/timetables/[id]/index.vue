@@ -620,17 +620,21 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
 
   // Get max rows for this day if any
   let maxRows = 1
-  if (hasOverlappingEvents) {
-    const positions = Array.from(eventPositions.values())
-      .filter((_, i) => dayEvents.some((e, j) => eventPositions.get(e.id)?.maxRows > 1))
+  if (dayEvents.length > 0) {
+    const positions = dayEvents
+      .map(e => eventPositions.get(e.id))
+      .filter(Boolean) as { row: number, maxRows: number }[]
 
     if (positions.length > 0) {
-      maxRows = Math.max(...positions.map(p => p.maxRows))
+      // Use both highest row + 1 and max rows to ensure consistency with day positions
+      const highestRow = Math.max(...positions.map(p => p.row)) + 1
+      const maxRowsValue = Math.max(...positions.map(p => p.maxRows || 1))
+      maxRows = Math.max(highestRow, maxRowsValue)
     }
   }
 
   // Adjust cell height based on number of events
-  const cellHeight = hasOverlappingEvents ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+  const cellHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
 
   return {
     position: 'absolute',
@@ -710,17 +714,21 @@ const getDayRowPositions = () => {
     let maxRows = 1
 
     if (dayEvents.length > 0) {
+      // Get actual event positions for this day
       const dayPositions = dayEvents
         .map(e => eventPositions.get(e.id))
         .filter(Boolean) as { row: number, maxRows: number }[]
 
       if (dayPositions.length > 0) {
-        maxRows = Math.max(...dayPositions.map(p => p.maxRows || 1))
+        // Use both max rows and highest row + 1 to ensure we have enough space
+        const highestRow = Math.max(...dayPositions.map(p => p.row)) + 1
+        const maxRowsValue = Math.max(...dayPositions.map(p => p.maxRows || 1))
+        maxRows = Math.max(highestRow, maxRowsValue)
       }
     }
 
     // Add this day's height to the running total
-    currentTop += maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+    currentTop += maxRows > 0 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
   })
 
   return positions
