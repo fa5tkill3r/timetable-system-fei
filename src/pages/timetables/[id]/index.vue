@@ -1153,18 +1153,30 @@ function handleDragEnd() {
                       <TabsContent value="parallels">
                         <!-- Add filtering controls for parallels view -->
                         <div class="flex flex-wrap gap-3 justify-center items-center">
-                          <ComboBox :options="semesterOptions" title="Semester" search-placeholder="Select semester..."
-                            @update:selection="selectedSemester = $event" />
-
-                          <ComboBox :options="yearOptions" title="Year" search-placeholder="Select year..."
-                            @update:selection="selectedYear = $event" />
-
-                          <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(g => ({
-                            id: g.name,
-                            name: g.name
-                          }))" title="Subject Group" search-placeholder="Select subject group..."
-                            @update:selection="selectedSubjectGroup = $event" />
-
+                          <ComboBox 
+                            :options="semesterOptions" 
+                            title="Semester" 
+                            search-placeholder="Select semester..."
+                            v-model:selection="selectedSemester"
+                          />
+                          
+                          <ComboBox 
+                            :options="yearOptions" 
+                            title="Year" 
+                            search-placeholder="Select year..."
+                            v-model:selection="selectedYear" 
+                          />
+                          
+                          <ComboBox
+                            :options="subjectGroupStore.subjectGroupGroups.map(g => ({
+                              id: g.name,
+                              name: g.name
+                            }))" 
+                            title="Subject Group" 
+                            search-placeholder="Select subject group..."
+                            v-model:selection="selectedSubjectGroup" 
+                          />
+                          
                           <Badge class="h-fit" variant="outline">
                             Nominal Semester: {{ nominalSemester }}
                           </Badge>

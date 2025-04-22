@@ -1,87 +1,99 @@
 <script setup lang="ts">
-  import { defineProps, defineEmits, watch, ref } from 'vue'
-  import { Button } from '@/components/ui/button'
-  import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-  } from '@/components/ui/command'
-  import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-  } from '@/components/ui/form'
-  import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from '@/components/ui/popover'
-  import { toast } from '@/components/ui/toast'
-  import { cn } from '@/lib/utils.ts'
-  import { toTypedSchema } from '@vee-validate/zod'
-  import { Check, ChevronsUpDown } from 'lucide-vue-next'
-  import { useForm } from 'vee-validate'
-  import * as z from 'zod'
-  import { NavigationMenuContent } from 'radix-vue'
+import { defineProps, watch, ref, onMounted } from 'vue'
+import { Button } from '@/components/ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { toast } from '@/components/ui/toast'
+import { cn } from '@/lib/utils.ts'
+import { toTypedSchema } from '@vee-validate/zod'
+import { Check, ChevronsUpDown } from 'lucide-vue-next'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { NavigationMenuContent } from 'radix-vue'
 
-  const props = defineProps({
-    options: {
-      type: Array,
-      required: true,
-      default: () => [],
-      validator: (value: any[]) => {
-        return value.every((option) => 'id' in option && 'name' in option)
-      },
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: false,
-    },
-    searchPlaceholder: {
-      type: String,
-      default: 'Search options...',
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-  })
+// Use defineModel for two-way binding
+const selection = defineModel<any>('selection', {
+  required: true,
+  default: null,
+})
 
-  const emit = defineEmits(['update:selection'])
+const props = defineProps({
+  options: {
+    type: Array,
+    required: true,
+    default: () => [],
+    validator: (value: any[]) => {
+      return value.every((option) => 'id' in option && 'name' in option)
+    },
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: false,
+  },
+  searchPlaceholder: {
+    type: String,
+    default: 'Search options...',
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+})
 
-  const formSchema = toTypedSchema(
-    z.object({
-      selection: z.any({
-        required_error: 'Please select an option.',
-      }),
+const formSchema = toTypedSchema(
+  z.object({
+    selection: z.any({
+      required_error: 'Please select an option.',
     }),
-  )
+  }),
+)
 
-  const { handleSubmit, setFieldValue, values } = useForm({
-    validationSchema: formSchema,
-  })
+const { handleSubmit, setFieldValue, values } = useForm({
+  validationSchema: formSchema,
+})
 
-  const isOpen = ref(false)
-  
-  const handleSelect = (optionId: any) => {
-    setFieldValue('selection', optionId)
-    isOpen.value = false
+const isOpen = ref(false)
+
+const handleSelect = (optionId: any) => {
+  setFieldValue('selection', optionId)
+  selection.value = optionId
+  isOpen.value = false
+}
+
+onMounted(() => {
+  if (selection.value !== null && selection.value !== undefined) {
+    setFieldValue('selection', selection.value)
   }
+})
 
-  // Watch for changes to the selection and emit them to parent
-  watch(() => values.selection, (newValue) => {
-    emit('update:selection', newValue)
-  })
+watch(() => selection.value, (newValue) => {
+  if (newValue !== values.selection) {
+    setFieldValue('selection', newValue)
+  }
+})
 </script>
 
 <template>
@@ -91,17 +103,12 @@
       <Popover v-model:open="isOpen">
         <PopoverTrigger as-child>
           <FormControl>
-            <Button
-              variant="outline"
-              role="combobox"
-              :class="
-                cn('w-full', !values.selection && 'text-muted-foreground')
-              "
-            >
+            <Button variant="outline" role="combobox" :class="cn('w-full', !values.selection && 'text-muted-foreground')
+              ">
               {{
                 values.selection
                   ? options.find((option) => option.id === values.selection)
-                      ?.name
+                    ?.name
                   : searchPlaceholder
               }}
               <ChevronsUpDown class="ml-auto h-4 w-4 shrink-0 opacity-50" />
@@ -119,26 +126,18 @@
                 <slot name="empty">Nič sme nenašli</slot>
               </CommandEmpty>
               <CommandGroup v-if="!loading">
-                <CommandItem
-                  v-for="option in options"
-                  :key="option.id"
-                  :value="option.name"
-                  @select="
-                    () => {
-                      handleSelect(option.id)
-                    }
-                  "
-                >
-                  <Check
-                    :class="
-                      cn(
-                        'mr-2 h-4 w-4',
-                        option.id === values.selection
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )
-                    "
-                  />
+                <CommandItem v-for="option in options" :key="option.id" :value="option.name" @select="
+                  () => {
+                    handleSelect(option.id)
+                  }
+                ">
+                  <Check :class="cn(
+                    'mr-2 h-4 w-4',
+                    option.id === values.selection
+                      ? 'opacity-100'
+                      : 'opacity-0',
+                  )
+                    " />
                   {{ option.name }}
                 </CommandItem>
               </CommandGroup>
