@@ -31,7 +31,7 @@ export const useEquipmentStore = defineStore('equipment', () => {
       })
       if (response.data) {
         equipment.value = response.data.results
-        return response.data
+        return response.data.results
       } else {
         error.value = 'Failed to fetch equipment'
         equipment.value = []

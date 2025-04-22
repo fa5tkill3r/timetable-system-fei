@@ -31,7 +31,7 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
       })
       if (response.data) {
         eventTypes.value = response.data.results
-        return response.data
+        return response.data.results
       } else {
         error.value = 'Failed to fetch event types'
         eventTypes.value = []

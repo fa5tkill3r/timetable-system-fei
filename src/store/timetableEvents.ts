@@ -35,7 +35,7 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
       
       if (response.data) {
         events.value = response.data.results
-        return response.data
+        return response.data.results
       } else {
         error.value = 'Failed to fetch timetable events'
         events.value = []
