@@ -60,10 +60,10 @@ import { Room } from '@/types'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 
 const TIME_CONFIG = {
-  WINDOWS_COUNT: 9,           // Number of time slots in a day
+  WINDOWS_COUNT: 12,           // Number of time slots in a day
   WINDOW_DURATION: 50,        // Duration of each slot in minutes
   BREAK_DURATION: 10,         // Duration of breaks between slots in minutes
-  START_HOUR: 9,              // Starting hour (24-hour format)
+  START_HOUR: 8,              // Starting hour (24-hour format)
   START_MINUTE: 0             // Starting minute
 }
 
@@ -1142,7 +1142,7 @@ function handleDragEnd() {
     <ResizablePanel :default-size="75">
       <ResizablePanelGroup direction="vertical">
         <ResizablePanel :default-size="80">
-          <div class="flex flex-col">
+          <div class="flex flex-col h-full">
             <div class="flex items-center">
               <div class="flex flex-col w-full">
                 <div class="flex justify-center">
@@ -1161,30 +1161,18 @@ function handleDragEnd() {
                       <TabsContent value="parallels">
                         <!-- Add filtering controls for parallels view -->
                         <div class="flex flex-wrap gap-3 justify-center items-center">
-                          <ComboBox 
-                            :options="semesterOptions" 
-                            title="Semester" 
-                            search-placeholder="Select semester..."
-                            v-model:selection="selectedSemester"
-                          />
-                          
-                          <ComboBox 
-                            :options="yearOptions" 
-                            title="Year" 
-                            search-placeholder="Select year..."
-                            v-model:selection="selectedYear" 
-                          />
-                          
-                          <ComboBox
-                            :options="subjectGroupStore.subjectGroupGroups.map(g => ({
-                              id: g.name,
-                              name: g.name
-                            }))" 
-                            title="Subject Group" 
-                            search-placeholder="Select subject group..."
-                            v-model:selection="selectedSubjectGroup" 
-                          />
-                          
+                          <ComboBox :options="semesterOptions" title="Semester" search-placeholder="Select semester..."
+                            v-model:selection="selectedSemester" />
+
+                          <ComboBox :options="yearOptions" title="Year" search-placeholder="Select year..."
+                            v-model:selection="selectedYear" />
+
+                          <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(g => ({
+                            id: g.name,
+                            name: g.name
+                          }))" title="Subject Group" search-placeholder="Select subject group..."
+                            v-model:selection="selectedSubjectGroup" />
+
                           <Badge class="h-fit" variant="outline">
                             Nominal Semester: {{ nominalSemester }}
                           </Badge>
@@ -1265,82 +1253,83 @@ function handleDragEnd() {
                 </div>
               </div>
             </div>
+
+            <ScrollArea class="overflow-auto p-1">
+              <!-- Show the timetable grid for both parallels and rooms views -->
+              <div :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
+                class="bg-white rounded-lg shadow-md overflow-hidden mb-2">
+                <div :style="cornerCellStyle"></div>
+
+                <!-- Show placeholder message when no room is selected in rooms view -->
+                <div v-if="viewType.value === 'rooms' && !preferredRoom.value"
+                  class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
+                  <div class="text-lg text-gray-500 font-medium">
+                    Please select a room to view its schedule
+                  </div>
+                </div>
+
+                <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
+                  class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+                  {{ time.from }} - {{ time.to }}
+                </div>
+
+                <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
+                  {{ day }}
+                </div>
+
+                <template v-if="isResizing">
+                  <!-- Replace the four separate skeletons with a single one covering the entire timetable -->
+                  <div class="absolute inset-0 z-10 overflow-hidden">
+                    <Skeleton class="absolute w-full h-full" :style="{
+                      width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
+                      height: containerStyle.height
+                    }" />
+                  </div>
+                </template>
+                <div v-else v-for="(day, dayIndex) in days" :key="day">
+                  <div v-for="(time, timeIndex) in timeSlots" :key="`${day}-${time}`"
+                    :style="getCellStyle(dayIndex, timeIndex)" />
+                </div>
+
+                <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
+                  <!-- Use filteredEvents instead of events -->
+                  <ContextMenu>
+                    <ContextMenuTrigger>
+                      <div :style="getEventStyle(event)"
+                        class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
+                        draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
+                        <div class="flex justify-between items-center">
+                          <div class="event-title font-semibold text-gray-800 truncate">
+                            {{ event.shortcut }}
+                            <span class="sr-only">{{ event.title }}</span>
+                          </div>
+                          <MoreVertical
+                            class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                          <div>{{ event.startTime }} - {{ event.endTime }}</div>
+                          <div v-if="event.roomName"
+                            class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
+                            <Building class="w-4 h-4" /> {{ event.roomName }}
+                          </div>
+                        </div>
+                      </div>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent class="w-64">
+                      <ContextMenuLabel>{{ event.title }}</ContextMenuLabel>
+                      <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
+                      <ContextMenuItem @click="deleteCalendarEvent(event)">Delete</ContextMenuItem>
+                      <ContextMenuSeparator />
+                      <ContextMenuItem @click="duplicateEvent(event)">Duplicate</ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                </div>
+              </div>
+
+              <ScrollBar orientation="horizontal" />
+              <ScrollBar orientation="vertical" />
+            </ScrollArea>
           </div>
-
-          <ScrollArea class="overflow-auto p-1">
-            <!-- Show the timetable grid for both parallels and rooms views -->
-            <div :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
-              class="bg-white rounded-lg shadow-md overflow-hidden mb-2 mx-auto">
-              <div :style="cornerCellStyle"></div>
-
-              <!-- Show placeholder message when no room is selected in rooms view -->
-              <div v-if="viewType.value === 'rooms' && !preferredRoom.value"
-                class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
-                <div class="text-lg text-gray-500 font-medium">
-                  Please select a room to view its schedule
-                </div>
-              </div>
-
-              <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
-                class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-                {{ time.from }} - {{ time.to }}
-              </div>
-
-              <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
-                {{ day }}
-              </div>
-
-              <template v-if="isResizing">
-                <!-- Replace the four separate skeletons with a single one covering the entire timetable -->
-                <div class="absolute inset-0 z-10 overflow-hidden">
-                  <Skeleton class="absolute w-full h-full" :style="{
-                    width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
-                    height: containerStyle.height
-                  }" />
-                </div>
-              </template>
-              <div v-else v-for="(day, dayIndex) in days" :key="day">
-                <div v-for="(time, timeIndex) in timeSlots" :key="`${day}-${time}`"
-                  :style="getCellStyle(dayIndex, timeIndex)" />
-              </div>
-
-              <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
-                <!-- Use filteredEvents instead of events -->
-                <ContextMenu>
-                  <ContextMenuTrigger>
-                    <div :style="getEventStyle(event)"
-                      class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
-                      draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
-                      <div class="flex justify-between items-center">
-                        <div class="event-title font-semibold text-gray-800 truncate">
-                          {{ event.shortcut }}
-                          <span class="sr-only">{{ event.title }}</span>
-                        </div>
-                        <MoreVertical
-                          class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                      </div>
-                      <div class="flex justify-between text-sm text-gray-600">
-                        <div>{{ event.startTime }} - {{ event.endTime }}</div>
-                        <div v-if="event.roomName"
-                          class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-                          <Building class="w-4 h-4" /> {{ event.roomName }}
-                        </div>
-                      </div>
-                    </div>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent class="w-64">
-                    <ContextMenuLabel>{{ event.title }}</ContextMenuLabel>
-                    <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
-                    <ContextMenuItem @click="deleteCalendarEvent(event)">Delete</ContextMenuItem>
-                    <ContextMenuSeparator />
-                    <ContextMenuItem @click="duplicateEvent(event)">Duplicate</ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              </div>
-            </div>
-
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
         </ResizablePanel>
 
         <ResizableHandle @dragging="resize($event)" with-handle />
