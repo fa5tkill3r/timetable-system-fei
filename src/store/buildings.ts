@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
 import { client } from '../lib/client'
 import { useSchemaStore } from './schemas'
-import { components } from 'schema'
+import { components, operations } from 'schema'
 
 type RoomEquipment = components['schemas']['RoomEquipment'] 
 type RoomEquipmentRequest = components['schemas']['RoomEquipmentRequest'] 
@@ -18,16 +18,14 @@ export const useBuildingStore = defineStore('buildings', () => {
   const selectedBuilding = ref<Building | null>(null)
   const selectedRoom = ref<Room | null>(null)
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
 
-  const fetchBuildings = async () => {
+  const fetchBuildings = async (): Promise<Building[]> => {
     if (!schemaStore.activeSchema?.id) {
       buildings.value = []
       return []
     }
     
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.GET('/api/buildings/', {
         params: {
@@ -35,16 +33,9 @@ export const useBuildingStore = defineStore('buildings', () => {
         }
       })
       
-      if (response.data) {
-        buildings.value = response.data.results
-        return response.data.results
-      } else {
-        error.value = 'Failed to fetch buildings'
-        buildings.value = []
-        return []
-      }
+      buildings.value = response.data?.results || []
+      return buildings.value
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       buildings.value = []
       return []
     } finally {
@@ -52,10 +43,8 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const getBuilding = async (id: number) => {
+  const getBuilding = async (id: number): Promise<Building | null> => {
     isLoading.value = true
-    error.value = null
-    
     try {
       const response = await client.GET('/api/buildings/{id}/', {
         params: {
@@ -64,24 +53,17 @@ export const useBuildingStore = defineStore('buildings', () => {
         }
       })
       
-      if (response.data) {
-        selectedBuilding.value = response.data
-        return response.data
-      } else {
-        error.value = 'Failed to fetch building'
-        return null
-      }
+      selectedBuilding.value = response.data || null
+      return selectedBuilding.value
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const createBuilding = async (building: BuildingRequest) => {
+  const createBuilding = async (building: BuildingRequest): Promise<Building | null> => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.POST('/api/buildings/', {
         params: {
@@ -89,24 +71,18 @@ export const useBuildingStore = defineStore('buildings', () => {
         },
         body: building,
       })
-      if (response.data) {
-        await fetchBuildings()
-        return response.data
-      } else {
-        error.value = 'Failed to create building'
-        return null
-      }
+      
+      await fetchBuildings()
+      return response.data || null
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const updateBuilding = async (id: number, building: BuildingRequest) => {
+  const updateBuilding = async (id: number, building: BuildingRequest): Promise<Building | null> => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.PUT('/api/buildings/{id}/', {
         params: {
@@ -115,24 +91,18 @@ export const useBuildingStore = defineStore('buildings', () => {
         },
         body: building
       })
-      if (response.data) {
-        await fetchBuildings()
-        return response.data
-      } else {
-        error.value = 'Failed to update building'
-        return null
-      }
+      
+      await fetchBuildings()
+      return response.data || null
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const deleteBuilding = async (id: number) => {
+  const deleteBuilding = async (id: number): Promise<boolean> => {
     isLoading.value = true
-    error.value = null
     try {
       const { response } = await client.DELETE('/api/buildings/{id}/', {
         params: {
@@ -140,60 +110,48 @@ export const useBuildingStore = defineStore('buildings', () => {
           header: schemaStore.termHeader,
         }
       })
-      if (response.status === 204) {
-        buildings.value = buildings.value.filter(b => b.id !== id)
-        return true
-      } else {
-        error.value = 'Failed to delete building'
-        return false
-      }
+      
+      buildings.value = buildings.value.filter(b => b.id !== id)
+
+      return true
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return false
+      throw err
     } finally {
       isLoading.value = false
     }
   }
 
-
-  const fetchRooms = async (buildingId: number) => {
+  const fetchRooms = async (buildingId?: number): Promise<Room[]> => {
     if (!schemaStore.activeSchema?.id) {
       rooms.value = []
       return []
     }
     
     isLoading.value = true
-    error.value = null
-    
     try {
+      const query: operations['rooms_list']['parameters']['query'] = {};
+      if (buildingId !== undefined) {
+        query.building = buildingId;
+      }
+      
       const response = await client.GET('/api/rooms/', {
         params: {
           header: schemaStore.termHeader,
-          query: { building: buildingId }
+          query
         }
       })
       
-      if (response.data) {
-        rooms.value = response.data.results
-        return response.data.results
-      } else {
-        error.value = 'Failed to fetch rooms'
-        rooms.value = []
-        return []
-      }
+      rooms.value = response.data?.results || []
+      return rooms.value
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      rooms.value = []
-      return []
+      throw err
     } finally {
       isLoading.value = false
     }
   }
 
-  const getRoom = async (id: number) => {
+  const getRoom = async (id: number): Promise<Room | null> => {
     isLoading.value = true
-    error.value = null
-    
     try {
       const response = await client.GET('/api/rooms/{id}/', {
         params: {
@@ -202,24 +160,17 @@ export const useBuildingStore = defineStore('buildings', () => {
         }
       })
       
-      if (response.data) {
-        selectedRoom.value = response.data
-        return response.data
-      } else {
-        error.value = 'Failed to fetch room'
-        return null
-      }
+      selectedRoom.value = response.data || null
+      return selectedRoom.value
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const createRoom = async (room: RoomRequest) => {
+  const createRoom = async (room: RoomRequest): Promise<Room | null> => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.POST('/api/rooms/', {
         params: {
@@ -227,26 +178,20 @@ export const useBuildingStore = defineStore('buildings', () => {
         },
         body: room
       })
-      if (response.data) {
-        if (rooms.value.length > 0) {
-          await fetchRooms(room.building)
-        }
-        return response.data
-      } else {
-        error.value = 'Failed to create room'
-        return null
+      
+      if (rooms.value.length > 0) {
+        await fetchRooms(room.building ?? undefined)
       }
+      return response.data || null
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const updateRoom = async (roomId: number, room: RoomRequest) => {
+  const updateRoom = async (roomId: number, room: RoomRequest): Promise<Room | null> => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.PUT('/api/rooms/{id}/', {
         params: {
@@ -255,26 +200,20 @@ export const useBuildingStore = defineStore('buildings', () => {
         },
         body: room
       })
-      if (response.data) {
-        if (rooms.value.length > 0) {
-          await fetchRooms(room.building)
-        }
-        return response.data
-      } else {
-        error.value = 'Failed to update room'
-        return null
+      
+      if (rooms.value.length > 0) {
+        await fetchRooms(room.building ?? undefined)
       }
+      return response.data || null
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const deleteRoom = async (roomId: number, buildingId: number) => {
+  const deleteRoom = async (roomId: number, buildingId: number): Promise<boolean> => {
     isLoading.value = true
-    error.value = null
     try {
       const { response } = await client.DELETE('/api/rooms/{id}/', {
         params: {
@@ -282,32 +221,27 @@ export const useBuildingStore = defineStore('buildings', () => {
           header: schemaStore.termHeader,
         }
       })
+      
       if (response.status === 204) {
         if (rooms.value.length > 0) {
           await fetchRooms(buildingId)
         }
         return true
-      } else {
-        error.value = 'Failed to delete room'
-        return false
       }
+      return false
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return false
     } finally {
       isLoading.value = false
     }
   }
 
-
-  const fetchRoomEquipment = async (roomId: number) => {
+  const fetchRoomEquipment = async (roomId: number): Promise<RoomEquipment[]> => {
     if (!schemaStore.activeSchema?.id) {
       return []
     }
     
     isLoading.value = true
-    error.value = null
-    
     try {
       const response = await client.GET('/api/room-equipment/', {
         params: {
@@ -316,28 +250,20 @@ export const useBuildingStore = defineStore('buildings', () => {
         }
       })
       
-      if (response.data) {
-        return response.data.results
-      } else {
-        error.value = 'Failed to fetch equipment'
-        return []
-      }
+      return response.data?.results || []
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return []
     } finally {
       isLoading.value = false
     }
   }
 
-  const fetchRoomEquipmentByEquipment = async (equipmentId: number) => {
+  const fetchRoomEquipmentByEquipment = async (equipmentId: number): Promise<RoomEquipment[]> => {
     if (!schemaStore.activeSchema?.id) {
       return []
     }
     
     isLoading.value = true
-    error.value = null
-    
     try {
       const response = await client.GET('/api/room-equipment/', {
         params: {
@@ -346,23 +272,16 @@ export const useBuildingStore = defineStore('buildings', () => {
         }
       })
       
-      if (response.data) {
-        return response.data.results
-      } else {
-        error.value = 'Failed to fetch equipment'
-        return []
-      }
+      return response.data?.results || []
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return []
     } finally {
       isLoading.value = false
     }
   }
 
-  const createRoomEquipment = async (roomId: number, equipmentData: RoomEquipmentRequest) => {
+  const createRoomEquipment = async (roomId: number, equipmentData: RoomEquipmentRequest): Promise<RoomEquipment | null> => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.POST('/api/room-equipment/', {
         params: {
@@ -370,23 +289,17 @@ export const useBuildingStore = defineStore('buildings', () => {
         },
         body: equipmentData
       })
-      if (response.data) {
-        return response.data
-      } else {
-        error.value = 'Failed to add equipment to room'
-        return null
-      }
+      
+      return response.data || null
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const updateRoomEquipment = async (equipmentId: number, equipmentData: RoomEquipmentRequest) => {
+  const updateRoomEquipment = async (equipmentId: number, equipmentData: RoomEquipmentRequest): Promise<RoomEquipment | null> => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.PUT('/api/room-equipment/{id}/', {
         params: {
@@ -395,23 +308,17 @@ export const useBuildingStore = defineStore('buildings', () => {
         },
         body: equipmentData
       })
-      if (response.data) {
-        return response.data
-      } else {
-        error.value = 'Failed to update room equipment'
-        return null
-      }
+      
+      return response.data || null
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const deleteRoomEquipment = async (equipmentId: number, roomId: number) => {
+  const deleteRoomEquipment = async (equipmentId: number, roomId: number): Promise<boolean> => {
     isLoading.value = true
-    error.value = null
     try {
       const { response } = await client.DELETE('/api/room-equipment/{id}/', {
         params: {
@@ -419,14 +326,9 @@ export const useBuildingStore = defineStore('buildings', () => {
           header: schemaStore.termHeader,
         }
       })
-      if (response.status === 204) {
-        return true
-      } else {
-        error.value = 'Failed to delete room equipment'
-        return false
-      }
+      
+      return response.status === 204
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return false
     } finally {
       isLoading.value = false
@@ -454,7 +356,6 @@ export const useBuildingStore = defineStore('buildings', () => {
     selectedBuilding,
     selectedRoom,
     isLoading,
-    error,
     fetchBuildings,
     getBuilding,
     fetchRooms,
