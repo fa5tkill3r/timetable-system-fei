@@ -354,7 +354,7 @@
     SelectValue,
   } from '@/components/ui/select'
   import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-  import FileExplorer from '@/components/common/file-explorer.vue'
+  import FileExplorer from '@/components/common/FileExplorer.vue'
   import { client } from '@/lib/client'
   import type { components } from '@/../schema'
 

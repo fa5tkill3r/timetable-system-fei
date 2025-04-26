@@ -98,7 +98,7 @@ import {
 } from '@/components/ui/breadcrumb'
 import { type ColumnDef } from '@tanstack/vue-table'
 import { components } from 'schema'
-import TablePagination from '@/components/common/table-pagination.vue'
+import TablePagination from '@/components/common/TablePagination.vue'
 
 type Building = components['schemas']['Building']
 

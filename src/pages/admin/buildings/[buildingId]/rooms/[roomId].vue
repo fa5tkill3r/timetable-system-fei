@@ -140,7 +140,7 @@ import {
 } from '@/components/ui/breadcrumb'
 import { type ColumnDef } from '@tanstack/vue-table'
 import { components } from 'schema'
-import TablePagination from '@/components/common/table-pagination.vue'
+import TablePagination from '@/components/common/TablePagination.vue'
 import { Checkbox } from '@/components/ui/checkbox'
 
 const buildingStore = useBuildingStore()

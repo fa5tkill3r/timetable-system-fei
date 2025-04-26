@@ -72,7 +72,7 @@
   } from 'lucide-vue-next'
   import { Button } from '@/components/ui/button'
   import { client } from '@/lib/client.ts'
-  import FileExplorer from '@/components/common/file-explorer.vue'
+  import FileExplorer from '@/components/common/FileExplorer.vue'
 
   const router = useRouter()
 

@@ -58,7 +58,7 @@ import { RouterLink } from 'vue-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { type ColumnDef } from '@tanstack/vue-table'
 import { components } from 'schema'
-import TablePagination from '@/components/common/table-pagination.vue'
+import TablePagination from '@/components/common/TablePagination.vue'
 import { Badge, BadgeVariants } from '@/components/ui/badge'
 
 type Timetable = components['schemas']['TT']
