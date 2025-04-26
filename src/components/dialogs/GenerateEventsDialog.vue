@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import {
   FormField,
   FormItem,
@@ -33,19 +34,18 @@ const emit = defineEmits<{
 const timetableEventStore = useTimetableEventStore()
 const subjectGroupStore = useSubjectGroupStore()
 const isGenerating = ref(false)
-const selectedSubjectGroup = ref<string[]>([]) // Keep as array for multi-select
+const selectedSubjectGroup = ref<string[]>([])
 const progressMessage = ref('')
 const totalGroups = ref(0)
 const processedGroups = ref(0)
+const progressPercentage = ref(0)
 
-// Form validation schema
 const formSchema = toTypedSchema(
   z.object({
     subjectGroupName: z.string().array().min(1, "At least one subject group is required"),
   })
 )
 
-// Setup form
 const { handleSubmit, values, setFieldValue, errors, resetForm } = useForm({
   validationSchema: formSchema,
   initialValues: {
@@ -53,31 +53,23 @@ const { handleSubmit, values, setFieldValue, errors, resetForm } = useForm({
   }
 })
 
-// Watch for changes to the selected subject group to update form field
 watch(selectedSubjectGroup, (newValue) => {
   setFieldValue('subjectGroupName', newValue)
 })
 
-// Watch for dialog open state to load subject groups
 watch(() => props.open, async (isOpen) => {
   if (isOpen && subjectGroupStore.subjectGroupGroups.length === 0) {
-    try {
-      await subjectGroupStore.fetchSubjectGroupGroups()
-    } finally {
-      // No need to manage local loading state
-    }
+    await subjectGroupStore.fetchSubjectGroupGroups()
   }
 }, { immediate: true })
 
-// Format subject groups for combobox
 const subjectGroupOptions = computed(() => {
   return subjectGroupStore.subjectGroupGroups.map(group => ({
-    id: group.name, // Use name as the id since that's what we need
+    id: group.name,
     name: group.name
   }))
 })
 
-// Update open state
 const updateOpen = (value: boolean) => {
   emit('update:open', value)
   if (!value) {
@@ -85,13 +77,12 @@ const updateOpen = (value: boolean) => {
   }
 }
 
-// Generate events
 const onSubmit = handleSubmit(async (values) => {
   if (!props.timetable) return
   
   isGenerating.value = true
+  progressPercentage.value = 0
   
-  // Track success and errors
   const results = {
     success: 0,
     failed: 0,
@@ -99,11 +90,10 @@ const onSubmit = handleSubmit(async (values) => {
   }
   
   try {
-    const groups = Array.isArray(values.subjectGroupName) ? values.subjectGroupName : [values.subjectGroupName]
+    const groups = values.subjectGroupName
     totalGroups.value = groups.length
     processedGroups.value = 0
     
-    // Process each selected group sequentially
     for (const groupName of groups) {
       progressMessage.value = `Processing group: ${groupName} (${processedGroups.value + 1}/${totalGroups.value})`
       
@@ -125,9 +115,9 @@ const onSubmit = handleSubmit(async (values) => {
       }
       
       processedGroups.value++
+      progressPercentage.value = Math.round((processedGroups.value / totalGroups.value) * 100)
     }
     
-    // Generate final message
     if (results.failed === 0) {
       emit('generate', { 
         success: true, 
@@ -156,6 +146,7 @@ const onSubmit = handleSubmit(async (values) => {
     progressMessage.value = ''
     totalGroups.value = 0
     processedGroups.value = 0
+    progressPercentage.value = 0
   }
 })
 </script>
@@ -189,16 +180,10 @@ const onSubmit = handleSubmit(async (values) => {
           </FormItem>
         </FormField>
         
-        <!-- Show progress when generating multiple groups -->
-        <div v-if="isGenerating && totalGroups > 1" class="text-sm">
+        <div v-if="isGenerating && totalGroups > 1" class="text-sm space-y-2">
           <div class="mb-2">{{ progressMessage }}</div>
-          <div class="w-full bg-secondary h-2 rounded-full overflow-hidden">
-            <div 
-              class="bg-primary h-2 transition-all duration-300" 
-              :style="`width: ${(processedGroups / totalGroups) * 100}%`"
-            ></div>
-          </div>
-          <div class="mt-1 text-xs text-muted-foreground text-right">
+          <Progress v-model="progressPercentage" class="w-full" />
+          <div class="text-xs text-muted-foreground text-right">
             {{ processedGroups }}/{{ totalGroups }} groups processed
           </div>
         </div>
