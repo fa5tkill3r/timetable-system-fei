@@ -12,7 +12,6 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
   const events = ref<TTEvent[]>([])
   const selectedEvent = ref<TTEvent | null>(null)
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
 
   const fetchEvents = async (timetableId?: number) => {
     if (!schemaStore.activeSchema?.id) {
@@ -21,7 +20,6 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
     }
     
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.GET('/api/ttevent/', {
         params: {
@@ -37,14 +35,8 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
         events.value = response.data.results
         return response.data.results
       } else {
-        error.value = 'Failed to fetch timetable events'
-        events.value = []
         return []
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      events.value = []
-      return []
     } finally {
       isLoading.value = false
     }
@@ -52,7 +44,6 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
 
   const getEvent = async (id: number) => {
     isLoading.value = true
-    error.value = null
     
     try {
       const response = await client.GET('/api/ttevent/{id}/', {
@@ -66,11 +57,9 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
         selectedEvent.value = response.data
         return response.data
       } else {
-        error.value = 'Failed to fetch timetable event'
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
@@ -79,7 +68,6 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
 
   const createEvent = async (event: TTEventRequest) => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.POST('/api/ttevent/', {
         params: {
@@ -93,11 +81,9 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
         }
         return response.data
       } else {
-        error.value = 'Failed to create timetable event'
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
@@ -106,7 +92,6 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
 
   const updateEvent = async (id: number, eventData: Partial<TTEventRequest>) => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.PATCH('/api/ttevent/{id}/', {
         params: {
@@ -118,16 +103,12 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
       if (response.data) {
         const index = events.value.findIndex(e => e.id === id)
         if (index !== -1) {
-          events.value[index] = { ...events.value[index], ...eventData, id }
+          events.value[index] = { ...events.value[index], ...eventData, id } as TTEvent
         }
         return response.data
       } else {
-        error.value = 'Failed to update timetable event'
         return null
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return null
     } finally {
       isLoading.value = false
     }
@@ -135,7 +116,6 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
 
   const deleteEvent = async (id: number, timetableId?: number) => {
     isLoading.value = true
-    error.value = null
     try {
       const { response } = await client.DELETE('/api/ttevent/{id}/', {
         params: {
@@ -152,22 +132,17 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
         
         return true
       } else {
-        error.value = 'Failed to delete timetable event'
         return false
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return false
-    } finally {
+    } 
+     finally {
       isLoading.value = false
     }
   }
 
   const generateTimetableEvents = async (timetableId: number, subjectGroupName: string) => {
     isLoading.value = true
-    error.value = null
     try {
-      // TODO: Backend needs to be updated to accept timetable ID instead of name
       const response = await client.GET('/api/ttecontroller/generate-tte-events/', {
         params: {
           header: schemaStore.termHeader,
@@ -179,16 +154,13 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
       })
       
       if (response.data) {
-        // Refresh the events list after generation
-        await fetchEvents(timetable.id)
+        await fetchEvents(timetableId)
         return { success: true, data: response.data }
       } else {
-        error.value = 'Failed to generate timetable events'
         return { success: false, error: 'No data returned from server' }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
-      error.value = errorMessage
       return { success: false, error: errorMessage }
     } finally {
       isLoading.value = false
@@ -210,7 +182,6 @@ export const useTimetableEventStore = defineStore('timetableEvents', () => {
     events,
     selectedEvent,
     isLoading,
-    error,
     fetchEvents,
     getEvent,
     createEvent,

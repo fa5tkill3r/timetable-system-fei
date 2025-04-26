@@ -33,11 +33,15 @@ const emit = defineEmits<{
 const timetableEventStore = useTimetableEventStore()
 const subjectGroupStore = useSubjectGroupStore()
 const isGenerating = ref(false)
+const selectedSubjectGroup = ref<string[]>([]) // Keep as array for multi-select
+const progressMessage = ref('')
+const totalGroups = ref(0)
+const processedGroups = ref(0)
 
 // Form validation schema
 const formSchema = toTypedSchema(
   z.object({
-    subjectGroupName: z.string().min(1, "Subject group is required"),
+    subjectGroupName: z.string().array().min(1, "At least one subject group is required"),
   })
 )
 
@@ -45,8 +49,13 @@ const formSchema = toTypedSchema(
 const { handleSubmit, values, setFieldValue, errors, resetForm } = useForm({
   validationSchema: formSchema,
   initialValues: {
-    subjectGroupName: '',
+    subjectGroupName: [],
   }
+})
+
+// Watch for changes to the selected subject group to update form field
+watch(selectedSubjectGroup, (newValue) => {
+  setFieldValue('subjectGroupName', newValue)
 })
 
 // Watch for dialog open state to load subject groups
@@ -81,23 +90,61 @@ const onSubmit = handleSubmit(async (values) => {
   if (!props.timetable) return
   
   isGenerating.value = true
+  
+  // Track success and errors
+  const results = {
+    success: 0,
+    failed: 0,
+    errors: [] as string[]
+  }
+  
   try {
-    const result = await timetableEventStore.generateTimetableEvents(
-      props.timetable.id,
-      values.subjectGroupName,
-    )
+    const groups = Array.isArray(values.subjectGroupName) ? values.subjectGroupName : [values.subjectGroupName]
+    totalGroups.value = groups.length
+    processedGroups.value = 0
     
-    if (result.success) {
+    // Process each selected group sequentially
+    for (const groupName of groups) {
+      progressMessage.value = `Processing group: ${groupName} (${processedGroups.value + 1}/${totalGroups.value})`
+      
+      try {
+        const result = await timetableEventStore.generateTimetableEvents(
+          props.timetable.id!,
+          groupName,
+        )
+        
+        if (result.success) {
+          results.success++
+        } else {
+          results.failed++
+          results.errors.push(`${groupName}: ${result.error}`)
+        }
+      } catch (error) {
+        results.failed++
+        results.errors.push(`${groupName}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      }
+      
+      processedGroups.value++
+    }
+    
+    // Generate final message
+    if (results.failed === 0) {
       emit('generate', { 
         success: true, 
-        message: 'Events generated successfully!' 
+        message: `Successfully generated events for all ${results.success} subject groups.` 
       })
       updateOpen(false)
-    } else {
+    } else if (results.success === 0) {
       emit('generate', { 
         success: false, 
-        message: `Failed to generate events: ${result.error}` 
+        message: `Failed to generate events: ${results.errors.join('; ')}` 
       })
+    } else {
+      emit('generate', { 
+        success: true, 
+        message: `Generated events for ${results.success} groups with ${results.failed} failures. Errors: ${results.errors.join('; ')}` 
+      })
+      updateOpen(false)
     }
   } catch (error) {
     emit('generate', { 
@@ -106,6 +153,9 @@ const onSubmit = handleSubmit(async (values) => {
     })
   } finally {
     isGenerating.value = false
+    progressMessage.value = ''
+    totalGroups.value = 0
+    processedGroups.value = 0
   }
 })
 </script>
@@ -126,7 +176,9 @@ const onSubmit = handleSubmit(async (values) => {
           title="Subject Group"
           search-placeholder="Select subject group..."
           :loading="subjectGroupStore.isLoadingGroups"
-          @update:selection="setFieldValue('subjectGroupName', $event)"
+          v-model:selection="selectedSubjectGroup"
+          :multiple="true"
+          description="Select one or more subject groups to generate events for"
         >
           <template #empty>No subject groups found.</template>
         </ComboBox>
@@ -136,6 +188,20 @@ const onSubmit = handleSubmit(async (values) => {
             <FormMessage />
           </FormItem>
         </FormField>
+        
+        <!-- Show progress when generating multiple groups -->
+        <div v-if="isGenerating && totalGroups > 1" class="text-sm">
+          <div class="mb-2">{{ progressMessage }}</div>
+          <div class="w-full bg-secondary h-2 rounded-full overflow-hidden">
+            <div 
+              class="bg-primary h-2 transition-all duration-300" 
+              :style="`width: ${(processedGroups / totalGroups) * 100}%`"
+            ></div>
+          </div>
+          <div class="mt-1 text-xs text-muted-foreground text-right">
+            {{ processedGroups }}/{{ totalGroups }} groups processed
+          </div>
+        </div>
         
         <DialogFooter>
           <Button 

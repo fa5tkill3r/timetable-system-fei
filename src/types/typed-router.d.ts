@@ -23,7 +23,6 @@ declare module 'vue-router/auto-routes' {
     '/admin/buildings/': RouteRecordInfo<'/admin/buildings/', '/admin/buildings', Record<never, never>, Record<never, never>>,
     '/admin/buildings/[buildingId]/rooms/': RouteRecordInfo<'/admin/buildings/[buildingId]/rooms/', '/admin/buildings/:buildingId/rooms', { buildingId: ParamValue<true> }, { buildingId: ParamValue<false> }>,
     '/admin/buildings/[buildingId]/rooms/[roomId]': RouteRecordInfo<'/admin/buildings/[buildingId]/rooms/[roomId]', '/admin/buildings/:buildingId/rooms/:roomId', { buildingId: ParamValue<true>, roomId: ParamValue<true> }, { buildingId: ParamValue<false>, roomId: ParamValue<false> }>,
-    '/admin/datatable-example': RouteRecordInfo<'/admin/datatable-example', '/admin/datatable-example', Record<never, never>, Record<never, never>>,
     '/admin/equipment/': RouteRecordInfo<'/admin/equipment/', '/admin/equipment', Record<never, never>, Record<never, never>>,
     '/admin/import': RouteRecordInfo<'/admin/import', '/admin/import', Record<never, never>, Record<never, never>>,
     '/admin/schemas': RouteRecordInfo<'/admin/schemas', '/admin/schemas', Record<never, never>, Record<never, never>>,

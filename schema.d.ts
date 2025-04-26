@@ -900,6 +900,62 @@ export interface paths {
         patch: operations["tt_partial_update"];
         trace?: never;
     };
+    "/api/ttactivity/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all objects
+         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+         */
+        get: operations["ttactivity_list"];
+        put?: never;
+        /**
+         * Create new object
+         * @description Creates a new object with the provided data. Returns the created object.
+         */
+        post: operations["ttactivity_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ttactivity/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get single object
+         * @description Retrieves a specific object by its unique identifier (ID).
+         */
+        get: operations["ttactivity_retrieve"];
+        /**
+         * Update object
+         * @description Fully updates an existing object. All fields must be provided.
+         */
+        put: operations["ttactivity_update"];
+        post?: never;
+        /**
+         * Delete object
+         * @description Permanently removes the specified object from the database.
+         */
+        delete: operations["ttactivity_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial update object
+         * @description Partially updates an existing object. Only specified fields will be modified.
+         */
+        patch: operations["ttactivity_partial_update"];
+        trace?: never;
+    };
     "/api/ttecontroller/generate-tte-events/": {
         parameters: {
             query?: never;
@@ -1227,7 +1283,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-04-17T19:51:14.588755
+             * @default 2025-04-26T11:16:12.885487
              */
             timestamp: string;
         };
@@ -1236,7 +1292,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-04-17T19:51:14.588833
+             * @default 2025-04-26T11:16:12.885554
              */
             timestamp: string;
         };
@@ -1245,7 +1301,7 @@ export interface components {
             message: string;
             /**
              * Format: date-time
-             * @default 2025-04-17T19:51:14.588833
+             * @default 2025-04-26T11:16:12.885554
              */
             timestamp: string;
         };
@@ -1444,6 +1500,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SubjectUserRole"][];
         };
+        PaginatedTTActivityList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["TTActivity"][];
+        };
         PaginatedTTEventList: {
             /** @example 123 */
             count: number;
@@ -1599,7 +1670,13 @@ export interface components {
             role?: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
+        PatchedTTActivityRequest: {
+            subject?: number;
+            event_type?: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTEventRequest: {
+            tt?: number;
             tta?: number;
             day_of_week?: number | null;
             /** Format: int64 */
@@ -1752,8 +1829,20 @@ export interface components {
             readonly updated_at?: string;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
+        TTActivity: {
+            readonly id?: number;
+            subject: number;
+            event_type: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        TTActivityRequest: {
+            subject: number;
+            event_type: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         TTEvent: {
             readonly id?: number;
+            tt: number;
             tta: number;
             day_of_week?: number | null;
             /** Format: int64 */
@@ -1764,6 +1853,7 @@ export interface components {
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTEventRequest: {
+            tt: number;
             tta: number;
             day_of_week?: number | null;
             /** Format: int64 */
@@ -3731,11 +3821,11 @@ export interface operations {
             query?: {
                 /** @description Filter groups with at least this many subjects */
                 count_gte?: number;
-                /** @description Number of results to return per page. */
+                /** @description Number of results to return per page */
                 limit?: number;
                 /** @description Filter group names by regex pattern (case insensitive) */
                 name_regex?: string;
-                /** @description The initial index from which to return the results. */
+                /** @description The initial index from which to return the results */
                 offset?: number;
                 /** @description Order by count (use - for descending) */
                 order?: "-count" | "count";
@@ -4414,6 +4504,183 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TT"];
+                };
+            };
+        };
+    };
+    ttactivity_list: {
+        parameters: {
+            query?: {
+                /** @description Filter by event type ID */
+                event_type?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description Filter by subject ID */
+                subject?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTTActivityList"];
+                };
+            };
+        };
+    };
+    ttactivity_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTActivityRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTActivityRequest"];
+                "multipart/form-data": components["schemas"]["TTActivityRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTActivity"];
+                };
+            };
+        };
+    };
+    ttactivity_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt activity. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTActivity"];
+                };
+            };
+        };
+    };
+    ttactivity_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt activity. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTActivityRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTActivityRequest"];
+                "multipart/form-data": components["schemas"]["TTActivityRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTActivity"];
+                };
+            };
+        };
+    };
+    ttactivity_destroy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt activity. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ttactivity_partial_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt activity. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTTActivityRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTActivityRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTTActivityRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTActivity"];
                 };
             };
         };

@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-    <!-- Current path -->
     <div class="flex items-center space-x-2">
       <Button variant="outline" size="sm" @click="navigateUp" :disabled="currentPath === ''">
         <ChevronUpIcon class="h-4 w-4 mr-2" />
@@ -11,7 +10,6 @@
       </div>
     </div>
 
-    <!-- File browser -->
     <div class="border rounded-md h-[400px] overflow-y-auto">
       <div v-if="loading" class="flex justify-center items-center h-full">
         <div class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
@@ -38,7 +36,6 @@
       </div>
     </div>
 
-    <!-- Current directory status -->
     <div class="p-3 bg-muted rounded-md">
       <div class="flex items-center justify-between">
         <div class="flex items-center">
@@ -64,13 +61,11 @@
   import { Button } from '@/components/ui/button'
   import { client } from '@/lib/client.ts'
 
-  // Types
   interface FileItem {
     name: string;
     isDirectory: boolean;
   }
 
-  // Props and emits
   const props = defineProps<{
     initialPath?: string;
     modelValue?: string;
@@ -82,21 +77,18 @@
     'csv-stats': [stats: { count: number, hasFiles: boolean }];
   }>()
 
-  // State
   const currentPath = ref(props.initialPath || '')
   const directoryContents = ref<FileItem[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
   const selectedPath = computed(() => props.modelValue || '')
 
-  // CSV detection
   const csvFileCount = computed(() => {
     return directoryContents.value.filter(item => !item.isDirectory && isCsvFile(item.name)).length
   })
   
   const hasCsvFiles = computed(() => csvFileCount.value > 0)
 
-  // Watch and emit CSV stats whenever they change
   watch([csvFileCount, hasCsvFiles], () => {
     emit('csv-stats', {
       count: csvFileCount.value,
@@ -114,7 +106,6 @@
       : item.name
   }
 
-  // Directory navigation
   async function fetchDirectoryContents() {
     loading.value = true
     error.value = null
@@ -129,13 +120,15 @@
         return
       }
 
-      // Transform API response format
-      const directories = ((data?.dirs as string[]) || []).map((name: string) => ({
+      const responseData = data as any
+
+
+      const directories = ((responseData?.dirs as string[]) || []).map((name: string) => ({
         name,
         isDirectory: true
       }))
 
-      const files = ((data?.files as string[]) || []).map((name: string) => ({
+      const files = ((responseData?.files as string[]) || []).map((name: string) => ({
         name,
         isDirectory: false
       }))
@@ -170,7 +163,6 @@
     }
   }
 
-  // Watch for external path changes
   watch(() => props.initialPath, (newPath) => {
     if (newPath !== undefined && newPath !== currentPath.value) {
       currentPath.value = newPath
@@ -178,7 +170,6 @@
     }
   })
 
-  // Initialize
   onMounted(() => {
     fetchDirectoryContents()
   })

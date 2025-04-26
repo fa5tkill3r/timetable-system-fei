@@ -102,7 +102,6 @@ import {
 import { type ColumnDef } from '@tanstack/vue-table'
 import { components } from 'schema'
 import TablePagination from '@/components/common/TablePagination.vue'
-import { Checkbox } from '@/components/ui/checkbox'
 
 type Equipment = components['schemas']['Equipment']
 
@@ -126,21 +125,6 @@ const itemToDelete = ref<number | null>(null)
 
 // Define table columns
 const columns: ColumnDef<Equipment>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => h(Checkbox, {
-      'modelValue': table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate'),
-      'onUpdate:modelValue': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
-      'ariaLabel': 'Select all',
-    }),
-    cell: ({ row }) => h(Checkbox, {
-      'modelValue': row.getIsSelected(),
-      'onUpdate:modelValue': (value: boolean) => row.toggleSelected(!!value),
-      'ariaLabel': 'Select row',
-    }),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: 'name',
     header: ({ column }) => {
