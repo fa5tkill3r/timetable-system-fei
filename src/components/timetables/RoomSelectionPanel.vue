@@ -29,6 +29,14 @@ const selectedRoomId = defineModel<number | undefined>('selectedRoomId', {
   default: null,
 })
 
+interface RoomEquipments {
+  id: number
+  equipment_id: number
+  room_id: number
+  count: number
+  name?: string
+}
+
 const buildingStore = useBuildingStore()
 const equipmentStore = useEquipmentStore()
 const roomGroupStore = useRoomGroupStore()
@@ -37,6 +45,7 @@ const selectedRoomGroups = ref<(string | number)[]>([])
 const selectedEquipmentIds = ref<(string | number)[]>([])
 const searchQuery = ref('')
 const capacityRange = ref<[number, number]>([0, 300])
+const roomEquipments = ref<RoomEquipments[] | null>(null)
 
 const buildingOptions = computed(() => {
   return buildingStore.buildings.map(building => ({
@@ -78,7 +87,7 @@ watch(selectedEquipmentIds, async (newValues, oldValues) => {
     if (!roomsWithEquipment.value.has(numericId)) {
 
       const equipmentResults = await buildingStore.fetchRoomEquipmentByEquipment(numericId)
-      
+
       const roomSet = new Set<number>()
       for (const item of equipmentResults) {
         roomSet.add(item.room)
@@ -109,9 +118,9 @@ const filteredRooms = computed(() => {
   if (selectedRoomGroups.value.length > 0) {
     rooms = rooms.filter(room => {
       if (!room.id) return false
-      
+
       // Check if room belongs to any of the selected room groups
-      return selectedRoomGroups.value.some(groupName => 
+      return selectedRoomGroups.value.some(groupName =>
         roomGroupStore.isRoomInGroup(room.id!, String(groupName))
       )
     })
@@ -168,16 +177,20 @@ const getBuildingName = (buildingId: number | null) => {
 }
 
 function getRoomEquipment(roomId: number) {
-  if (!roomId) return []
-  
-  return buildingStore.fetchRoomEquipment(roomId)
+  if (!roomId) {
+    roomEquipments.value = null
+    return
+  }
+
+  buildingStore.fetchRoomEquipment(roomId)
     .then(equipment => {
       if (!equipment) return []
-      
-      return equipment.map(item => {
+
+      roomEquipments.value = equipment.map(item => {
         const equipDetails = equipmentStore.equipment.find(e => e.id === item.equipment);
+
         return {
-          id: item.id,
+          id: item.id!,
           equipment_id: item.equipment,
           room_id: item.room,
           count: item.count,
@@ -186,17 +199,6 @@ function getRoomEquipment(roomId: number) {
       });
     });
 }
-
-// Fetch room groups along with equipment
-onMounted(async () => {
-  if (equipmentStore.equipment.length === 0) {
-    await equipmentStore.fetchEquipment()
-  }
-  
-  if (roomGroupStore.roomGroups.length === 0) {
-    await roomGroupStore.fetchRoomGroups()
-  }
-})
 </script>
 
 <template>
@@ -243,13 +245,11 @@ onMounted(async () => {
 
     <ScrollArea class="flex-1 p-2">
       <div class="flex flex-wrap gap-2">
-        <HoverCard 
-          v-for="room in filteredRooms" 
-          :key="room.id">
+        <HoverCard v-for="room in filteredRooms" :key="room.id"
+          @update:open="(open) => open ? getRoomEquipment(room.id) : null">
           <HoverCardTrigger as-child>
-            <Button variant="outline"
-              :class="{ 'bg-primary text-primary-foreground': selectedRoomId === room.id }" size="sm" class="h-8 px-3"
-              @click="selectedRoomId = room.id">
+            <Button variant="outline" :class="{ 'bg-primary text-primary-foreground': selectedRoomId === room.id }"
+              size="sm" class="h-8 px-3" @click="selectedRoomId = room.id">
               {{ room.name }}
             </Button>
           </HoverCardTrigger>
@@ -262,7 +262,7 @@ onMounted(async () => {
                   {{ getRoomType(room.id) }}
                 </Badge>
               </div>
-              
+
               <div class="grid grid-cols-2 gap-2 text-sm">
                 <div class="flex items-center">
                   <Users class="h-4 w-4 mr-2 opacity-70" />
@@ -273,57 +273,44 @@ onMounted(async () => {
                   <span>{{ getBuildingName(room.building) }}</span>
                 </div>
               </div>
-              
+
               <!-- Add room groups display -->
               <div v-if="room.id && roomGroupStore.getRoomGroups(room.id).length > 0" class="text-sm">
                 <div class="font-medium mb-1">Room Groups:</div>
                 <div class="flex flex-wrap gap-1">
-                  <Badge 
-                    v-for="group in roomGroupStore.getRoomGroups(room.id)" 
-                    :key="group.id" 
-                    variant="outline" 
+                  <Badge v-for="group in roomGroupStore.getRoomGroups(room.id)" :key="group.id" variant="outline"
                     class="text-xs">
                     {{ group.name }}
                   </Badge>
                 </div>
               </div>
-              
+
               <div v-if="room.id" class="text-sm">
                 <div class="font-medium mb-1">Equipment:</div>
                 <div class="flex flex-wrap gap-1">
-                  <Suspense>
-                    <template #default>
-                      <div class="flex flex-wrap gap-1">
-                        <template v-if="(getRoomEquipment(room.id)).length > 0">
-                          <Badge 
-                            v-for="item in getRoomEquipment(room.id)" 
-                            :key="item.id" 
-                            variant="secondary" 
-                            class="text-xs">
-                            <MonitorDot class="h-3 w-3 mr-1" />
-                            {{ item.name }} {{ item.count > 1 ? `(${item.count})` : '' }}
-                          </Badge>
-                        </template>
-                        <div v-else class="text-xs text-muted-foreground">
-                          No equipment available
-                        </div>
-                      </div>
+                  <div v-if="roomEquipments" class="flex flex-wrap gap-1">
+                    <template v-if="roomEquipments.length > 0">
+                      <Badge v-for="item in roomEquipments" :key="item.id" variant="secondary" class="text-xs">
+                        <MonitorDot class="h-3 w-3 mr-1" />
+                        {{ item.name }} {{ item.count > 1 ? `(${item.count})` : '' }}
+                      </Badge>
                     </template>
-                    <template #fallback>
-                      <div class="text-xs text-muted-foreground">
-                        <div class="flex items-center gap-1">
-                          <div class="h-3 w-3 rounded-full border-2 border-r-transparent border-primary animate-spin"></div>
-                          Loading equipment...
-                        </div>
-                      </div>
-                    </template>
-                  </Suspense>
+                    <div v-else class="text-xs text-muted-foreground">
+                      No equipment available
+                    </div>
+                  </div>
+                  <div v-else class="text-xs text-muted-foreground">
+                    <div class="flex items-center gap-1">
+                      <div class="h-3 w-3 rounded-full border-2 border-r-transparent border-primary animate-spin"></div>
+                      Loading equipment...
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </HoverCardContent>
         </HoverCard>
-        
+
         <div v-if="filteredRooms.length === 0" class="text-center py-8 text-muted-foreground">
           No rooms found.
         </div>
