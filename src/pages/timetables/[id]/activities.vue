@@ -29,6 +29,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
+import { ComboboxOption } from '@/components/common/ComboBox.vue'
 
 type TTEvent = components['schemas']['TTEvent']
 type TTEventType = components['schemas']['TTEventType']
@@ -201,7 +202,7 @@ const groupOptions = computed(() => {
 const typeOptions = computed(() => {
   return ttEventTypeStore.eventTypes.map((type: TTEventType) => ({
     label: type.name,
-    value: type.id
+    value: type.id ?? 0  // Use nullish coalescing to ensure value is never undefined
   }))
 })
 
@@ -486,18 +487,18 @@ const columns: ColumnDef<TTEvent>[] = [
       return day
     },
   },
-  {
-    accessorKey: 'start_time',
-    header: 'Time',
-    id: 'time',
-    cell: ({ row }) => {
-      const startTime = row.getValue('start_time') as string
-      if (!startTime) return 'Not scheduled'
+  // {
+  //   accessorKey: 'start_time',
+  //   header: 'Time',
+  //   id: 'time',
+  //   cell: ({ row }) => {
+  //     const startTime = row.getValue('start_time') as string
+  //     if (!startTime) return 'Not scheduled'
 
-      const endTime = row.original.end_time
-      return `${startTime} - ${endTime || '?'}`
-    },
-  },
+  //     const endTime = row.original.end_time
+  //     return `${startTime} - ${endTime || '?'}`
+  //   },
+  // },
   {
     accessorKey: 'room',
     header: 'Room',
@@ -732,7 +733,7 @@ onMounted(async () => {
     <ConfirmDeleteDialog :open="deleteDialogVisible" :title="deleteDialogTitle" :description="deleteDialogDescription"
       :is-loading="dialogLoading" @update:open="deleteDialogVisible = $event" @confirm="handleDelete" />
 
-    <GenerateEventsDialog :open="generateDialogVisible" :timetable="currentTimetable"
+    <GenerateEventsDialog :open="generateDialogVisible" :timetable="currentTimetable ?? null"
       :is-loading="timetableEventStore.isLoading" @update:open="generateDialogVisible = $event"
       @generate="handleGenerateResult" />
   </div>

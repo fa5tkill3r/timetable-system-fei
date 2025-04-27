@@ -25,7 +25,7 @@ const props = defineProps<{
   timetable: Timetable | null
   isLoading?: boolean
 }>()
-
+// 
 const emit = defineEmits<{
   'update:open': [value: boolean]
   'generate': [result: { success: boolean, message: string }]

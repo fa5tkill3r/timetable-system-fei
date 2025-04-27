@@ -12,7 +12,7 @@
   import { useTTEventTypeStore } from '@/store/ttEventTypes'
   import { getColorFromString } from '@/lib/utils'
   import { Button } from '@/components/ui/button'
-  import ComboBoxFilter from '@/components/common/ComboBoxFilter.vue'
+  import ComboBoxFilter, { RoomFilterOption } from '@/components/common/ComboBoxFilter.vue'
   import { useSubjectGroupStore } from '@/store/subjectGroups'
   import { useSubjectStore } from '@/store/subjects'
   import { components } from 'schema'
@@ -56,7 +56,7 @@
     return ttEventTypeStore.eventTypes.map((type: EventType) => ({
       label: type.name,
       value: type.id,
-    }))
+    }) as RoomFilterOption)
   })
 
   const groupOptions = computed(() => {

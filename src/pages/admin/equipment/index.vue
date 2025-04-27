@@ -30,7 +30,7 @@
       enable-selection
       enable-column-visibility
       search-placeholder="Search equipment..."
-      @update:search-term="onSearchChange"
+      @search-change="onSearchChange"
       @selection-change="onSelectionChange"
     >
       <!-- Empty state slot -->

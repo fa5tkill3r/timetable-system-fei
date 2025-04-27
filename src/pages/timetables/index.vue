@@ -9,7 +9,7 @@
 
     <DataTable :data="timetables" :columns="columns" :is-loading="timetableStore.isLoading" :search-term="searchTerm"
       :page-index="pageIndex" :page-size="pageSize" enable-search enable-selection enable-column-visibility
-      search-placeholder="Search timetables..." @update:search-term="onSearchChange"
+      search-placeholder="Search timetables..." @search-change="onSearchChange"
       @selection-change="onSelectionChange">
       <template #empty>
         <div class="text-center p-4">

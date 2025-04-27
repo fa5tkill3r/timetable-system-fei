@@ -1,9 +1,5 @@
 <script setup lang="ts">
-  import { Button } from '@/components/ui/button'
 
-  import Navigation from '@/components/Navigation.vue'
-
-  import TimetableSwitcher from '@/components/TimetableSwitcher.vue'
 </script>
 
 <template>

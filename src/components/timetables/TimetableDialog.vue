@@ -22,18 +22,6 @@
             />
           </div>
           
-          <!-- Program -->
-          <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="program" class="text-right">Program</Label>
-            <Textarea
-              id="program"
-              v-model="form.program"
-              placeholder="Timetable program"
-              class="col-span-3"
-              :disabled="isLoading"
-            />
-          </div>
-
           <!-- Status -->
           <div class="grid grid-cols-4 items-center gap-4">
             <Label for="status" class="text-right">Status</Label>
@@ -92,7 +80,6 @@ const emit = defineEmits<{
 // Form state
 const form = ref<TimetableRequest>({
   name: '',
-  program: '',
   status: 'WIP',
   owner: 111407, // TODO: Replace with logged-in user ID
 })
@@ -104,11 +91,9 @@ watch(
     if (props.open) {
       if (props.timetable) {
         form.value.name = props.timetable.name || ''
-        form.value.program = props.timetable.program || ''
         form.value.status = props.timetable.status || 'WIP'
       } else {
         form.value.name = ''
-        form.value.program = ''
         form.value.status = 'WIP'
       }
     }
@@ -120,7 +105,6 @@ watch(
 const handleSubmit = () => {
   emit('save', {
     name: form.value.name,
-    program: form.value.program,
     status: form.value.status,
     owner: form.value.owner,
   })

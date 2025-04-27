@@ -34,17 +34,17 @@ const selection = defineModel<any>('selection', {
   default: null,
 })
 
-interface Option {
+export interface ComboboxOption {
   id: any
   name: string
 }
 
 const props = defineProps({
   options: {
-    type: Array as () => Option[],
+    type: Array as () => ComboboxOption[],
     required: true,
     default: () => [],
-    validator: (value: any[]): value is Option[] => {
+    validator: (value: any[]): value is ComboboxOption[] => {
       return value.every((option) => 'id' in option && 'name' in option)
     },
   },

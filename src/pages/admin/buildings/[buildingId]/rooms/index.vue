@@ -48,7 +48,7 @@
         enable-selection
         enable-column-visibility
         search-placeholder="Search rooms..."
-        @update:search-term="onSearchChange"
+        @search-change="onSearchChange"
         @selection-change="onSelectionChange"
       >
         <template #empty>

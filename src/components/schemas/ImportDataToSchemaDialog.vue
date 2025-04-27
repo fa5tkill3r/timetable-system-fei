@@ -140,11 +140,11 @@
                     :key="term.id"
                     class="flex items-center space-x-2 p-2 mb-1 rounded-md hover:bg-accent"
                     :class="{
-                      'bg-accent/50': selectedTermId === term.id.toString(),
+                      'bg-accent/50': selectedTermId === term.id!.toString(),
                     }"
                   >
                     <RadioGroupItem
-                      :value="term.id.toString()"
+                      :value="term.id!.toString()"
                       :id="`term-${term.id}`"
                     />
                     <label
@@ -429,7 +429,7 @@
   // Selected term details
   const selectedTerm = computed<Term | undefined>(() => {
     if (!selectedTermId.value) return undefined
-    return terms.value.find((t) => t.id.toString() === selectedTermId.value)
+    return terms.value.find((t) => t.id!.toString() === selectedTermId.value)
   })
 
   // Can import validation
@@ -499,6 +499,7 @@
 
       const { error } = await client.POST(
         '/api/imports_exports/fei/import/dir/',
+        //@ts-ignore
         {
           params: {
             query: {
@@ -508,7 +509,7 @@
             header: {
               'X-Term': props.schema?.schema_name || '',
             },
-          },
+          }
         },
       )
 
@@ -586,7 +587,7 @@
       if (
         selectedTermId.value &&
         !newFilteredTerms.some(
-          (term) => term.id.toString() === selectedTermId.value,
+          (term) => term.id?.toString() === selectedTermId.value,
         )
       ) {
         selectedTermId.value = ''

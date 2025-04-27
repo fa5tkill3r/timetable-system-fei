@@ -8,12 +8,17 @@ type SubjectUserRole = components['schemas']['SubjectUserRole']
 type Subject = components['schemas']['Subject']
 type SubjectUserRoleRequest = components['schemas']['SubjectUserRoleRequest']
 
+interface Role {
+  id: number
+  display_name: string
+  description: string
+}
+
 export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
   const schemaStore = useSchemaStore()
   const subjectUserRoles = ref<SubjectUserRole[]>([])
   const lecturers = ref<SubjectUserRole[]>([])
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
 
   const fetchSubjectUserRoles = async () => {
     if (!schemaStore.activeSchema?.id) {
@@ -22,7 +27,6 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
     }
 
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.GET('/api/subject-user-roles/', {
         params: {
@@ -33,14 +37,9 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
         subjectUserRoles.value = response.data.results
         return response.data.results
       } else {
-        error.value = 'Failed to fetch subject user roles'
         subjectUserRoles.value = []
         return []
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      subjectUserRoles.value = []
-      return []
     } finally {
       isLoading.value = false
     }
@@ -53,7 +52,6 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
     }
 
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.GET('/api/subject-user-roles/', {
         params: {
@@ -68,14 +66,9 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
         lecturers.value = response.data.results
         return response.data.results
       } else {
-        error.value = 'Failed to fetch lecturers'
         lecturers.value = []
         return []
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      lecturers.value = []
-      return []
     } finally {
       isLoading.value = false
     }
@@ -89,7 +82,6 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
 
   const createSubjectUserRole = async (subjectUserRole: SubjectUserRoleRequest) => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.POST('/api/subject-user-roles/', {
         params: {
@@ -104,12 +96,8 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
         }
         return response.data
       } else {
-        error.value = 'Failed to create subject user role'
         return null
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return null
     } finally {
       isLoading.value = false
     }
@@ -117,7 +105,6 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
 
   const updateSubjectUserRole = async (id: number, subjectUserRole: Partial<SubjectUserRoleRequest>) => {
     isLoading.value = true
-    error.value = null
     try {
       const response = await client.PATCH('/api/subject-user-roles/{id}/', {
         params: {
@@ -127,21 +114,10 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
         body: subjectUserRole,
       })
       if (response.data) {
-        const index = subjectUserRoles.value.findIndex(sur => sur.id === id)
-        if (index !== -1) {
-          subjectUserRoles.value[index] = { ...subjectUserRoles.value[index], ...subjectUserRole, id }
-        }
-        if (subjectUserRole.role === 1 || subjectUserRoles.value[index]?.role?.id === 1) {
-          await fetchLecturers()
-        }
-        return response.data
+        await fetchLecturers()
       } else {
-        error.value = 'Failed to update subject user role'
         return null
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return null
     } finally {
       isLoading.value = false
     }
@@ -149,7 +125,6 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
 
   const deleteSubjectUserRole = async (id: number) => {
     isLoading.value = true
-    error.value = null
     try {
       const { response } = await client.DELETE('/api/subject-user-roles/{id}/', {
         params: {
@@ -158,22 +133,12 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
         },
       })
       if (response.status === 204) {
-        const deletedItem = subjectUserRoles.value.find(sur => sur.id === id)
-        
-        subjectUserRoles.value = subjectUserRoles.value.filter(sur => sur.id !== id)
-        
-        if (deletedItem?.role?.id === 1) {
-          await fetchLecturers()
-        }
+        await fetchLecturers()
         
         return true
       } else {
-        error.value = 'Failed to delete subject user role'
         return false
       }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      return false
     } finally {
       isLoading.value = false
     }
@@ -192,7 +157,6 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
     subjectUserRoles,
     lecturers,
     isLoading,
-    error,
     fetchSubjectUserRoles,
     fetchLecturers,
     getLecturersForSubject,

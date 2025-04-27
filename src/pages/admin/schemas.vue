@@ -145,7 +145,7 @@ async function fetchTerms() {
       params: {
         query: {
           ordering: '-year_start',
-          year_start__gte: (new Date().getFullYear() - 3).toString(),
+          year_start__gte: (new Date().getFullYear() - 3),
         }
       },
     })

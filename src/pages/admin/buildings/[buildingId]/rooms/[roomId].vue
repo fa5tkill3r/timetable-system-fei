@@ -3,7 +3,7 @@
     <div v-if="(!room || !building) && buildingStore.isLoading" class="flex justify-center py-8">
       <div class="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
     </div>
-    
+
     <template v-else-if="building && room">
       <Breadcrumb>
         <BreadcrumbList>
@@ -24,12 +24,12 @@
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      
+
       <div class="flex justify-between items-center">
         <h1 class="text-2xl font-semibold">Equipment in {{ room.name }}</h1>
         <Button @click="openEquipmentDialog()">Add New Equipment</Button>
       </div>
-      
+
       <div class="p-4 border rounded-md bg-muted/40 space-y-2">
         <div class="grid gap-2">
           <div class="flex items-center gap-2">
@@ -47,26 +47,15 @@
           </div>
         </div>
       </div>
-      
-      <DataTable
-        ref="dataTable"
-        :data="equipment"
-        :columns="columns"
-        :is-loading="buildingStore.isLoading || equipmentStore.isLoading"
-        :search-term="searchTerm"
-        :page-index="pageIndex"
-        :page-size="pageSize"
-        enable-search
-        enable-selection
-        enable-column-visibility
-        search-placeholder="Search equipment..."
-        @update:search-term="onSearchChange"
-        @selection-change="onSelectionChange"
-      >
+
+      <DataTable ref="dataTable" :data="equipment" :columns="columns"
+        :is-loading="buildingStore.isLoading || equipmentStore.isLoading" :search-term="searchTerm"
+        :page-index="pageIndex" :page-size="pageSize" enable-search enable-selection enable-column-visibility
+        search-placeholder="Search equipment..." @search-change="onSearchChange" @selection-change="onSelectionChange">
         <template #empty>
           No equipment found. Add your first equipment to this room.
         </template>
-        
+
         <template #selection-actions>
           <div class="space-x-2">
             <Button variant="outline" size="sm">
@@ -77,15 +66,10 @@
             </Button>
           </div>
         </template>
-        
+
         <template #pagination="{ filteredCount, selectedCount }">
-          <TablePagination
-            :current-page="pageIndex"
-            :page-size="pageSize"
-            :total-count="filteredCount"
-            :selected-count="selectedCount"
-            @page-change="onPageChange"
-          />
+          <TablePagination :current-page="pageIndex" :page-size="pageSize" :total-count="filteredCount"
+            :selected-count="selectedCount" @page-change="onPageChange" />
         </template>
       </DataTable>
     </template>
@@ -94,24 +78,12 @@
       Room not found
     </div>
 
-    <RoomEquipmentDialog
-      :open="equipmentDialogVisible"
-      :room-equipment="selectedEquipment"
-      :room-id="roomId"
-      :room-name="room?.name || ''"
-      :is-loading="dialogLoading"
-      @update:open="equipmentDialogVisible = $event"
-      @save="saveEquipment"
-    />
+    <RoomEquipmentDialog :open="equipmentDialogVisible" :room-equipment="selectedEquipment" :room-id="roomId"
+      :room-name="room?.name || ''" :is-loading="dialogLoading" @update:open="equipmentDialogVisible = $event"
+      @save="saveEquipment" />
 
-    <ConfirmDeleteDialog
-      :open="deleteDialogVisible"
-      :title="deleteDialogTitle"
-      :description="deleteDialogDescription"
-      :is-loading="dialogLoading"
-      @update:open="deleteDialogVisible = $event"
-      @confirm="handleDelete"
-    />
+    <ConfirmDeleteDialog :open="deleteDialogVisible" :title="deleteDialogTitle" :description="deleteDialogDescription"
+      :is-loading="dialogLoading" @update:open="deleteDialogVisible = $event" @confirm="handleDelete" />
   </div>
 </template>
 
@@ -124,9 +96,9 @@ import { useToast } from '@/components/ui/toast/use-toast'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import DataTable from '@/components/common/DataTable.vue'
-import { 
+import {
   PencilIcon, TrashIcon, BuildingIcon, DoorOpen,
-  ArrowUpDown 
+  ArrowUpDown
 } from 'lucide-vue-next'
 import RoomEquipmentDialog from '@/components/buildings/RoomEquipmentDialog.vue'
 import ConfirmDeleteDialog from '@/components/dialogs/ConfirmDeleteDialog.vue'
@@ -142,6 +114,7 @@ import { type ColumnDef } from '@tanstack/vue-table'
 import { components } from 'schema'
 import TablePagination from '@/components/common/TablePagination.vue'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Room } from '@/types'
 
 const buildingStore = useBuildingStore()
 const route = useRoute()
@@ -159,18 +132,22 @@ interface RouteParams {
   roomId: string;
 }
 
+type RoomEquipment = components['schemas']['RoomEquipment']
+
 const params = route.params as RouteParams;
 const buildingId = computed(() => parseInt(params.buildingId));
 const roomId = computed(() => parseInt(params.roomId));
 
 const building = computed(() => buildingStore.selectedBuilding)
 const room = computed(() => buildingStore.selectedRoom)
-const roomEquipment = computed(() => buildingStore.roomEquipment)
+const roomEquipment = ref<RoomEquipment[]>([])
 
 const equipmentStore = useEquipmentStore()
 const availableEquipment = computed(() => equipmentStore.equipment)
 
 const equipment = computed(() => {
+  if (!room.value || !roomEquipment.value) return []
+
   return roomEquipment.value.map(item => {
     const equipDetails = availableEquipment.value.find(e => e.id === item.equipment);
     return {
@@ -222,7 +199,7 @@ const columns: ColumnDef<any>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const equipment = row.original
-      
+
       return h('div', { class: 'flex justify-end space-x-2' }, [
         h(Button, {
           variant: 'outline',
@@ -241,11 +218,14 @@ const columns: ColumnDef<any>[] = [
 
 const fetchData = async () => {
   if (roomId.value) {
-    await buildingStore.fetchRoomEquipment(roomId.value) // Updated from fetchEquipment
-    // Also fetch available equipment if not already loaded
-    if (equipmentStore.equipment.length === 0) {
-      await equipmentStore.fetchEquipment()
-    }
+    buildingStore.fetchRoomEquipment(roomId.value).then((response: RoomEquipment[]) => {
+      console.log('Fetched Room Equipment:', response);
+      
+      roomEquipment.value = response
+      console.log('Room Equipment:', roomEquipment.value);
+
+    })
+
   }
 }
 
@@ -275,7 +255,7 @@ async function loadData(buildingId: number, roomId: number) {
       return
     }
   }
-  
+
   // Load room
   const roomData = await buildingStore.getRoom(roomId)
   if (!roomData) {
@@ -287,7 +267,7 @@ async function loadData(buildingId: number, roomId: number) {
     router.push(`/admin/buildings/${buildingId}/rooms`)
     return
   }
-  
+
   if (parseInt(String(roomData.building)) !== buildingId) {
     toast({
       title: "Room not in this building",
@@ -297,7 +277,7 @@ async function loadData(buildingId: number, roomId: number) {
     router.push(`/admin/buildings/${buildingId}/rooms`)
     return
   }
-  
+
   await fetchData()
 }
 
@@ -375,11 +355,11 @@ async function saveEquipment(equipmentData: any) {
 async function handleDelete() {
   console.log('Deleting', itemToDelete.value)
   if (!itemToDelete.value) return
-  
+
   dialogLoading.value = true
   try {
     const success = await buildingStore.deleteRoomEquipment(itemToDelete.value, roomId.value)
-    
+
     if (success) {
       toast({ title: "Equipment deleted successfully" })
       deleteDialogVisible.value = false
@@ -395,10 +375,6 @@ async function handleDelete() {
     dialogLoading.value = false
   }
 }
-
-onMounted(async () => {
-  await equipmentStore.fetchEquipment()
-})
 
 const equipmentDialogVisible = ref(false)
 const deleteDialogVisible = ref(false)

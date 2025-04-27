@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator'
 import { CheckIcon, CirclePlus } from 'lucide-vue-next'
 
-interface RoomFilterOption {
+export interface RoomFilterOption {
   label: string
   value: string | number
   icon?: Component

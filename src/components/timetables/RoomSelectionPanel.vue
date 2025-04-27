@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Building, X as XIcon, BookOpen, Wrench, Users, MonitorDot } from 'lucide-vue-next'
-import RoomFilter from '@/components/common/ComboBoxFilter.vue'
+import RoomFilter, { RoomFilterOption } from '@/components/common/ComboBoxFilter.vue'
 import CapacitySliderFilter from '@/components/common/CapacitySliderFilter.vue'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -51,7 +51,7 @@ const buildingOptions = computed(() => {
   return buildingStore.buildings.map(building => ({
     label: `${building.name} (${building.abbrev})`,
     value: building.id,
-  }))
+  }) as RoomFilterOption)
 })
 
 
@@ -59,7 +59,7 @@ const equipmentOptions = computed(() => {
   return equipmentStore.equipment.map(item => ({
     label: item.name,
     value: item.id,
-  }))
+  }) as RoomFilterOption)
 })
 
 // Replace hardcoded room group options with data from the API
@@ -112,7 +112,7 @@ const filteredRooms = computed(() => {
   }
 
   if (selectedBuildingIds.value.length > 0) {
-    rooms = rooms.filter(room => selectedBuildingIds.value.includes(room.building))
+    rooms = rooms.filter(room => selectedBuildingIds.value.includes(room.building!))
   }
 
   if (selectedRoomGroups.value.length > 0) {
@@ -246,7 +246,7 @@ function getRoomEquipment(roomId: number) {
     <ScrollArea class="flex-1 p-2">
       <div class="flex flex-wrap gap-2">
         <HoverCard v-for="room in filteredRooms" :key="room.id"
-          @update:open="(open) => open ? getRoomEquipment(room.id) : null">
+          @update:open="(open) => open ? getRoomEquipment(room.id!) : null">
           <HoverCardTrigger as-child>
             <Button variant="outline" :class="{ 'bg-primary text-primary-foreground': selectedRoomId === room.id }"
               size="sm" class="h-8 px-3" @click="selectedRoomId = room.id">

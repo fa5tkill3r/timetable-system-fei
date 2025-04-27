@@ -7,7 +7,7 @@
         class="max-w-sm"
         :placeholder="searchPlaceholder"
         :model-value="searchTerm"
-        @update:model-value="$emit('update:searchTerm', $event)"
+        @update:model-value="$emit('searchChange', $event.toString())"
       />
       <slot name="toolbar"></slot>
       <DropdownMenu v-if="enableColumnVisibility">
@@ -122,6 +122,7 @@ import {
   type Row,
 } from '@tanstack/vue-table'
 import { valueUpdater } from '@/lib/utils'
+import { string } from 'zod'
 
 const props = defineProps<{
   // Data and columns
@@ -145,10 +146,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update:pageIndex': [index: number]
-  'update:pageSize': [size: number]
-  'update:searchTerm': [term: string]
-  'rowClick': [row: any]
+  'update:pageIndex': [index: number],
+  'update:pageSize': [size: number],
+  'searchChange': [term: string],
+  'rowClick': [row: any],
   'selectionChange': [selectedRows: Record<string, boolean>]
 }>()
 
