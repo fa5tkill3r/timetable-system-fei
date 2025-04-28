@@ -59,49 +59,53 @@ import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue
 import { Room } from '@/types'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 
-const TIME_CONFIG = {
-  WINDOWS_COUNT: 12,           // Number of time slots in a day
-  WINDOW_DURATION: 50,        // Duration of each slot in minutes
-  BREAK_DURATION: 10,         // Duration of breaks between slots in minutes
-  START_HOUR: 8,              // Starting hour (24-hour format)
-  START_MINUTE: 0             // Starting minute
-}
-
 interface TimeSlot {
-  from: string               // Display time (e.g., "9:00")
-  to: string                 // Display time (e.g., "9:50")
-  index: number              // 0-based index for the time slot
+  from: string
+  to: string
+  index: number
 }
 
 interface EventTemplate {
-  id: string
+  id: number
   title: string
   duration: number
   color: string
   quantity: number
-  subjectId?: number | null
-  originalEventId?: number | null
-  eventType?: number | null
+  subject_id?: number | null
+  original_eventId?: number | null
+  event_type?: number | null
 }
 
 interface CalendarEvent {
   id: number
   day: string
-  startTime: string
-  endTime: string
-  startIndex?: number
+  start_time: string
+  end_time: string
+  start_index?: number
   title: string
   shortcut: string
   color: string
-  roomId?: number | null
-  roomName?: string | null
-  subjectId?: number | null
-  eventType?: number | null
+  room_id?: number | null
+  room_name?: string | null
+  subject_id?: number | null
+  event_type?: number | null
 }
 
-const selectedSemester = ref<string>('LS')
-const selectedYear = ref<string>('1bc')
-const selectedSubjectGroup = ref<string | null>(null)
+// STATIC CONFIGURATION
+const TIME_CONFIG = {
+  SLOT_COUNT: 12,
+  SLOT_DURATION: 50,
+  BREAK_DURATION: 10,
+  START_HOUR: 8,
+  START_MINUTE: 0
+}
+
+const TIMETABLE_CONFIG = {
+  CELL_WIDTH: 120,
+  CELL_HEIGHT: 60,
+  HEADER_HEIGHT: 40,
+  DAY_COLUMN_WIDTH: 100
+}
 
 const semesterOptions = [
   { id: 'LS', name: 'Summer Semester (LS)' },
@@ -115,43 +119,57 @@ const yearOptions = [
   { id: '2i', name: '2. Master' }
 ]
 
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+
+
 const timetableStore = useTimetableStore()
 const timetableEventStore = useTimetableEventStore()
 const subjectStore = useSubjectStore()
 const buildingStore = useBuildingStore()
 const ttEventTypeStore = useTTEventTypeStore()
 const subjectGroupStore = useSubjectGroupStore()
+
 const { toast } = useToast()
 const route = useRoute('/timetables/[id]/')
 const router = useRouter()
 
+const selectedSemester = ref<string>('LS')
+const selectedYear = ref<string>('1bc')
+const selectedSubjectGroup = ref<string | null>(null)
 const viewType = ref<string>('parallels')
 const subjectId = ref<number | null>(null)
 const roomId = ref<number | null>(null)
+const selectedTimetableName = ref<string>('')
+const isOverMenu = ref(false)
+const events = ref<CalendarEvent[]>([])
+const eventTemplates = ref<EventTemplate[]>([])
+const isResizing = ref(false)
+const preferredRoom = ref<number | undefined>(undefined)
+const overrideRooms = ref<boolean>(false)
+const draggedEvent = ref<CalendarEvent | null>(null)
+const draggedTemplate = ref<EventTemplate | null>(null)
+const draggedOverDay = ref<string | null>(null)
+const draggedOverTime = ref<TimeSlot | null>(null)
+
 
 const timetableId = computed(() => {
   return route.params.id ? parseInt(route.params.id as string) : null
 })
 
-const selectedTimetableName = ref<string>('')
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
-// Generate time slots dynamically based on configuration
 const timeSlots: TimeSlot[] = (() => {
   const slots: TimeSlot[] = []
   let currentHour = TIME_CONFIG.START_HOUR
   let currentMinute = TIME_CONFIG.START_MINUTE
 
-  for (let i = 0; i < TIME_CONFIG.WINDOWS_COUNT; i++) {
-    // Format start time
+  for (let i = 0; i < TIME_CONFIG.SLOT_COUNT; i++) {
     const fromHour = currentHour.toString().padStart(2, '0')
     const fromMinute = currentMinute.toString().padStart(2, '0')
     const from = `${fromHour}:${fromMinute}`
 
-    // Calculate end time
     let endHour = currentHour
-    let endMinute = currentMinute + TIME_CONFIG.WINDOW_DURATION
+    let endMinute = currentMinute + TIME_CONFIG.SLOT_DURATION
 
     if (endMinute >= 60) {
       endHour += Math.floor(endMinute / 60)
@@ -164,8 +182,7 @@ const timeSlots: TimeSlot[] = (() => {
 
     slots.push({ from, to, index: i })
 
-    // Calculate next start time (after break)
-    currentMinute += TIME_CONFIG.WINDOW_DURATION + TIME_CONFIG.BREAK_DURATION
+    currentMinute += TIME_CONFIG.SLOT_DURATION + TIME_CONFIG.BREAK_DURATION
     if (currentMinute >= 60) {
       currentHour += Math.floor(currentMinute / 60)
       currentMinute = currentMinute % 60
@@ -175,19 +192,7 @@ const timeSlots: TimeSlot[] = (() => {
   return slots
 })()
 
-const isOverMenu = ref(false)
 
-const events = ref<CalendarEvent[]>([])
-const eventTemplates = ref<EventTemplate[]>([])
-
-const isResizing = ref(false)
-
-function resize(dragging: boolean) {
-  isResizing.value = dragging
-}
-
-const preferredRoom = ref<number | undefined>(undefined)
-const overrideRooms = ref<boolean>(false)
 
 function getSubjectCode(subjectId?: number | null): string | null {
   if (!subjectId) return null
@@ -216,38 +221,6 @@ const isBachelorSubject = (code: string | null) => {
 const isMasterSubject = (code: string | null) => {
   if (!code) return true
   return code.startsWith('I-') || !code.startsWith('B-')
-}
-
-onMounted(async () => {
-  await subjectStore.fetchSubjects()
-  await buildingStore.fetchRooms()
-  await ttEventTypeStore.fetchEventTypes()
-  await subjectGroupStore.fetchSubjectGroups()
-  await subjectGroupStore.fetchSubjectGroupGroups()
-
-  if (subjectGroupStore.subjectGroupGroups.length > 0) {
-    selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0].name
-  }
-
-  if (route.query.subject) {
-    subjectId.value = parseInt(route.query.subject as string)
-  }
-  if (route.query.room) {
-    roomId.value = parseInt(route.query.room as string)
-  }
-
-  loadTimetableData()
-})
-
-const subjectMatchesGroup = (subjectId: number | null, groupName: string | null): boolean => {
-  if (!subjectId || !groupName) return true
-
-  const matchingGroups = subjectGroupStore.subjectGroups.filter(group =>
-    Array.isArray(group.subjects) ? group.subjects.includes(subjectId) : group.subject === subjectId
-  )
-
-  // Check if any of those groups have the specified name
-  return matchingGroups.some(group => group.name === groupName)
 }
 
 async function loadTimetableData() {
@@ -317,36 +290,34 @@ function processTimetableEvents() {
       event.weeks_bitmask !== 0) {
 
       // Convert numeric time index to display time
-      const timeIndex = Math.min(Math.max(event.start_time as number, 0), timeSlots.length - 1)
-      const startTime = timeSlots[timeIndex].from
-      const endTime = calculateEndTime(startTime, event.duration)
+      const timeIndex = Math.min(event.start_time!, timeSlots.length - 1)
+      const startTime = timeSlots[timeIndex]!.from
+      const endTime = calculateEndTime(startTime, event.duration!)
 
       const room = event.room as any as Room
 
       const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
 
       events.value.push({
-        id: event.id,
-        day: getDayName(event.day_of_week),
-        startTime: startTime,
-        endTime: endTime,
-        startIndex: timeToIndex(startTime),
+        id: event.id!,
+        day: days[event.day_of_week! - 1]!,
+        start_time: startTime,
+        end_time: endTime,
+        start_index: timeToIndex(startTime),
         title: subjectName!,
         shortcut: subjectCode!,
         color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-        roomId: room.id,
-        roomName: room.name,
-        subjectId: subjectId,
-        eventType: eventType
+        room_id: room.id,
+        room_name: room.name,
+        subject_id: subjectId,
+        event_type: eventType
       })
     } else {
 
-      const title = subjectName || event.subject_name || `Event ${event.id}`
-
       const existingTemplate = eventTemplates.value.find(t =>
-        t.title === title &&
+        t.title === subjectName &&
         t.duration === event.duration &&
-        t.eventType === eventType
+        t.event_type === eventType
       )
 
       if (existingTemplate) {
@@ -355,22 +326,18 @@ function processTimetableEvents() {
         const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
 
         eventTemplates.value.push({
-          id: `template-${event.id}`,
-          title: title,
+          id: event.id!,
+          title: subjectName!,
           duration: event.duration || 1,
-          color: getColorFromString(title, 'pastel', brightnessAdjustment),
+          color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
           quantity: 1,
-          subjectId: subjectId,
-          originalEventId: event.id,
-          eventType: eventType
+          subject_id: subjectId,
+          original_eventId: event.id,
+          event_type: eventType
         })
       }
     }
   })
-}
-
-function getDayName(dayOfWeek: number): string {
-  return days[dayOfWeek - 1] || 'Monday'
 }
 
 function timeToIndex(time: string): number {
@@ -389,9 +356,9 @@ function calculateEndTime(startTime: string, duration: number): string {
   }
 
   const endIndex = startIndex + duration - 1
-  if (endIndex >= timeSlots.length) return timeSlots[timeSlots.length - 1].to
+  if (endIndex >= timeSlots.length) return timeSlots[timeSlots.length - 1]!.to
 
-  return timeSlots[endIndex].to
+  return timeSlots[endIndex]!.to
 }
 
 function getSubjectName(subjectId?: number | null): string | null {
@@ -401,39 +368,20 @@ function getSubjectName(subjectId?: number | null): string | null {
   return subject ? subject.name : null
 }
 
-watch([subjectId, roomId, viewType], async () => {
-  if (timetableId.value) {
-    const query = { ...route.query }
+const isSubjectInGroup = (subjectId: number | null, groupName: string | null): boolean => {
+  if (!subjectId || !groupName) return true
 
-    if (subjectId.value) {
-      query.subject = subjectId.value.toString()
-    } else {
-      delete query.subject
-    }
+  const matchingGroups = subjectGroupStore.subjectGroups.filter(group =>
+    Array.isArray(group.subjects) ? group.subjects.includes(subjectId) : group.subject === subjectId
+  )
 
-    if (roomId.value) {
-      query.room = roomId.value.toString()
-    } else {
-      delete query.room
-    }
+  return matchingGroups.some(group => group.name === groupName)
+}
 
-    router.replace({
-      path: route.path,
-      query
-    })
+const applyParallelsFilter = (item: CalendarEvent) => {
+  if (!item.subject_id) return false
 
-    await fetchTimetableEvents(timetableId.value)
-  }
-})
-
-watch([viewType], async () => {
-  console.log(`View changed to: ${viewType.value}`)
-})
-
-const applyParallelsFilter = (item: { subjectId?: number | null }) => {
-  if (!item.subjectId) return false
-
-  const subject = subjectStore.subjects.find(s => s.id === item.subjectId)
+  const subject = subjectStore.subjects.find(s => s.id === item.subject_id)
   if (!subject) return false
 
   const subjectCode = subject.code || null
@@ -446,7 +394,7 @@ const applyParallelsFilter = (item: { subjectId?: number | null }) => {
   const isCorrectSemester = subject.nominal_semester === nominalSemester.value
 
   const isInSelectedGroup = !selectedSubjectGroup.value ||
-    subjectMatchesGroup(item.subjectId, selectedSubjectGroup.value)
+    isSubjectInGroup(item.subject_id, selectedSubjectGroup.value)
 
   return isCorrectLevel && isCorrectSemester && isInSelectedGroup
 }
@@ -455,14 +403,12 @@ const filteredEvents = computed(() => {
   if (viewType.value === 'parallels') {
     return events.value.filter(applyParallelsFilter)
   } else if (viewType.value === 'rooms') {
-    // In rooms view, filter events by the selected room
     if (!preferredRoom.value) {
-      return [] // If no room selected, show no events
+      return []
     }
-    return events.value.filter(event => event.roomId === preferredRoom.value)
+    return events.value.filter(event => event.room_id === preferredRoom.value)
   }
 
-  // Default case - return all events
   return events.value
 })
 
@@ -480,29 +426,15 @@ const filteredEventTemplates = computed(() => {
   return templates
 })
 
-// Add watcher for filter changes
-watch([selectedSemester, selectedYear, selectedSubjectGroup], async () => {
-  console.log("Filters changed, applying new filters")
-  // No need to refetch events, just reapply filters
-})
+
 
 let nextEventId = 1
 
-const CELL_HEIGHT = 60
-const CELL_WIDTH = 120
-const HEADER_HEIGHT = 40
-const DAY_COLUMN_WIDTH = 100
-
-const draggedEvent = ref<CalendarEvent | null>(null)
-const draggedTemplate = ref<EventTemplate | null>(null)
-const draggedOverDay = ref<string | null>(null)
-const draggedOverTime = ref<TimeSlot | null>(null)
-
 const getEventDuration = (event: CalendarEvent): number => {
   const startIndex = timeSlots.findIndex(
-    (slot) => slot.from === event.startTime,
+    (slot) => slot.from === event.start_time,
   )
-  const endIndex = timeSlots.findIndex((slot) => slot.to === event.endTime)
+  const endIndex = timeSlots.findIndex((slot) => slot.to === event.end_time)
   return endIndex - startIndex + 1
 }
 
@@ -514,16 +446,16 @@ const getEventPositions = () => {
   Object.entries(eventsByDay).forEach(([day, dayEvents]) => {
     // Sort events by start time
     const sortedEvents = [...dayEvents].sort((a, b) => {
-      const timeA = timeSlots.findIndex(slot => slot.from === a.startTime)
-      const timeB = timeSlots.findIndex(slot => slot.from === b.startTime)
+      const timeA = timeSlots.findIndex(slot => slot.from === a.start_time)
+      const timeB = timeSlots.findIndex(slot => slot.from === b.start_time)
       return timeA - timeB
     })
 
     // Track occupied time slots for each row
-    const rows: { endTime: string; event: CalendarEvent }[][] = []
+    const rows: { end_time: string; event: CalendarEvent }[][] = []
 
     sortedEvents.forEach(event => {
-      const startIndex = timeSlots.findIndex(slot => slot.from === event.startTime)
+      const startIndex = timeSlots.findIndex(slot => slot.from === event.start_time)
 
       // Find a row where this event can fit
       let rowIndex = 0
@@ -536,7 +468,7 @@ const getEventPositions = () => {
         } else {
           // Check if any event in this row overlaps
           const overlaps = rows[rowIndex].some(occupiedSlot => {
-            const occupiedEndIndex = timeSlots.findIndex(slot => slot.to === occupiedSlot.event.endTime)
+            const occupiedEndIndex = timeSlots.findIndex(slot => slot.to === occupiedSlot.event.end_time)
             return startIndex <= occupiedEndIndex
           })
 
@@ -549,7 +481,7 @@ const getEventPositions = () => {
       }
 
       // Add event to the row
-      rows[rowIndex].push({ endTime: event.endTime, event })
+      rows[rowIndex].push({ end_time: event.end_time, event })
       eventPositions.set(event.id, { row: rowIndex, maxRows: 0 })
     })
 
@@ -571,7 +503,7 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const dayPositions = getDayRowPositions()
 
   const startIndex = timeSlots.findIndex(
-    (slot) => slot.from === event.startTime,
+    (slot) => slot.from === event.start_time,
   )
   const duration = getEventDuration(event)
 
@@ -584,18 +516,18 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const totalRows = position ? position.maxRows : 1
 
   // Keep consistent event height regardless of stacking
-  const eventHeight = CELL_HEIGHT - 4
+  const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
 
   // Calculate vertical position within the expanded cell
   // This spaces events evenly within the expanded cell
-  const rowSpacing = totalRows > 1 ? (CELL_HEIGHT * totalRows - eventHeight * totalRows) / (totalRows + 1) : 0
+  const rowSpacing = totalRows > 1 ? (TIMETABLE_CONFIG.CELL_HEIGHT * totalRows - eventHeight * totalRows) / (totalRows + 1) : 0
   const topOffset = rowPosition * (eventHeight + rowSpacing)
 
   return {
     position: 'absolute',
-    left: `${DAY_COLUMN_WIDTH + CELL_WIDTH * startIndex}px`,
+    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * startIndex}px`,
     top: `${dayPositions[dayIndex] + topOffset}px`,
-    width: `${CELL_WIDTH * duration - 4}px`,
+    width: `${TIMETABLE_CONFIG.CELL_WIDTH * duration - 4}px`,
     height: `${eventHeight}px`,
     backgroundColor: event.color,
     borderRadius: '4px',
@@ -634,13 +566,13 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
   }
 
   // Adjust cell height based on number of events
-  const cellHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+  const cellHeight = maxRows > 1 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
 
   return {
     position: 'absolute',
-    left: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeIndex}px`,
+    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeIndex}px`,
     top: `${dayPositions[dayIndex]}px`, // Use calculated position
-    width: `${CELL_WIDTH}px`,
+    width: `${TIMETABLE_CONFIG.CELL_WIDTH}px`,
     height: `${cellHeight}px`,
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
@@ -652,10 +584,10 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
 
       const duration = draggedEvent.value
         ? timeSlots.findIndex(
-          (slot) => slot.to === draggedEvent.value?.endTime,
+          (slot) => slot.to === draggedEvent.value?.end_time,
         ) -
         timeSlots.findIndex(
-          (slot) => slot.from === draggedEvent.value?.startTime,
+          (slot) => slot.from === draggedEvent.value?.start_time,
         ) +
         1
         : draggedTemplate.value?.duration || 0
@@ -683,10 +615,10 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
 const getHeaderStyle = (index: number): CSSProperties => {
   return {
     position: 'absolute',
-    left: `${DAY_COLUMN_WIDTH + CELL_WIDTH * index}px`,
+    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * index}px`,
     top: '0',
-    width: `${CELL_WIDTH}px`,
-    height: `${HEADER_HEIGHT}px`,
+    width: `${TIMETABLE_CONFIG.CELL_WIDTH}px`,
+    height: `${TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
     backgroundColor: '#f5f5f5',
@@ -702,7 +634,7 @@ const getDayRowPositions = () => {
   const positions: number[] = Array(days.length).fill(0)
   const eventPositions = getEventPositions()
 
-  let currentTop = HEADER_HEIGHT
+  let currentTop = TIMETABLE_CONFIG.HEADER_HEIGHT
 
   // Calculate position for each day based on expanded heights of previous days
   days.forEach((day, index) => {
@@ -728,7 +660,7 @@ const getDayRowPositions = () => {
     }
 
     // Add this day's height to the running total
-    currentTop += maxRows > 0 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+    currentTop += maxRows > 0 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
   })
 
   return positions
@@ -752,13 +684,13 @@ const getDayStyle = (index: number): CSSProperties => {
   }
 
   // Adjust day row height based on number of events
-  const rowHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+  const rowHeight = maxRows > 1 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
 
   return {
     position: 'absolute',
     left: '0',
     top: `${dayPositions[index]}px`, // Use calculated position
-    width: `${DAY_COLUMN_WIDTH}px`,
+    width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH}px`,
     height: `${rowHeight}px`,
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
@@ -775,8 +707,8 @@ const cornerCellStyle: CSSProperties = {
   position: 'absolute',
   left: '0',
   top: '0',
-  width: `${DAY_COLUMN_WIDTH}px`,
-  height: `${HEADER_HEIGHT}px`,
+  width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH}px`,
+  height: `${TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
   borderRight: '1px solid #e0e0e0',
   borderBottom: '1px solid #e0e0e0',
   backgroundColor: '#f5f5f5',
@@ -789,7 +721,7 @@ const containerStyle = computed<CSSProperties>(() => {
 
   // Calculate total container height by finding the bottom position of the last day
   const lastDayIndex = days.length - 1
-  let lastDayHeight = CELL_HEIGHT
+  let lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT
 
   // Get max rows for last day
   // Use filteredEvents instead of events.value
@@ -802,7 +734,7 @@ const containerStyle = computed<CSSProperties>(() => {
 
     if (positions.length > 0) {
       const maxRows = Math.max(...positions.map(p => p.maxRows || 1))
-      lastDayHeight = maxRows > 1 ? CELL_HEIGHT * maxRows : CELL_HEIGHT
+      lastDayHeight = maxRows > 1 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
     }
   }
 
@@ -811,7 +743,7 @@ const containerStyle = computed<CSSProperties>(() => {
 
   return {
     position: 'relative',
-    width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
+    width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeSlots.length}px`,
     height: `${totalHeight}px`,
     border: '1px solid #e0e0e0',
     borderBottom: 'none',
@@ -864,7 +796,7 @@ const getMousePosition = (
     }
   }
 
-  const timeIndex = Math.floor((x - DAY_COLUMN_WIDTH) / CELL_WIDTH)
+  const timeIndex = Math.floor((x - TIMETABLE_CONFIG.DAY_COLUMN_WIDTH) / TIMETABLE_CONFIG.CELL_WIDTH)
 
   if (
     dayIndex >= 0 &&
@@ -955,18 +887,18 @@ const handleDrop = async (event: DragEvent) => {
     const newEndIndex = newStartIndex + duration - 1
 
     // TODO: This may not be necessary cant test due to API issues
-    const brightnessAdjustment = draggedTemplate.value.eventType === 1 ? 0.9 : 1.1
+    const brightnessAdjustment = draggedTemplate.value.event_type === 1 ? 0.9 : 1.1
 
     const eventToPlace = {
-      id: draggedTemplate.value.originalEventId || -nextEventId++,
+      id: draggedTemplate.value.original_eventId || -nextEventId++,
       day: position.day,
-      startTime: timeSlots[newStartIndex].from,
-      endTime: timeSlots[newEndIndex].to,
+      start_time: timeSlots[newStartIndex].from,
+      end_time: timeSlots[newEndIndex].to,
       title: draggedTemplate.value.title,
       color: getColorFromString(draggedTemplate.value.title, 'pastel', brightnessAdjustment),
-      subjectId: draggedTemplate.value.subjectId,
-      eventType: draggedTemplate.value.eventType,
-      shortcut: getSubjectCode(draggedTemplate.value.subjectId)
+      subject_id: draggedTemplate.value.subject_id,
+      event_type: draggedTemplate.value.event_type,
+      shortcut: getSubjectCode(draggedTemplate.value.subject_id)
     }
 
     events.value.push(eventToPlace)
@@ -1007,9 +939,9 @@ const handleDrop = async (event: DragEvent) => {
       const updatedEvent = {
         ...events.value[eventIndex],
         day: position.day,
-        startTime: timeSlots[newStartIndex]?.from,
-        endTime: timeSlots[newEndIndex]?.to,
-      }
+        start_time: timeSlots[newStartIndex]?.from,
+        end_time: timeSlots[newEndIndex]?.to,
+      } as CalendarEvent
       events.value[eventIndex] = updatedEvent
 
       await saveEventPlacement(updatedEvent)
@@ -1044,12 +976,12 @@ async function saveEventPlacement(event: CalendarEvent) {
   try {
     const dayOfWeek = days.indexOf(event.day) + 1
     // Use the index of the time slot instead of the actual time
-    const startTimeIndex = timeToIndex(event.startTime)
+    const startTimeIndex = timeToIndex(event.start_time)
 
     // Determine which room to use based on the overrideRooms setting
-    const roomToUse = overrideRooms.value || !event.roomId
+    const roomToUse = overrideRooms.value || !event.room_id
       ? preferredRoom.value
-      : event.roomId
+      : event.room_id
 
     console.log("Room to use:", roomToUse);
 
@@ -1071,8 +1003,8 @@ async function saveEventPlacement(event: CalendarEvent) {
         ...eventData,
         timetable: timetableId.value,
         tta: {
-          subject: event.subjectId,
-          event_type: event.eventType || 1
+          subject: event.subject_id,
+          event_type: event.event_type || 1
         },
         duration: getEventDuration(event),
       }
@@ -1135,6 +1067,52 @@ function handleDragEnd() {
   draggedOverDay.value = null
   draggedOverTime.value = null
 }
+
+watch([subjectId, roomId, viewType], async () => {
+  if (timetableId.value) {
+    const query = { ...route.query }
+
+    if (subjectId.value) {
+      query.subject = subjectId.value.toString()
+    } else {
+      delete query.subject
+    }
+
+    if (roomId.value) {
+      query.room = roomId.value.toString()
+    } else {
+      delete query.room
+    }
+
+    router.replace({
+      path: route.path,
+      query
+    })
+
+    await fetchTimetableEvents(timetableId.value)
+  }
+})
+
+onMounted(async () => {
+  await subjectStore.fetchSubjects()
+  await buildingStore.fetchRooms()
+  await ttEventTypeStore.fetchEventTypes()
+  await subjectGroupStore.fetchSubjectGroups()
+  await subjectGroupStore.fetchSubjectGroupGroups()
+
+  if (subjectGroupStore.subjectGroupGroups.length > 0) {
+    selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0]?.name
+  }
+
+  if (route.query.subject) {
+    subjectId.value = parseInt(route.query.subject as string)
+  }
+  if (route.query.room) {
+    roomId.value = parseInt(route.query.room as string)
+  }
+
+  loadTimetableData()
+})
 </script>
 
 <template>
@@ -1281,7 +1259,7 @@ function handleDragEnd() {
                   <!-- Replace the four separate skeletons with a single one covering the entire timetable -->
                   <div class="absolute inset-0 z-10 overflow-hidden">
                     <Skeleton class="absolute w-full h-full" :style="{
-                      width: `${DAY_COLUMN_WIDTH + CELL_WIDTH * timeSlots.length}px`,
+                      width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeSlots.length}px`,
                       height: containerStyle.height
                     }" />
                   </div>
@@ -1307,10 +1285,10 @@ function handleDragEnd() {
                             class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         </div>
                         <div class="flex justify-between text-sm text-gray-600">
-                          <div>{{ event.startTime }} - {{ event.endTime }}</div>
-                          <div v-if="event.roomName"
+                          <div>{{ event.start_time }} - {{ event.end_time }}</div>
+                          <div v-if="event.room_name"
                             class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-                            <Building class="w-4 h-4" /> {{ event.roomName }}
+                            <Building class="w-4 h-4" /> {{ event.room_name }}
                           </div>
                         </div>
                       </div>
@@ -1332,7 +1310,7 @@ function handleDragEnd() {
           </div>
         </ResizablePanel>
 
-        <ResizableHandle @dragging="resize($event)" with-handle />
+        <ResizableHandle @dragging="isResizing = $event" with-handle />
 
         <ResizablePanel :default-size="20">
 
@@ -1342,7 +1320,7 @@ function handleDragEnd() {
       </ResizablePanelGroup>
     </ResizablePanel>
 
-    <ResizableHandle @dragging="resize($event)" with-handle />
+    <ResizableHandle @dragging="isResizing = $event" with-handle />
 
     <ResizablePanel :default-size="25">
       <EventSelectionPanel :event-templates="filteredEventTemplates" :is-loading="timetableEventStore.isLoading"

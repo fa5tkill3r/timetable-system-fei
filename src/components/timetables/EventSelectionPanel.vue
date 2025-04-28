@@ -16,27 +16,20 @@
   import { useSubjectGroupStore } from '@/store/subjectGroups'
   import { useSubjectStore } from '@/store/subjects'
   import { components } from 'schema'
-
-  interface EventTemplate {
-    id: string
-    title: string
-    duration: number
-    color: string
-    quantity: number
-    subjectId?: number | null
-    originalEventId?: number | null
-    eventType?: number | null
-  }
+  import type { CalendarEvent } from '@/pages/timetables/[id]/index.vue'
 
   type EventType = components['schemas']['TTEventType']
+  interface UnplacedEvent extends CalendarEvent {
+    quantity: number;
+  }
 
   const props = defineProps<{
-    eventTemplates: EventTemplate[]
+    eventTemplates: CalendarEvent[]
     isLoading: boolean
   }>()
 
   const emit = defineEmits<{
-    dragStart: [event: DragEvent, template: EventTemplate]
+    dragStart: [event: DragEvent, template: CalendarEvent]
     dragEnd: []
     menuDragOver: [event: DragEvent]
     menuDragLeave: []
@@ -65,8 +58,8 @@
 
     const subjectIds = new Set<number>()
     props.eventTemplates.forEach((template) => {
-      if (template.subjectId) {
-        subjectIds.add(template.subjectId)
+      if (template.subject_id) {
+        subjectIds.add(template.subject_id)
       }
     })
 
@@ -98,9 +91,29 @@
     return subjectGroupStore.getGroupsBySubject(subjectId)
   }
 
+  const groupedEvents = computed(() => {
+    const groups = new Map<string, UnplacedEvent>();
+    
+    props.eventTemplates.forEach(event => {
+      const key = `${event.title}_${event.event_type}`;
+      
+      if (groups.has(key)) {
+        const existingEvent = groups.get(key)!;
+        existingEvent.quantity += 1;
+      } else {
+        groups.set(key, {
+          ...event,
+          quantity: 1
+        } as UnplacedEvent);  
+      }
+    });
+    
+    return Array.from(groups.values());
+  });
+
   const filteredEventTemplates = computed(() => {
-    let filtered = props.eventTemplates.filter(
-      (template) => template.quantity > 0,
+    let filtered = groupedEvents.value.filter(
+      (template) => (template.quantity || 0) > 0,
     )
 
     if (searchQuery.value.trim()) {
@@ -113,16 +126,16 @@
     if (selectedEventTypeIds.value.length > 0) {
       filtered = filtered.filter(
         (template) =>
-          template.eventType &&
-          selectedEventTypeIds.value.includes(template.eventType),
+          template.event_type &&
+          selectedEventTypeIds.value.includes(template.event_type),
       )
     }
 
     if (selectedGroupIds.value.length > 0) {
       filtered = filtered.filter((template) => {
-        if (!template.subjectId) return false
+        if (!template.subject_id) return false
 
-        const groups = getSubjectGroups(template.subjectId)
+        const groups = getSubjectGroups(template.subject_id)
         return groups.some(
           (group) => group.name && selectedGroupIds.value.includes(group.name),
         )
@@ -147,7 +160,7 @@
     return eventTypeObj?.name || `Type ${eventType}`
   }
 
-  function handleDragStart(event: DragEvent, template: EventTemplate) {
+  function handleDragStart(event: DragEvent, template: CalendarEvent) {
     emit('dragStart', event, template)
   }
 
@@ -175,16 +188,11 @@
     emit('menuDrop', event)
   }
 
-  function getAdjustedColor(template: EventTemplate): string {
-    const brightnessAdjustment = template.eventType === 1 ? 0.9 : 1.1
+  function getAdjustedColor(template: CalendarEvent): string {
+    if (template.color) return template.color;
+    
+    const brightnessAdjustment = template.event_type === 1 ? 0.9 : 1.1
     return getColorFromString(template.title, 'pastel', brightnessAdjustment)
-  }
-
-  function getSubjectCode(subjectId?: number | null): string | null {
-    if (!subjectId) return null
-
-    const subject = subjectStore.subjects.find((s) => s.id === subjectId)
-    return subject?.code || null
   }
 </script>
 
@@ -223,9 +231,7 @@
           <Badge>{{ filteredEventTemplates.length }}</Badge>
         </div>
 
-        <!-- Filters section - stacked vertically -->
         <div class="mb-4 space-y-2">
-          <!-- Search input first -->
           <Input
             v-model="searchQuery"
             type="text"
@@ -233,7 +239,6 @@
             placeholder="Search events..."
           />
 
-          <!-- Filters below -->
           <div class="flex flex-wrap gap-2">
             <ComboBoxFilter
               title="Type"
@@ -265,8 +270,8 @@
         <div class="space-y-3">
           <div
             v-for="template in filteredEventTemplates"
-            :key="template.id"
-            v-show="template.quantity > 0"
+            :key="`${template.title}_${template.event_type}`"
+            v-show="(template.quantity || 0) > 0"
             class="group relative cursor-move rounded-lg p-3"
             :style="{ backgroundColor: getAdjustedColor(template) }"
             draggable="true"
@@ -275,9 +280,7 @@
           >
             <div class="truncate font-medium">
               <!-- Show subject code always -->
-              <span class="font-semibold">{{
-                getSubjectCode(template.subjectId) || ''
-              }}</span>
+              <span class="font-semibold">{{ template.shortcut || '' }}</span>
 
               <span class="ml-1">- {{ template.title }}</span>
             </div>
@@ -285,11 +288,11 @@
             <div
               class="flex items-center justify-between text-sm text-gray-600"
             >
-              <span>{{ getEventTypeLabel(template.eventType ?? null) }}</span>
-              <span>Duration: {{ template.duration }}h</span>
+              <span>{{ getEventTypeLabel(template.event_type ?? null) }}</span>
+              <span>Duration: {{ template.duration || 1 }}h</span>
             </div>
             <div class="mt-1 text-sm text-gray-600">
-              <span class="ml-auto">Remaining: {{ template.quantity }}</span>
+              <span class="ml-auto">Remaining: {{ template.quantity || 0 }}</span>
             </div>
           </div>
         </div>
