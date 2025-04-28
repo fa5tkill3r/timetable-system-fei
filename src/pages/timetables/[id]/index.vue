@@ -58,6 +58,7 @@ import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
 import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue'
 import { Room } from '@/types'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
+import { components } from 'schema'
 
 interface TimeSlot {
   from: string
@@ -423,23 +424,20 @@ const getEventDuration = (event: CalendarEvent): number => {
   return endIndex - startIndex + 1
 }
 
-const getEventPositions = () => {
+const getRowEventPositions = () => {
   const eventsByDay = _.groupBy(filteredEvents.value, 'day')
   const eventPositions = new Map()
 
   Object.entries(eventsByDay).forEach(([, dayEvents]) => {
-    // Sort events by start time
     const sortedEvents = [...dayEvents].sort((a, b) => 
       timeToIndex(a.start_time!) - timeToIndex(b.start_time!)
     )
 
-    // Track occupied time slots for each row
     const rows: { end_time: string; event: CalendarEvent }[][] = []
 
     sortedEvents.forEach(event => {
       const startIndex = timeSlots.findIndex(slot => slot.from === event.start_time)
 
-      // Find a row where this event can fit
       let rowIndex = 0
       let foundRow = false
 
@@ -448,10 +446,9 @@ const getEventPositions = () => {
           rows[rowIndex] = []
           foundRow = true
         } else {
-          // Check if any event in this row overlaps
-          const overlaps = rows[rowIndex].some(occupiedSlot => {
+          const overlaps = rows[rowIndex]?.some(occupiedSlot => {
             const occupiedEndIndex = timeSlots.findIndex(slot => slot.to === occupiedSlot.event.end_time)
-            return startIndex <= occupiedEndIndex{
+            return startIndex <= occupiedEndIndex
           })
 
           if (!overlaps) {
@@ -462,12 +459,10 @@ const getEventPositions = () => {
         }
       }
 
-      // Add event to the row
-      rows[rowIndex].push({ end_time: event.end_time, event })
+      rows[rowIndex]?.push({ end_time: event.end_time!, event })
       eventPositions.set(event.id, { row: rowIndex, maxRows: 0 })
-    }))
+    })
 
-    // Set maxRows for all events in this day
     const maxRows = rows.length
     sortedEvents.forEach(event => {
       const position = eventPositions.get(event.id)
@@ -481,39 +476,27 @@ const getEventPositions = () => {
 }
 
 const getEventStyle = (event: CalendarEvent): CSSProperties => {
-  // Only for placed events with day and time
   if (!event.day || !event.start_time || !event.end_time) {
     return {}
   }
 
   const dayIndex = days.indexOf(event.day)
-  const dayPositions = getDayRowPositions()
-
-  const startIndex = timeSlots.findIndex(
-    (slot) => slot.from === event.start_time,
-  )
+  const startIndex = timeToIndex(event.start_time)
   const duration = getEventDuration(event)
-
-  // Get position data for stacking
-  const eventPositions = getEventPositions()
-  const position = eventPositions.get(event.id)
-
-  // Calculate row position if this event needs to be stacked
-  const rowPosition = position ? position.row : 0
-  const totalRows = position ? position.maxRows : 1
-
-  // Keep consistent event height regardless of stacking
+  
+  const dayPositions = getDayRowPositions()
+  const position = getRowEventPositions().get(event.id) || { row: 0, maxRows: 1 }
+  
   const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
-
-  // Calculate vertical position within the expanded cell
-  // This spaces events evenly within the expanded cell
-  const rowSpacing = totalRows > 1 ? (TIMETABLE_CONFIG.CELL_HEIGHT * totalRows - eventHeight * totalRows) / (totalRows + 1) : 0
-  const topOffset = rowPosition * (eventHeight + rowSpacing)
+  const rowSpacing = position.maxRows > 1 
+    ? (TIMETABLE_CONFIG.CELL_HEIGHT * position.maxRows - eventHeight * position.maxRows) / (position.maxRows + 1) 
+    : 0
+  const topOffset = position.row * (eventHeight + rowSpacing)
 
   return {
     position: 'absolute',
     left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * startIndex}px`,
-    top: `${dayPositions[dayIndex] + topOffset}px`,
+    top: `${dayPositions[dayIndex]! + topOffset}px`,
     width: `${TIMETABLE_CONFIG.CELL_WIDTH * duration - 4}px`,
     height: `${eventHeight}px`,
     backgroundColor: event.color,
@@ -527,7 +510,7 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
 }
 
 const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
-  const eventPositions = getEventPositions()
+  const eventPositions = getRowEventPositions()
   // Use filteredEvents instead of events.value
   const dayEvents = filteredEvents.value.filter(e => e.day === days[dayIndex])
   const dayPositions = getDayRowPositions()
@@ -619,7 +602,7 @@ const getHeaderStyle = (index: number): CSSProperties => {
 
 const getDayRowPositions = () => {
   const positions: number[] = Array(days.length).fill(0)
-  const eventPositions = getEventPositions()
+  const eventPositions = getRowEventPositions()
 
   let currentTop = TIMETABLE_CONFIG.HEADER_HEIGHT
 
@@ -654,7 +637,7 @@ const getDayRowPositions = () => {
 }
 
 const getDayStyle = (index: number): CSSProperties => {
-  const eventPositions = getEventPositions()
+  const eventPositions = getRowEventPositions()
   // Use filteredEvents instead of events.value
   const dayEvents = filteredEvents.value.filter(e => e.day === days[index])
   const dayPositions = getDayRowPositions()
@@ -704,7 +687,7 @@ const cornerCellStyle: CSSProperties = {
 
 const containerStyle = computed<CSSProperties>(() => {
   const dayPositions = getDayRowPositions()
-  const eventPositions = getEventPositions()
+  const eventPositions = getRowEventPositions()
 
   // Calculate total container height by finding the bottom position of the last day
   const lastDayIndex = days.length - 1
@@ -726,7 +709,7 @@ const containerStyle = computed<CSSProperties>(() => {
   }
 
   // Total height is position of last day plus its height
-  const totalHeight = dayPositions[lastDayIndex] + lastDayHeight
+  const totalHeight = dayPositions[lastDayIndex]! + lastDayHeight
 
   return {
     position: 'relative',
@@ -757,9 +740,7 @@ function handleTemplateStart(event: DragEvent, template: CalendarEvent) {
   event.dataTransfer!.effectAllowed = 'move'
 }
 
-const getMousePosition = (
-  event: DragEvent,
-): { day: string; time: TimeSlot } | null => {
+const getMousePosition = (event: DragEvent): { day: string; time: TimeSlot } | null => {
   const rect = (event.currentTarget as HTMLElement)?.getBoundingClientRect()
   if (!rect) return null
 
@@ -776,7 +757,7 @@ const getMousePosition = (
     const currentDayTop = dayPositions[i];
     const nextDayTop = nextDayIndex < days.length ? dayPositions[nextDayIndex] : Infinity;
 
-    if (y >= currentDayTop && y < nextDayTop) {
+    if (y >= currentDayTop! && y < nextDayTop!) {
       dayIndex = i;
       break;
     }
@@ -791,8 +772,8 @@ const getMousePosition = (
     timeIndex < timeSlots.length
   ) {
     return {
-      day: days[dayIndex],
-      time: timeSlots[timeIndex],
+      day: days[dayIndex]!,
+      time: timeSlots[timeIndex]!,
     }
   }
   return null
@@ -810,10 +791,6 @@ const handleDragOver = (event: DragEvent) => {
 const handleMenuDragOver = (event: DragEvent) => {
   event.preventDefault()
   isOverMenu.value = true
-}
-
-const handleMenuDragLeave = () => {
-  isOverMenu.value = false
 }
 
 const handleMenuDrop = async (event: DragEvent) => {
@@ -873,13 +850,11 @@ const handleDrop = async (event: DragEvent) => {
     const newEndIndex = newStartIndex + duration - 1
 
     // TODO: This may not be necessary cant test due to API issues
-    const brightnessAdjustment = draggedTemplate.value.event_type === 1 ? 0.9 : 1.1
-
     const eventToPlace: CalendarEvent = {
       id: draggedTemplate.value.original_eventId || -nextEventId++,
       day: position.day,
-      start_time: timeSlots[newStartIndex].from,
-      end_time: timeSlots[newEndIndex].to,
+      start_time: timeSlots[newStartIndex]!.from,
+      end_time: timeSlots[newEndIndex]!.to,
       title: draggedTemplate.value.title,
       shortcut: draggedTemplate.value.shortcut || getSubjectCode(draggedTemplate.value.subject_id) || '',
       color: draggedTemplate.value.color,
@@ -889,14 +864,6 @@ const handleDrop = async (event: DragEvent) => {
     }
 
     events.value.push(eventToPlace)
-
-    // Decrement quantity of the template
-    const template = eventTemplates.value.find(
-      (t) => t.id === draggedTemplate.value?.id,
-    )
-    if (template && template.quantity && template.quantity > 0) {
-      template.quantity--
-    }
 
     await saveEventPlacement(eventToPlace)
 
@@ -963,10 +930,8 @@ async function saveEventPlacement(event: CalendarEvent) {
 
   try {
     const dayOfWeek = days.indexOf(event.day!) + 1
-    // Use the index of the time slot instead of the actual time
     const startTimeIndex = timeToIndex(event.start_time!)
 
-    // Determine which room to use based on the overrideRooms setting
     const roomToUse = overrideRooms.value || !event.room_id
       ? preferredRoom.value
       : event.room_id
@@ -976,37 +941,19 @@ async function saveEventPlacement(event: CalendarEvent) {
 
     const eventData = {
       day_of_week: dayOfWeek,
-      start_time: startTimeIndex, // Send index instead of time string
+      start_time: startTimeIndex,
       room: roomToUse,
       weeks_bitmask: 4095,
     }
 
-    console.log("Placing event with room:", preferredRoom.value)
+    await timetableEventStore.updateEvent(event.id, eventData)
 
-    let result
-    if (event.id && event.id > 0) {
-      result = await timetableEventStore.updateEvent(event.id, eventData)
-    } else {
-      const fullEventData = {
-        ...eventData,
-        timetable: timetableId.value,
-        tta: {
-          subject: event.subject_id,
-          event_type: event.event_type || 1
-        },
-        duration: getEventDuration(event),
-      }
-      result = await timetableEventStore.createEvent(fullEventData)
-    }
-
-    if (result) {
-      toast({
+    toast({
         title: "Success",
         description: "Event has been placed in the timetable."
       })
 
       await fetchTimetableEvents(timetableId.value)
-    }
   } catch (error) {
     console.error("Error saving event placement:", error)
     toast({
@@ -1089,7 +1036,7 @@ onMounted(async () => {
   await subjectGroupStore.fetchSubjectGroupGroups()
 
   if (subjectGroupStore.subjectGroupGroups.length > 0) {
-    selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0]?.name
+    selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0]?.name ?? null
   }
 
   if (route.query.subject) {
@@ -1208,9 +1155,6 @@ onMounted(async () => {
                       Owner: {{ timetableStore.selectedTimetable?.owner }}
                     </Badge>
 
-                    <Badge variant="outline" v-if="timetableStore.selectedTimetable?.program">
-                      Program: {{ timetableStore.selectedTimetable?.program }}
-                    </Badge>
                   </div>
                   <!-- <div class="min-w-[150px]">
                     <ComboBox :options="roomOptions" title="Preferred Room"
@@ -1227,7 +1171,7 @@ onMounted(async () => {
                 <div :style="cornerCellStyle"></div>
 
                 <!-- Show placeholder message when no room is selected in rooms view -->
-                <div v-if="viewType.value === 'rooms' && !preferredRoom.value"
+                <div v-if="viewType === 'rooms' && !preferredRoom"
                   class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
                   <div class="text-lg text-gray-500 font-medium">
                     Please select a room to view its schedule
@@ -1313,7 +1257,7 @@ onMounted(async () => {
     <ResizablePanel :default-size="25">
       <EventSelectionPanel :event-templates="filteredEventTemplates" :is-loading="timetableEventStore.isLoading"
         @drag-start="handleTemplateStart" @drag-end="handleDragEnd" @menu-drag-over="handleMenuDragOver"
-        @menu-drag-leave="handleMenuDragLeave" @menu-drop="handleMenuDrop" />
+        @menu-drag-leave="isOverMenu = false" @menu-drop="handleMenuDrop" />
     </ResizablePanel>
   </ResizablePanelGroup>
 </template>
