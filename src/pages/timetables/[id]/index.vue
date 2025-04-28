@@ -65,22 +65,11 @@ interface TimeSlot {
   index: number
 }
 
-interface EventTemplate {
+export interface CalendarEvent {
   id: number
-  title: string
-  duration: number
-  color: string
-  quantity: number
-  subject_id?: number | null
-  original_eventId?: number | null
-  event_type?: number | null
-}
-
-interface CalendarEvent {
-  id: number
-  day: string
-  start_time: string
-  end_time: string
+  day: string | null
+  start_time: string | null
+  end_time: string | null
   start_index?: number
   title: string
   shortcut: string
@@ -89,6 +78,8 @@ interface CalendarEvent {
   room_name?: string | null
   subject_id?: number | null
   event_type?: number | null
+  duration?: number
+  original_eventId?: number | null
 }
 
 // STATIC CONFIGURATION
@@ -143,12 +134,12 @@ const roomId = ref<number | null>(null)
 const selectedTimetableName = ref<string>('')
 const isOverMenu = ref(false)
 const events = ref<CalendarEvent[]>([])
-const eventTemplates = ref<EventTemplate[]>([])
+const eventTemplates = ref<CalendarEvent[]>([])
 const isResizing = ref(false)
 const preferredRoom = ref<number | undefined>(undefined)
 const overrideRooms = ref<boolean>(false)
 const draggedEvent = ref<CalendarEvent | null>(null)
-const draggedTemplate = ref<EventTemplate | null>(null)
+const draggedTemplate = ref<CalendarEvent | null>(null)
 const draggedOverDay = ref<string | null>(null)
 const draggedOverTime = ref<TimeSlot | null>(null)
 
@@ -313,29 +304,21 @@ function processTimetableEvents() {
         event_type: eventType
       })
     } else {
-
-      const existingTemplate = eventTemplates.value.find(t =>
-        t.title === subjectName &&
-        t.duration === event.duration &&
-        t.event_type === eventType
-      )
-
-      if (existingTemplate) {
-        existingTemplate.quantity += 1
-      } else {
-        const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
+      const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
 
         eventTemplates.value.push({
           id: event.id!,
+          day: null,
+          start_time: null,
+          end_time: null,
           title: subjectName!,
-          duration: event.duration || 1,
+          shortcut: subjectCode || '',
           color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-          quantity: 1,
+          duration: event.duration || 1,
           subject_id: subjectId,
           original_eventId: event.id,
           event_type: eventType
         })
-      }
     }
   })
 }
@@ -371,9 +354,7 @@ function getSubjectName(subjectId?: number | null): string | null {
 const isSubjectInGroup = (subjectId: number | null, groupName: string | null): boolean => {
   if (!subjectId || !groupName) return true
 
-  const matchingGroups = subjectGroupStore.subjectGroups.filter(group =>
-    Array.isArray(group.subjects) ? group.subjects.includes(subjectId) : group.subject === subjectId
-  )
+  const matchingGroups = subjectGroupStore.subjectGroups.filter(group => group.subject === subjectId)
 
   return matchingGroups.some(group => group.name === groupName)
 }
@@ -412,11 +393,10 @@ const filteredEvents = computed(() => {
   return events.value
 })
 
-// Update filteredEventTemplates to always show all unplaced templates
+// Update filteredEventTemplates to use the same filter approach
 const filteredEventTemplates = computed(() => {
-  // Always show events with quantity > 0
-  const templates = eventTemplates.value.filter(template => template.quantity > 0)
-
+  // Show only events with quantity > 0
+  const templates = eventTemplates.value
   // Only apply additional filtering in parallels view
   if (viewType.value === 'parallels') {
     return templates.filter(applyParallelsFilter)
@@ -431,6 +411,11 @@ const filteredEventTemplates = computed(() => {
 let nextEventId = 1
 
 const getEventDuration = (event: CalendarEvent): number => {
+  // For template events with no start/end time
+  if (!event.start_time || !event.end_time) {
+    return event.duration || 1
+  }
+
   const startIndex = timeSlots.findIndex(
     (slot) => slot.from === event.start_time,
   )
@@ -439,17 +424,14 @@ const getEventDuration = (event: CalendarEvent): number => {
 }
 
 const getEventPositions = () => {
-  // Use filteredEvents instead of events.value for layout calculations
   const eventsByDay = _.groupBy(filteredEvents.value, 'day')
   const eventPositions = new Map()
 
-  Object.entries(eventsByDay).forEach(([day, dayEvents]) => {
+  Object.entries(eventsByDay).forEach(([, dayEvents]) => {
     // Sort events by start time
-    const sortedEvents = [...dayEvents].sort((a, b) => {
-      const timeA = timeSlots.findIndex(slot => slot.from === a.start_time)
-      const timeB = timeSlots.findIndex(slot => slot.from === b.start_time)
-      return timeA - timeB
-    })
+    const sortedEvents = [...dayEvents].sort((a, b) => 
+      timeToIndex(a.start_time!) - timeToIndex(b.start_time!)
+    )
 
     // Track occupied time slots for each row
     const rows: { end_time: string; event: CalendarEvent }[][] = []
@@ -469,7 +451,7 @@ const getEventPositions = () => {
           // Check if any event in this row overlaps
           const overlaps = rows[rowIndex].some(occupiedSlot => {
             const occupiedEndIndex = timeSlots.findIndex(slot => slot.to === occupiedSlot.event.end_time)
-            return startIndex <= occupiedEndIndex
+            return startIndex <= occupiedEndIndex{
           })
 
           if (!overlaps) {
@@ -483,7 +465,7 @@ const getEventPositions = () => {
       // Add event to the row
       rows[rowIndex].push({ end_time: event.end_time, event })
       eventPositions.set(event.id, { row: rowIndex, maxRows: 0 })
-    })
+    }))
 
     // Set maxRows for all events in this day
     const maxRows = rows.length
@@ -499,6 +481,11 @@ const getEventPositions = () => {
 }
 
 const getEventStyle = (event: CalendarEvent): CSSProperties => {
+  // Only for placed events with day and time
+  if (!event.day || !event.start_time || !event.end_time) {
+    return {}
+  }
+
   const dayIndex = days.indexOf(event.day)
   const dayPositions = getDayRowPositions()
 
@@ -754,19 +741,18 @@ const containerStyle = computed<CSSProperties>(() => {
 
 const handleDragStart = (
   event: DragEvent,
-  eventData: CalendarEvent | EventTemplate,
-  isTemplate = false,
+  eventData: CalendarEvent,
 ) => {
-  if (isTemplate) {
-    draggedTemplate.value = eventData as EventTemplate
+  if (!eventData.day && !eventData.start_time) {
+    draggedTemplate.value = eventData
   } else {
-    draggedEvent.value = eventData as CalendarEvent
+    draggedEvent.value = eventData
   }
   event.dataTransfer!.effectAllowed = 'move'
 }
 
 // Handle event from EventSelectionPanel for template drag start
-function handleTemplateStart(event: DragEvent, template: EventTemplate) {
+function handleTemplateStart(event: DragEvent, template: CalendarEvent) {
   draggedTemplate.value = template
   event.dataTransfer!.effectAllowed = 'move'
 }
@@ -889,24 +875,26 @@ const handleDrop = async (event: DragEvent) => {
     // TODO: This may not be necessary cant test due to API issues
     const brightnessAdjustment = draggedTemplate.value.event_type === 1 ? 0.9 : 1.1
 
-    const eventToPlace = {
+    const eventToPlace: CalendarEvent = {
       id: draggedTemplate.value.original_eventId || -nextEventId++,
       day: position.day,
       start_time: timeSlots[newStartIndex].from,
       end_time: timeSlots[newEndIndex].to,
       title: draggedTemplate.value.title,
-      color: getColorFromString(draggedTemplate.value.title, 'pastel', brightnessAdjustment),
+      shortcut: draggedTemplate.value.shortcut || getSubjectCode(draggedTemplate.value.subject_id) || '',
+      color: draggedTemplate.value.color,
       subject_id: draggedTemplate.value.subject_id,
       event_type: draggedTemplate.value.event_type,
-      shortcut: getSubjectCode(draggedTemplate.value.subject_id)
+      room_id: preferredRoom.value
     }
 
     events.value.push(eventToPlace)
 
+    // Decrement quantity of the template
     const template = eventTemplates.value.find(
       (t) => t.id === draggedTemplate.value?.id,
     )
-    if (template && template.quantity > 0) {
+    if (template && template.quantity && template.quantity > 0) {
       template.quantity--
     }
 
@@ -974,9 +962,9 @@ async function saveEventPlacement(event: CalendarEvent) {
   }
 
   try {
-    const dayOfWeek = days.indexOf(event.day) + 1
+    const dayOfWeek = days.indexOf(event.day!) + 1
     // Use the index of the time slot instead of the actual time
-    const startTimeIndex = timeToIndex(event.start_time)
+    const startTimeIndex = timeToIndex(event.start_time!)
 
     // Determine which room to use based on the overrideRooms setting
     const roomToUse = overrideRooms.value || !event.room_id
