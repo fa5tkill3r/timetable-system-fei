@@ -42,14 +42,6 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
-import TimetableSwitcher from '@/components/timetables/TimetableSwitcher.vue'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Skeleton } from '@/components/ui/skeleton'
 
 import ComboBox from '@/components/common/ComboBox.vue'
@@ -59,6 +51,11 @@ import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue
 import { Room } from '@/types'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 import { components } from 'schema'
+import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
+import { 
+  DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
+  DEFAULT_TIME_CONFIG as TIME_CONFIG, 
+} from '@/utils/timetable'
 
 interface TimeSlot {
   from: string
@@ -81,22 +78,6 @@ export interface CalendarEvent {
   event_type?: number | null
   duration?: number
   original_eventId?: number | null
-}
-
-// STATIC CONFIGURATION
-const TIME_CONFIG = {
-  SLOT_COUNT: 12,
-  SLOT_DURATION: 50,
-  BREAK_DURATION: 10,
-  START_HOUR: 8,
-  START_MINUTE: 0
-}
-
-const TIMETABLE_CONFIG = {
-  CELL_WIDTH: 120,
-  CELL_HEIGHT: 60,
-  HEADER_HEIGHT: 40,
-  DAY_COLUMN_WIDTH: 100
 }
 
 const semesterOptions = [
@@ -1048,6 +1029,12 @@ onMounted(async () => {
 
   loadTimetableData()
 })
+
+function handleCellClick(dayIndex: number, timeIndex: number) {
+}
+
+function handleContextMenu(dayIndex: number, timeIndex: number) {
+}
 </script>
 
 <template>
@@ -1165,11 +1152,22 @@ onMounted(async () => {
             </div>
 
             <ScrollArea class="overflow-auto p-1">
-              <!-- Show the timetable grid for both parallels and rooms views -->
-              <div :style="containerStyle" @dragover="handleDragOver" @drop="handleDrop"
-                class="bg-white rounded-lg shadow-md overflow-hidden mb-2">
-                <div :style="cornerCellStyle"></div>
-
+              <!-- Replace custom timetable with TimetableGrid component -->
+              <TimetableGrid
+                :days="days"
+                :time-slots="timeSlots"
+                :get-cell-style="getCellStyle"
+                :get-header-style="getHeaderStyle"
+                :get-day-style="getDayStyle"
+                :corner-cell-style="cornerCellStyle"
+                :container-style="containerStyle"
+                :is-resizing="isResizing"
+                @cell-click="handleCellClick"
+                @drag-over="handleDragOver"
+                @drop="handleDrop"
+                @drag-end="handleDragEnd"
+                @cell-context-menu="handleContextMenu"
+              >
                 <!-- Show placeholder message when no room is selected in rooms view -->
                 <div v-if="viewType === 'rooms' && !preferredRoom"
                   class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
@@ -1178,31 +1176,8 @@ onMounted(async () => {
                   </div>
                 </div>
 
-                <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
-                  class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-                  {{ time.from }} - {{ time.to }}
-                </div>
-
-                <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
-                  {{ day }}
-                </div>
-
-                <template v-if="isResizing">
-                  <!-- Replace the four separate skeletons with a single one covering the entire timetable -->
-                  <div class="absolute inset-0 z-10 overflow-hidden">
-                    <Skeleton class="absolute w-full h-full" :style="{
-                      width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeSlots.length}px`,
-                      height: containerStyle.height
-                    }" />
-                  </div>
-                </template>
-                <div v-else v-for="(day, dayIndex) in days" :key="day">
-                  <div v-for="(time, timeIndex) in timeSlots" :key="`${day}-${time}`"
-                    :style="getCellStyle(dayIndex, timeIndex)" />
-                </div>
-
+                <!-- Add events as slots in the TimetableGrid -->
                 <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
-                  <!-- Use filteredEvents instead of events -->
                   <ContextMenu>
                     <ContextMenuTrigger>
                       <div :style="getEventStyle(event)"
@@ -1234,7 +1209,7 @@ onMounted(async () => {
                     </ContextMenuContent>
                   </ContextMenu>
                 </div>
-              </div>
+              </TimetableGrid>
 
               <ScrollBar orientation="horizontal" />
               <ScrollBar orientation="vertical" />

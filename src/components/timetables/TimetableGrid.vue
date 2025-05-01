@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, CSSProperties, PropType } from 'vue'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface TimeSlot {
   from: string
@@ -53,7 +54,7 @@ const emit = defineEmits([
   'dragLeave',
   'drop',
   'dragEnd',
-  'cellContextMenu'  // Add new event for right-click
+  'cellContextMenu'
 ])
 
 function handleCellClick(dayIndex: number, timeIndex: number) {
@@ -112,7 +113,6 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
     >
       <div :style="cornerCellStyle"></div>
       
-      <!-- Time Headers -->
       <div 
         v-for="(time, index) in timeSlots" 
         :key="index" 
@@ -122,7 +122,6 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
         {{ time.from }} - {{ time.to }}
       </div>
 
-      <!-- Day Headers -->
       <div 
         v-for="(day, index) in days" 
         :key="day" 
@@ -131,22 +130,32 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
         {{ day }}
       </div>
 
-      <!-- Timetable Cells -->
-      <div 
-        v-for="(day, dayIndex) in days" 
-        :key="`day-${day}`"
-      >
+      <template v-if="isResizing">
+        <div class="absolute inset-0 z-10 overflow-hidden">
+          <Skeleton class="absolute w-full h-full" :style="{
+            width: `${containerStyle.width}px`,
+            height: `${containerStyle.height}px`
+          }" />
+        </div>
+      </template>
+
+      <template v-else>
         <div 
-          v-for="(time, timeIndex) in timeSlots" 
-          :key="`${day}-${time.index}`"
-          :style="getCellStyle(dayIndex, timeIndex)"
-          @click="handleCellClick(dayIndex, timeIndex)"
-          @mousedown="(event) => handleMouseDown(event, dayIndex, timeIndex)"
-          @mouseover="(event) => handleMouseOver(event, dayIndex, timeIndex)"
-          @contextmenu="handleContextMenu($event, dayIndex, timeIndex)"
-          class="cursor-pointer hover:opacity-80 transition-opacity"
-        />
-      </div>
+          v-for="(day, dayIndex) in days" 
+          :key="`day-${day}`"
+        >
+          <div 
+            v-for="(time, timeIndex) in timeSlots" 
+            :key="`${day}-${time.index}`"
+            :style="getCellStyle(dayIndex, timeIndex)"
+            @click="handleCellClick(dayIndex, timeIndex)"
+            @mousedown="(event) => handleMouseDown(event, dayIndex, timeIndex)"
+            @mouseover="(event) => handleMouseOver(event, dayIndex, timeIndex)"
+            @contextmenu="handleContextMenu($event, dayIndex, timeIndex)"
+            class="cursor-pointer hover:opacity-80 transition-opacity"
+          />
+        </div>
+      </template>
       
       <!-- Slot for events and other content -->
       <slot></slot>
