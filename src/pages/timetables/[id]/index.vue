@@ -465,7 +465,7 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const startIndex = timeToIndex(event.start_time)
   const duration = getEventDuration(event)
   
-  const dayPositions = getDayRowPositions()
+  const dayPositions = getDayRowPositions.value
   const position = getRowEventPositions.value.get(event.id) || { row: 0, maxRows: 1 }
   
   const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
@@ -493,18 +493,21 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
 const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
   const eventPositions = getRowEventPositions.value
   const dayEvents = filteredEvents.value.filter(e => e.day === days[dayIndex])
-  const dayPositions = getDayRowPositions()
+  const dayPositions = getDayRowPositions.value
 
   let maxRows = 1
   if (dayEvents.length > 0) {
-    const positions = dayEvents
-      .map(e => eventPositions.get(e.id))
-      .filter(Boolean) as { row: number, maxRows: number }[]
-
-    if (positions.length > 0) {
-      maxRows = Math.max(...positions.map(p => p.row)) + 1
-    }
+    maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
   }
+  // if (dayEvents.length > 0) {
+  //   const positions = dayEvents
+  //     .map(e => eventPositions.get(e.id))
+  //     .filter(Boolean) as { row: number, maxRows: number }[]
+
+  //   if (positions.length > 0) {
+  //     maxRows = Math.max(...positions.map(p => p.row)) + 1
+  //   }
+  // }
 
   const cellHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
 
@@ -569,7 +572,8 @@ const getHeaderStyle = (index: number): CSSProperties => {
   }
 }
 
-const getDayRowPositions = () => {
+// const getDayRowPositions = () => {
+const getDayRowPositions = computed<number[]>(() => {
   const positions: number[] = Array(days.length).fill(0)
   const eventPositions = getRowEventPositions.value
 
@@ -591,44 +595,32 @@ const getDayRowPositions = () => {
         .filter(Boolean) as { row: number, maxRows: number }[]
 
       if (dayPositions.length > 0) {
-        // Use both max rows and highest row + 1 to ensure we have enough space
-        const highestRow = Math.max(...dayPositions.map(p => p.row)) + 1
-        const maxRowsValue = Math.max(...dayPositions.map(p => p.maxRows || 1))
-        maxRows = Math.max(highestRow, maxRowsValue)
+        maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
       }
     }
 
-    // Add this day's height to the running total
-    currentTop += maxRows > 0 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
+    currentTop += TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
   })
 
   return positions
-}
+})
 
 const getDayStyle = (index: number): CSSProperties => {
   const eventPositions = getRowEventPositions.value
-  // Use filteredEvents instead of events.value
   const dayEvents = filteredEvents.value.filter(e => e.day === days[index])
-  const dayPositions = getDayRowPositions()
+  const dayPositions = getDayRowPositions.value
 
-  // Get max rows for this day if any
   let maxRows = 1
   if (dayEvents.length > 0) {
-    const positions = dayEvents.map(e => eventPositions.get(e.id))
-      .filter(Boolean) as { row: number, maxRows: number }[]
-
-    if (positions.length > 0) {
-      maxRows = Math.max(...positions.map(p => p.maxRows || 1))
-    }
+    maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
   }
 
-  // Adjust day row height based on number of events
-  const rowHeight = maxRows > 1 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
+  const rowHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
 
   return {
     position: 'absolute',
     left: '0',
-    top: `${dayPositions[index]}px`, // Use calculated position
+    top: `${dayPositions[index]}px`,
     width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH}px`,
     height: `${rowHeight}px`,
     borderRight: '1px solid #e0e0e0',
@@ -655,7 +647,7 @@ const cornerCellStyle: CSSProperties = {
 }
 
 const containerStyle = computed<CSSProperties>(() => {
-  const dayPositions = getDayRowPositions()
+  const dayPositions = getDayRowPositions.value
   const eventPositions = getRowEventPositions.value
 
   // Calculate total container height by finding the bottom position of the last day
@@ -717,7 +709,7 @@ const getMousePosition = (event: DragEvent): { day: string; time: TimeSlot } | n
   const y = event.clientY - rect.top
 
   // Use the day row positions to determine which day we're hovering over
-  const dayPositions = getDayRowPositions()
+  const dayPositions = getDayRowPositions.value
   let dayIndex = -1;
 
   // Find which day row contains our current mouse position
