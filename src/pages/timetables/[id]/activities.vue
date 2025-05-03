@@ -12,7 +12,7 @@ import { PencilIcon, TrashIcon, ArrowUpDown, CalendarIcon, ChevronLeft, Clock, Z
 import DataTable from '@/components/common/DataTable.vue'
 import { Checkbox } from '@/components/ui/checkbox'
 import { type ColumnDef } from '@tanstack/vue-table'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 import TablePagination from '@/components/common/TablePagination.vue'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'

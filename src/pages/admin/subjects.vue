@@ -80,7 +80,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import SubjectDialog from '@/components/subjects/SubjectDialog.vue'
 import DeleteSubjectDialog from '@/components/subjects/DeleteSubjectDialog.vue'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 
 type SubjectRequest = components['schemas']['SubjectRequest']
 type Subject = components['schemas']['Subject']

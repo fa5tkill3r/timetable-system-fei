@@ -32,7 +32,7 @@ import {
   DialogDescription,
   DialogFooter
 } from '@/components/ui/dialog'
-import type { components } from '@/../schema'
+import type { components } from '@/types/schema'
 
 type Subject = components['schemas']['Subject']
 

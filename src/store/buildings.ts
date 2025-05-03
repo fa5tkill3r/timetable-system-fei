@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
 import { client } from '../lib/client'
 import { useSchemaStore } from './schemas'
-import { components, operations } from 'schema'
+import { components, operations } from '@/types/schema'
 
 type RoomEquipment = components['schemas']['RoomEquipment'] 
 type RoomEquipmentRequest = components['schemas']['RoomEquipmentRequest'] 

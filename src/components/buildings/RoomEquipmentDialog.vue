@@ -114,7 +114,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { useEquipmentStore } from '@/store/equipment'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 
 type Equipment = components['schemas']['Equipment']
 type RoomEquipmentRequest = components['schemas']['RoomEquipment']

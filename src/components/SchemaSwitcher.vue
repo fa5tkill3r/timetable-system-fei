@@ -38,7 +38,7 @@
   import { ArrowDownUp, Check, CirclePlus } from 'lucide-vue-next'
   import { ref, onMounted, computed } from 'vue'
   import { useSchemaStore } from '@/store/schemas'
-  import { components } from 'schema'
+  import { components } from '@/types/schema'
 
   type Schema = components['schemas']['schema']
 

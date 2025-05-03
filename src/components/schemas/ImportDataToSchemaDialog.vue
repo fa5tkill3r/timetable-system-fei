@@ -356,7 +356,7 @@
   import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
   import FileExplorer from '@/components/common/FileExplorer.vue'
   import { client } from '@/lib/client'
-  import type { components } from '@/../schema'
+  import type { components } from '@/types/schema'
 
   type Schema = components['schemas']['schema']
   type Term = components['schemas']['AISObdobie']

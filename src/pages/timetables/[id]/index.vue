@@ -48,14 +48,15 @@ import ComboBox from '@/components/common/ComboBox.vue'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
 import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue'
-import { Room } from '@/types'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
 import { 
   DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
   DEFAULT_TIME_CONFIG as TIME_CONFIG, 
 } from '@/utils/timetable'
+
+type Room = components['schemas']['Room']
 
 interface TimeSlot {
   from: string
@@ -404,8 +405,7 @@ const getEventDuration = (event: CalendarEvent): number => {
   const endIndex = timeSlots.findIndex((slot) => slot.to === event.end_time)
   return endIndex - startIndex + 1
 }
-
-const getRowEventPositions = () => {
+const getRowEventPositions = computed<Map<number, { row: number, maxRows: number }>>(() => {
   const eventsByDay = _.groupBy(filteredEvents.value, 'day')
   const eventPositions = new Map()
 
@@ -454,7 +454,7 @@ const getRowEventPositions = () => {
   })
 
   return eventPositions
-}
+})
 
 const getEventStyle = (event: CalendarEvent): CSSProperties => {
   if (!event.day || !event.start_time || !event.end_time) {
@@ -466,7 +466,7 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const duration = getEventDuration(event)
   
   const dayPositions = getDayRowPositions()
-  const position = getRowEventPositions().get(event.id) || { row: 0, maxRows: 1 }
+  const position = getRowEventPositions.value.get(event.id) || { row: 0, maxRows: 1 }
   
   const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
   const rowSpacing = position.maxRows > 1 
@@ -491,17 +491,10 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
 }
 
 const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
-  const eventPositions = getRowEventPositions()
-  // Use filteredEvents instead of events.value
+  const eventPositions = getRowEventPositions.value
   const dayEvents = filteredEvents.value.filter(e => e.day === days[dayIndex])
   const dayPositions = getDayRowPositions()
 
-  const hasOverlappingEvents = dayEvents.some(e => {
-    const position = eventPositions.get(e.id)
-    return position && position.maxRows > 1
-  })
-
-  // Get max rows for this day if any
   let maxRows = 1
   if (dayEvents.length > 0) {
     const positions = dayEvents
@@ -509,20 +502,16 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
       .filter(Boolean) as { row: number, maxRows: number }[]
 
     if (positions.length > 0) {
-      // Use both highest row + 1 and max rows to ensure consistency with day positions
-      const highestRow = Math.max(...positions.map(p => p.row)) + 1
-      const maxRowsValue = Math.max(...positions.map(p => p.maxRows || 1))
-      maxRows = Math.max(highestRow, maxRowsValue)
+      maxRows = Math.max(...positions.map(p => p.row)) + 1
     }
   }
 
-  // Adjust cell height based on number of events
-  const cellHeight = maxRows > 1 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
+  const cellHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
 
   return {
     position: 'absolute',
     left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeIndex}px`,
-    top: `${dayPositions[dayIndex]}px`, // Use calculated position
+    top: `${dayPositions[dayIndex]}px`,
     width: `${TIMETABLE_CONFIG.CELL_WIDTH}px`,
     height: `${cellHeight}px`,
     borderRight: '1px solid #e0e0e0',
@@ -530,7 +519,6 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     boxSizing: 'border-box',
     zIndex: 1,
     backgroundColor: (() => {
-      // Same highlighting logic as before
       if (!draggedEvent.value && !draggedTemplate.value) return 'transparent'
 
       const duration = draggedEvent.value
@@ -583,7 +571,7 @@ const getHeaderStyle = (index: number): CSSProperties => {
 
 const getDayRowPositions = () => {
   const positions: number[] = Array(days.length).fill(0)
-  const eventPositions = getRowEventPositions()
+  const eventPositions = getRowEventPositions.value
 
   let currentTop = TIMETABLE_CONFIG.HEADER_HEIGHT
 
@@ -618,7 +606,7 @@ const getDayRowPositions = () => {
 }
 
 const getDayStyle = (index: number): CSSProperties => {
-  const eventPositions = getRowEventPositions()
+  const eventPositions = getRowEventPositions.value
   // Use filteredEvents instead of events.value
   const dayEvents = filteredEvents.value.filter(e => e.day === days[index])
   const dayPositions = getDayRowPositions()
@@ -668,7 +656,7 @@ const cornerCellStyle: CSSProperties = {
 
 const containerStyle = computed<CSSProperties>(() => {
   const dayPositions = getDayRowPositions()
-  const eventPositions = getRowEventPositions()
+  const eventPositions = getRowEventPositions.value
 
   // Calculate total container height by finding the bottom position of the last day
   const lastDayIndex = days.length - 1

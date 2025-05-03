@@ -17,7 +17,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/hover-card'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 
 const overrideRooms = defineModel('overrideRooms', {
   required: true,

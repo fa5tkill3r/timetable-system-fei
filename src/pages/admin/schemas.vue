@@ -98,7 +98,7 @@
 import { ref, onMounted } from 'vue'
 import { format, parseISO } from 'date-fns'
 import { PencilIcon, TrashIcon, ImportIcon, CheckIcon } from 'lucide-vue-next'
-import type { components } from '@/../schema'
+import type { components } from '@/types/schema'
 import { client } from '@/lib/client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

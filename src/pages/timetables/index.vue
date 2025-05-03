@@ -57,7 +57,7 @@ import ConfirmDeleteDialog from '@/components/dialogs/ConfirmDeleteDialog.vue'
 import { RouterLink } from 'vue-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { type ColumnDef } from '@tanstack/vue-table'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 import TablePagination from '@/components/common/TablePagination.vue'
 import { Badge, BadgeVariants } from '@/components/ui/badge'
 

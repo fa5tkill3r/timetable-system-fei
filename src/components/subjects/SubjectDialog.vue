@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { components } from '@/../schema'
+import { components } from '@/types/schema'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'

@@ -55,7 +55,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2Icon } from 'lucide-vue-next'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 
 type Room = components['schemas']['Room']
 type RoomRequest = components['schemas']['RoomRequest']

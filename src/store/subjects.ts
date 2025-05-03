@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
 import { client } from '../lib/client'
 import { useSchemaStore } from './schemas'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 
 type Subject = components['schemas']['Subject']
 type SubjectRequest = components['schemas']['SubjectRequest']
@@ -13,9 +13,7 @@ export const useSubjectStore = defineStore('subjects', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  // Get all subjects
   const fetchSubjects = async () => {
-    // Don't fetch if no active schema
     if (!schemaStore.activeSchema?.id) {
       subjects.value = []
       return

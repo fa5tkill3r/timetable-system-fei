@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { client } from '../lib/client'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 
 type Schema = components['schemas']['schema']
 type SchemaRequest = components['schemas']['schemaRequest']

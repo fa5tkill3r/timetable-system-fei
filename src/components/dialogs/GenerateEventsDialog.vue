@@ -15,7 +15,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 import { Loader2 } from 'lucide-vue-next'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 import ComboBox from '@/components/common/ComboBox.vue'
 
 type Timetable = components['schemas']['TT']

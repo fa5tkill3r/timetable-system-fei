@@ -86,7 +86,7 @@
 import { ref, computed, watch } from 'vue'
 import { CalendarIcon } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
-import type { components } from '@/../schema'
+import type { components } from '@/types/schema'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'

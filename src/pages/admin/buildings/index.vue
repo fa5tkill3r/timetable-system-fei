@@ -97,7 +97,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { type ColumnDef } from '@tanstack/vue-table'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 import TablePagination from '@/components/common/TablePagination.vue'
 
 type Building = components['schemas']['Building']

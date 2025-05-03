@@ -15,7 +15,7 @@
   import ComboBoxFilter, { RoomFilterOption } from '@/components/common/ComboBoxFilter.vue'
   import { useSubjectGroupStore } from '@/store/subjectGroups'
   import { useSubjectStore } from '@/store/subjects'
-  import { components } from 'schema'
+  import { components } from '@/types/schema'
   import type { CalendarEvent } from '@/pages/timetables/[id]/index.vue'
 
   type EventType = components['schemas']['TTEventType']

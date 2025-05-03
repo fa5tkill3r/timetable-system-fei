@@ -60,7 +60,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2Icon } from 'lucide-vue-next'
-import { components } from 'schema'
+import { components } from '@/types/schema'
 
 type Timetable = components['schemas']['TT']
 type TimetableRequest = components['schemas']['TTRequest']
