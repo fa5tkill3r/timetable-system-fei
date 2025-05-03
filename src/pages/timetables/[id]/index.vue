@@ -464,15 +464,13 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const dayIndex = days.indexOf(event.day)
   const startIndex = timeToIndex(event.start_time)
   const duration = getEventDuration(event)
-  
   const dayPositions = getDayRowPositions.value
-  const position = getRowEventPositions.value.get(event.id) || { row: 0, maxRows: 1 }
   
+  const { row = 0, maxRows = 1 } = getRowEventPositions.value.get(event.id) || {}
+
   const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
-  const rowSpacing = position.maxRows > 1 
-    ? (TIMETABLE_CONFIG.CELL_HEIGHT * position.maxRows - eventHeight * position.maxRows) / (position.maxRows + 1) 
-    : 0
-  const topOffset = position.row * (eventHeight + rowSpacing)
+  const rowSpacing = 4 * maxRows / (maxRows + 1)
+  const topOffset = row * (eventHeight + rowSpacing)
 
   return {
     position: 'absolute',
@@ -499,15 +497,6 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
   if (dayEvents.length > 0) {
     maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
   }
-  // if (dayEvents.length > 0) {
-  //   const positions = dayEvents
-  //     .map(e => eventPositions.get(e.id))
-  //     .filter(Boolean) as { row: number, maxRows: number }[]
-
-  //   if (positions.length > 0) {
-  //     maxRows = Math.max(...positions.map(p => p.row)) + 1
-  //   }
-  // }
 
   const cellHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
 
@@ -572,24 +561,19 @@ const getHeaderStyle = (index: number): CSSProperties => {
   }
 }
 
-// const getDayRowPositions = () => {
 const getDayRowPositions = computed<number[]>(() => {
   const positions: number[] = Array(days.length).fill(0)
   const eventPositions = getRowEventPositions.value
 
   let currentTop = TIMETABLE_CONFIG.HEADER_HEIGHT
 
-  // Calculate position for each day based on expanded heights of previous days
   days.forEach((day, index) => {
     positions[index] = currentTop
 
-    // Calculate height for this day based on max rows
-    // Use filteredEvents instead of events.value
     const dayEvents = filteredEvents.value.filter(e => e.day === day)
     let maxRows = 1
 
     if (dayEvents.length > 0) {
-      // Get actual event positions for this day
       const dayPositions = dayEvents
         .map(e => eventPositions.get(e.id))
         .filter(Boolean) as { row: number, maxRows: number }[]
@@ -650,26 +634,16 @@ const containerStyle = computed<CSSProperties>(() => {
   const dayPositions = getDayRowPositions.value
   const eventPositions = getRowEventPositions.value
 
-  // Calculate total container height by finding the bottom position of the last day
   const lastDayIndex = days.length - 1
   let lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT
 
-  // Get max rows for last day
-  // Use filteredEvents instead of events.value
-  const lastDayEvents = (viewType.value === 'parallels' ? filteredEvents.value : events.value)
-    .filter(e => e.day === days[lastDayIndex])
+  const lastDayEvents = filteredEvents.value.filter(e => e.day === days[lastDayIndex])
 
   if (lastDayEvents.length > 0) {
-    const positions = lastDayEvents.map(e => eventPositions.get(e.id))
-      .filter(Boolean) as { row: number, maxRows: number }[]
-
-    if (positions.length > 0) {
-      const maxRows = Math.max(...positions.map(p => p.maxRows || 1))
-      lastDayHeight = maxRows > 1 ? TIMETABLE_CONFIG.CELL_HEIGHT * maxRows : TIMETABLE_CONFIG.CELL_HEIGHT
-    }
+    const maxRows = eventPositions.get(lastDayEvents[0]!.id!)?.maxRows || 1
+    lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
   }
 
-  // Total height is position of last day plus its height
   const totalHeight = dayPositions[lastDayIndex]! + lastDayHeight
 
   return {
