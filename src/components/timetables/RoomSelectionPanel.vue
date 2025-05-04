@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useBuildingStore } from '@/store/buildings'
 import { useEquipmentStore } from '@/store/equipment'
 import { useRoomGroupStore } from '@/store/roomGroups'
@@ -199,123 +199,186 @@ function getRoomEquipment(roomId: number) {
       });
     });
 }
+
+const isCompactMode = ref(false)
+const isVeryCompactMode = ref(false)
+const containerRef = ref<HTMLElement | null>(null)
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  if (typeof ResizeObserver !== 'undefined' && containerRef.value) {
+    resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const height = entry.contentRect.height
+        isCompactMode.value = height < 150
+        isVeryCompactMode.value = height < 100
+      }
+    })
+
+    resizeObserver.observe(containerRef.value)
+  }
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
+})
 </script>
 
 <template>
-  <div class="h-full flex flex-col">
-    <div class="p-3 border-b">
-      <div class="w-full flex flex-col mb-3">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center">
-            <h3 class="text-lg font-semibold mr-4">Room Selection</h3>
-            <div v-if="selectedRoomId">
-              <Badge variant="outline" class="flex items-center gap-2 h-7">
-                <Building class="w-4 h-4" />
-                <span>{{filteredRooms.find(room => room.id === selectedRoomId)?.name || `Room
-                  ${selectedRoomId}`}}</span>
-                <Button variant="ghost" size="icon" class="h-4 w-4" @click="selectedRoomId = undefined">
-                  <span class="sr-only">Remove</span>
-                  &times;
-                </Button>
-              </Badge>
+  <div class="h-full flex">
+    <!-- Main panel -->
+    <div ref="containerRef" class="h-full flex-1 flex flex-col">
+      <!-- Hide the entire top bar when in compact mode -->
+      <div v-if="!isCompactMode" class="p-3 border-b">
+        <div class="w-full flex flex-col mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center">
+              <h3 class="text-lg font-semibold mr-4">Room Selection</h3>
+              <div v-if="selectedRoomId">
+                <Badge variant="outline" class="flex items-center gap-2 h-7">
+                  <Building class="w-4 h-4" />
+                  <span>{{filteredRooms.find(room => room.id === selectedRoomId)?.name || `Room
+                    ${selectedRoomId}`}}</span>
+                  <Button variant="ghost" size="icon" class="h-4 w-4" @click="selectedRoomId = undefined">
+                    <span class="sr-only">Remove</span>
+                    &times;
+                  </Button>
+                </Badge>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <Label for="override-rooms" class="text-sm text-muted-foreground">Override rooms</Label>
+              <Switch id="override-rooms" v-model:checked="overrideRooms" />
             </div>
           </div>
 
-          <div class="flex items-center gap-2">
-            <Label for="override-rooms" class="text-sm text-muted-foreground">Override rooms</Label>
-            <Switch id="override-rooms" v-model:checked="overrideRooms" />
+          <div class="flex flex-wrap gap-2">
+            <Input placeholder="Search rooms..." v-model="searchQuery" class="h-8 w-[150px] lg:w-[200px]" />
+            <RoomFilter title="Buildings" :options="buildingOptions" v-model="selectedBuildingIds" />
+            <RoomFilter title="Room Types" :options="roomGroupOptions" v-model="selectedRoomGroups" />
+            <RoomFilter title="Equipment" :options="equipmentOptions" v-model="selectedEquipmentIds" />
+            <CapacitySliderFilter v-model="capacityRange" />
+
+            <Button v-if="isFiltered" variant="ghost" class="h-8 px-2 lg:px-3" @click="resetAll">
+              Reset
+              <XIcon class="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </div>
+      </div>
 
-        <div class="flex flex-wrap gap-2">
-
-          <Input placeholder="Search rooms..." v-model="searchQuery" class="h-8 w-[150px] lg:w-[200px]" />
-          <RoomFilter title="Buildings" :options="buildingOptions" v-model="selectedBuildingIds" />
-          <RoomFilter title="Room Types" :options="roomGroupOptions" v-model="selectedRoomGroups" />
-          <RoomFilter title="Equipment" :options="equipmentOptions" v-model="selectedEquipmentIds" />
-          <CapacitySliderFilter v-model="capacityRange" />
-
-          <Button v-if="isFiltered" variant="ghost" class="h-8 px-2 lg:px-3" @click="resetAll">
-            Reset
-            <XIcon class="ml-2 h-4 w-4" />
+      <!-- Show selected room badge at the top in compact mode -->
+      <div v-if="isCompactMode && selectedRoomId" class="px-2 pt-2">
+        <Badge variant="outline" class="flex items-center gap-2 h-7">
+          <Building class="w-4 h-4" />
+          <span>{{filteredRooms.find(room => room.id === selectedRoomId)?.name || `Room ${selectedRoomId}`}}</span>
+          <Button variant="ghost" size="icon" class="h-4 w-4" @click="selectedRoomId = undefined">
+            <span class="sr-only">Remove</span>
+            &times;
           </Button>
+        </Badge>
+      </div>
+
+      <ScrollArea class="flex-1 p-2">
+        <div class="flex flex-wrap gap-2">
+          <HoverCard v-for="room in filteredRooms" :key="room.id"
+            @update:open="(open) => open ? getRoomEquipment(room.id!) : null">
+            <HoverCardTrigger as-child>
+              <Button variant="outline" :class="{ 'bg-primary text-primary-foreground': selectedRoomId === room.id }"
+                size="sm" class="h-8 px-3" @click="selectedRoomId = room.id">
+                {{ room.name }}
+              </Button>
+            </HoverCardTrigger>
+            <HoverCardContent class="w-80">
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <h4 class="text-sm font-semibold">{{ room.name }}</h4>
+                  <Badge variant="outline" class="ml-2">
+                    <Building class="h-4 w-4 mr-1" />
+                    {{ getRoomType(room.id) }}
+                  </Badge>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                  <div class="flex items-center">
+                    <Users class="h-4 w-4 mr-2 opacity-70" />
+                    <span>Capacity: {{ room.capacity || 'Unknown' }}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <Building class="h-4 w-4 mr-2 opacity-70" />
+                    <span>{{ getBuildingName(room.building) }}</span>
+                  </div>
+                </div>
+
+                <!-- Add room groups display -->
+                <div v-if="room.id && roomGroupStore.getRoomGroups(room.id).length > 0" class="text-sm">
+                  <div class="font-medium mb-1">Room Groups:</div>
+                  <div class="flex flex-wrap gap-1">
+                    <Badge v-for="group in roomGroupStore.getRoomGroups(room.id)" :key="group.id" variant="outline"
+                      class="text-xs">
+                      {{ group.name }}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div v-if="room.id" class="text-sm">
+                  <div class="font-medium mb-1">Equipment:</div>
+                  <div class="flex flex-wrap gap-1">
+                    <div v-if="roomEquipments" class="flex flex-wrap gap-1">
+                      <template v-if="roomEquipments.length > 0">
+                        <Badge v-for="item in roomEquipments" :key="item.id" variant="secondary" class="text-xs">
+                          <MonitorDot class="h-3 w-3 mr-1" />
+                          {{ item.name }} {{ item.count > 1 ? `(${item.count})` : '' }}
+                        </Badge>
+                      </template>
+                      <div v-else class="text-xs text-muted-foreground">
+                        No equipment available
+                      </div>
+                    </div>
+                    <div v-else class="text-xs text-muted-foreground">
+                      <div class="flex items-center gap-1">
+                        <div class="h-3 w-3 rounded-full border-2 border-r-transparent border-primary animate-spin">
+                        </div>
+                        Loading equipment...
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+
+          <div v-if="filteredRooms.length === 0" class="text-center py-8 text-muted-foreground">
+            No rooms found.
+          </div>
+        </div>
+        <ScrollBar />
+      </ScrollArea>
+    </div>
+
+    <div v-if="isCompactMode" class="flex items-center h-full w-48 border-l bg-white py-4" :class="{
+      'flex-col justify-between': !isVeryCompactMode,
+      'justify-center': isVeryCompactMode
+    }">
+
+      <div class="flex items-center gap-2" :class="{ 'flex-col': !isVeryCompactMode }">
+        <Input id="compact-search" v-model="searchQuery" class="h-8 w-40 text-sm px-2" :class="{
+          'w-24': isVeryCompactMode
+        }" :placeholder="isVeryCompactMode ? 'Search' : 'Search rooms...'" />
+
+        <div class="flex flex-col items-center" :class="{
+          'gap-2': !isVeryCompactMode,
+        }">
+          <Label for="compact-override-rooms" class="text-xs text-muted-foreground">
+            {{ isVeryCompactMode ? 'Override' : 'Override rooms' }}
+          </Label>
+          <Switch id="compact-override-rooms" v-model:checked="overrideRooms"
+            :class="{ 'scale-75': isVeryCompactMode }" />
         </div>
       </div>
     </div>
-
-    <ScrollArea class="flex-1 p-2">
-      <div class="flex flex-wrap gap-2">
-        <HoverCard v-for="room in filteredRooms" :key="room.id"
-          @update:open="(open) => open ? getRoomEquipment(room.id!) : null">
-          <HoverCardTrigger as-child>
-            <Button variant="outline" :class="{ 'bg-primary text-primary-foreground': selectedRoomId === room.id }"
-              size="sm" class="h-8 px-3" @click="selectedRoomId = room.id">
-              {{ room.name }}
-            </Button>
-          </HoverCardTrigger>
-          <HoverCardContent class="w-80">
-            <div class="space-y-3">
-              <div class="flex justify-between items-center">
-                <h4 class="text-sm font-semibold">{{ room.name }}</h4>
-                <Badge variant="outline" class="ml-2">
-                  <Building class="h-4 w-4 mr-1" />
-                  {{ getRoomType(room.id) }}
-                </Badge>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2 text-sm">
-                <div class="flex items-center">
-                  <Users class="h-4 w-4 mr-2 opacity-70" />
-                  <span>Capacity: {{ room.capacity || 'Unknown' }}</span>
-                </div>
-                <div class="flex items-center">
-                  <Building class="h-4 w-4 mr-2 opacity-70" />
-                  <span>{{ getBuildingName(room.building) }}</span>
-                </div>
-              </div>
-
-              <!-- Add room groups display -->
-              <div v-if="room.id && roomGroupStore.getRoomGroups(room.id).length > 0" class="text-sm">
-                <div class="font-medium mb-1">Room Groups:</div>
-                <div class="flex flex-wrap gap-1">
-                  <Badge v-for="group in roomGroupStore.getRoomGroups(room.id)" :key="group.id" variant="outline"
-                    class="text-xs">
-                    {{ group.name }}
-                  </Badge>
-                </div>
-              </div>
-
-              <div v-if="room.id" class="text-sm">
-                <div class="font-medium mb-1">Equipment:</div>
-                <div class="flex flex-wrap gap-1">
-                  <div v-if="roomEquipments" class="flex flex-wrap gap-1">
-                    <template v-if="roomEquipments.length > 0">
-                      <Badge v-for="item in roomEquipments" :key="item.id" variant="secondary" class="text-xs">
-                        <MonitorDot class="h-3 w-3 mr-1" />
-                        {{ item.name }} {{ item.count > 1 ? `(${item.count})` : '' }}
-                      </Badge>
-                    </template>
-                    <div v-else class="text-xs text-muted-foreground">
-                      No equipment available
-                    </div>
-                  </div>
-                  <div v-else class="text-xs text-muted-foreground">
-                    <div class="flex items-center gap-1">
-                      <div class="h-3 w-3 rounded-full border-2 border-r-transparent border-primary animate-spin"></div>
-                      Loading equipment...
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </HoverCardContent>
-        </HoverCard>
-
-        <div v-if="filteredRooms.length === 0" class="text-center py-8 text-muted-foreground">
-          No rooms found.
-        </div>
-      </div>
-      <ScrollBar />
-    </ScrollArea>
   </div>
 </template>

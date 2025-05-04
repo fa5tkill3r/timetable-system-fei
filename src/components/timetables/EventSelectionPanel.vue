@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
   import {
     Tabs,
     TabsContent,
@@ -194,11 +194,35 @@
     const brightnessAdjustment = template.event_type === 1 ? 0.9 : 1.1
     return getColorFromString(template.title, 'pastel', brightnessAdjustment)
   }
+
+  const isCompactMode = ref(false)
+  const containerRef = ref<HTMLElement | null>(null)
+  let resizeObserver: ResizeObserver | null = null
+  
+  onMounted(() => {
+    if (typeof ResizeObserver !== 'undefined' && containerRef.value) {
+      resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          // If the panel width is less than 220px, switch to compact mode
+          isCompactMode.value = entry.contentRect.width < 220
+        }
+      })
+      
+      resizeObserver.observe(containerRef.value)
+    }
+  })
+  
+  onUnmounted(() => {
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+    }
+  })
 </script>
 
 <template>
   <!-- Event selection panel -->
   <div
+    ref="containerRef"
     class="relative h-full bg-white p-4"
     :class="{ 'bg-gray-50': isOverMenu }"
     @dragover="handleMenuDragOver"
@@ -209,7 +233,11 @@
       default-value="events"
       class="h-full"
     >
-      <TabsList class="w-full">
+      <!-- Hide tabs when in compact mode -->
+      <TabsList 
+        v-if="!isCompactMode"
+        class="w-full"
+      >
         <TabsTrigger
           value="events"
           class="w-full"
@@ -225,13 +253,22 @@
       <TabsContent
         value="events"
         class="h-[calc(100%-40px)] overflow-y-auto"
+        :class="{ 'h-full': isCompactMode }"
       >
-        <div class="mb-4 flex items-center justify-between">
+        <!-- Hide title and count when in compact mode -->
+        <div 
+          v-if="!isCompactMode" 
+          class="mb-4 flex items-center justify-between"
+        >
           <h3 class="text-lg font-semibold">Unplaced Events</h3>
           <Badge>{{ filteredEventTemplates.length }}</Badge>
         </div>
 
-        <div class="mb-4 space-y-2">
+        <!-- Hide filters when in compact mode -->
+        <div 
+          v-if="!isCompactMode"
+          class="mb-4 space-y-2"
+        >
           <Input
             v-model="searchQuery"
             type="text"
@@ -272,27 +309,25 @@
             v-for="template in filteredEventTemplates"
             :key="`${template.title}_${template.event_type}`"
             v-show="(template.quantity || 0) > 0"
-            class="group relative cursor-move rounded-lg p-3"
+            class="group relative cursor-move rounded-lg p-2"
+            :class="{ 'p-3': !isCompactMode }"
             :style="{ backgroundColor: getAdjustedColor(template) }"
             draggable="true"
             @dragstart="handleDragStart($event, template)"
             @dragend="handleDragEnd"
           >
             <div class="truncate font-medium">
-              <!-- Show subject code always -->
+              <!-- Always show subject code -->
               <span class="font-semibold">{{ template.shortcut || '' }}</span>
 
-              <span class="ml-1">- {{ template.title }}</span>
+              <!-- Show full title only when not in compact mode -->
+              <span v-if="!isCompactMode" class="ml-1">- {{ template.title }}</span>
             </div>
 
-            <div
-              class="flex items-center justify-between text-sm text-gray-600"
-            >
-              <span>{{ getEventTypeLabel(template.event_type ?? null) }}</span>
-              <span>Duration: {{ template.duration || 1 }}h</span>
-            </div>
-            <div class="mt-1 text-sm text-gray-600">
-              <span class="ml-auto">Remaining: {{ template.quantity || 0 }}</span>
+            <div class="space-y-0.5 text-gray-600" :class="{ 'text-xs': isCompactMode, 'text-sm': !isCompactMode }">
+              <div class="truncate">{{ getEventTypeLabel(template.event_type ?? null) }}</div>
+              <div class="truncate">Duration: {{ template.duration || 1 }}h</div>
+              <div class="truncate">Remaining: {{ template.quantity || 0 }}</div>
             </div>
           </div>
         </div>
