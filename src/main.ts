@@ -5,12 +5,14 @@ import { useSchemaStore } from './store/schemas'
 import './assets/index.css'
 import router from '@/router.ts'
 import _ from 'lodash'
+import i18n from './lib/i18n'
 
 const app = createApp(App)
 const pinia = createPinia()
 
 app.use(router)
 app.use(pinia)
+app.use(i18n)
 
 useSchemaStore()
 
