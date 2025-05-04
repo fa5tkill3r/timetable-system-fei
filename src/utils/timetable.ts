@@ -36,6 +36,13 @@ export const DEFAULT_TIMETABLE_CONFIG: TimetableConfig = {
   DAY_COLUMN_WIDTH: 100
 }
 
+export const COMPACT_TIMETABLE_CONFIG: TimetableConfig = {
+  CELL_WIDTH: 80,
+  CELL_HEIGHT: 50,
+  HEADER_HEIGHT: 40,
+  DAY_COLUMN_WIDTH: 100
+}
+
 export const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 export function generateTimeSlots(config: TimeConfig = DEFAULT_TIME_CONFIG): TimeSlot[] {

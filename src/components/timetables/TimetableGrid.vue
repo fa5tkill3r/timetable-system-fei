@@ -41,6 +41,10 @@ const props = defineProps({
   isResizing: {
     type: Boolean,
     default: false
+  },
+  compact: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -119,7 +123,12 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
         :style="getHeaderStyle(index)"
         class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
       >
-        {{ time.from }} - {{ time.to }}
+        <template v-if="compact">
+          {{ time.from }}
+        </template>
+        <template v-else>
+          {{ time.from }} - {{ time.to }}
+        </template>
       </div>
 
       <div 

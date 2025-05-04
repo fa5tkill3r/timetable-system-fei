@@ -1,0 +1,272 @@
+@startuml TimetableUseCases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Hlavný rozvrhár/rozvrhár" as Scheduler
+actor "Učiteľ"          as Teacher
+actor "Študent"         as Student
+
+package "Rozvrhový komponent" {
+    usecase "Upraviť rozvrh"          as UC1
+    usecase "Zobraziť svoj rozvrh"         as UC2
+    usecase "Zobraziť všetkých rozvrh"     as UC3
+    usecase "Zobraziť dostupnosť"     as UC4
+}
+
+Scheduler --> UC1
+Scheduler --> UC2
+Scheduler --> UC3
+Scheduler --> UC4
+
+Teacher   --> UC2
+Teacher   --> UC3
+Teacher   --> UC4
+
+Student   --> UC2
+@enduml
+
+
+@startuml
+title Prieskumník Súborov
+
+actor Používateľ
+participant "Nadradený Komponent" as NK
+participant "Prieskumník Súborov" as PS
+participant "API" as API
+
+== Inicializácia ==
+Používateľ -> NK: Otvorí komponent importu súborov
+activate NK
+NK -> PS: Inicializuje komponent
+activate PS
+
+== Získanie dát ==
+PS -> API: Vyžiada obsah adresára
+activate API
+API --> PS: Vráti súbory a priečinky
+deactivate API
+
+== Analýza dát ==
+PS -> PS: Spočíta CSV súbory 
+
+== Zobrazenie používateľovi ==
+PS --> Používateľ: Zobrazí obsah\n+ počet CSV súborov
+deactivate PS
+deactivate NK
+
+== Navigácia ==
+Používateľ -> PS: Naviguje do iného priečinka
+activate PS
+PS -> API: Vyžiada nový obsah
+activate API
+API --> PS: Vráti nové súbory a priečinky
+deactivate API
+PS -> PS: Spočíta CSV súbory
+PS --> Používateľ: Zobrazí aktualizovaný obsah
+deactivate PS
+
+== Importovanie dát ==
+Používateľ -> NK: Potvrdí výber adresára
+note right of Používateľ: Používateľ môže vybrať\niba aktuálny adresár
+activate NK
+NK -> API: Spustí importovanie CSV dát
+activate API
+API --> NK: Výsledok importu (úspech/neúspech)
+deactivate API
+NK --> Používateľ: Zobrazí výsledok operácie
+deactivate NK
+
+@enduml
+
+
+@startuml
+title Navigácia pomocou vue-router
+
+actor Používateľ
+participant "Aplikácia" as App
+participant "vue-router" as Router
+participant "Komponent (lazy-load)" as Komponent
+
+Používateľ -> App: Klikne na odkaz
+activate App
+App -> Router: Požiada o zmenu cesty
+activate Router
+Router -> Router: Vyhodnotí definované trasy
+alt Komponent ešte nie je načítaný
+  Router -> Komponent: Dynamicky načíta komponent
+  activate Komponent
+  Komponent --> Router: Komponent načítaný
+  deactivate Komponent
+end
+Router --> App: Vráti komponent pre trasu
+deactivate Router
+
+App -> Komponent: Zobrazí komponent
+deactivate App
+Komponent --> Používateľ: Obsah celej stránky
+note right of Používateľ: Obsah sa zobrazí bez obnovenia celej stránky
+
+@enduml
+
+
+@startuml
+!define Page rectangle
+!define IndexPage rectangle #LightBlue
+!define DynamicPage rectangle #LightGreen
+
+skinparam ranksep 80
+skinparam nodesep 40
+skinparam DefaultFontSize 14
+skinparam rectangleFontStyle bold
+
+title "Štruktúra stránok aplikácie"
+
+package "Hlavné stránky" {
+  IndexPage "Úvodná stránka\n(/)" as index
+  IndexPage "Požiadavky\n(/requirements)" as requirements
+}
+
+package "Rozvrhy" {
+  IndexPage "Zoznam rozvrhov\n(/timetables)" as timetables
+  
+  package "Detail rozvrhu" {
+    DynamicPage "Aktivity\n(/timetables/[id]/activities)" as tt_activities
+  }
+  
+  timetables --> tt_activities
+}
+
+package "Administrácia" {
+  IndexPage "Admin panel\n(/admin)" as admin
+  
+  package "Budovy" {
+    IndexPage "Zoznam budov\n(/admin/buildings)" as buildings
+    
+    package "Detail budovy" {
+      IndexPage "Miestnosti\n(/admin/buildings/[buildingId]/rooms)" as rooms
+      DynamicPage "Detail miestnosti\n(/admin/buildings/[buildingId]/rooms/[roomId])" as room_detail
+      
+      rooms --> room_detail
+    }
+    
+    buildings --> rooms
+  }
+  
+  package "Ďalšie sekcie" {
+    IndexPage "Predmety\n(/admin/subjects)" as subjects
+    IndexPage "Vybavenie\n(/admin/equipment)" as equipment
+    IndexPage "Schémy\n(/admin/schemas)" as schemas
+    IndexPage "Import\n(/admin/import)" as import
+  }
+  
+  admin --> buildings
+  admin --> subjects
+  admin --> equipment
+  admin --> schemas
+  admin --> import
+}
+
+index -[hidden]-> timetables
+index -[hidden]-> requirements
+index -[hidden]-> admin
+
+@enduml
+
+
+
+@startuml
+title Mapa stránok aplikácie
+
+actor Používateľ
+
+node "Verejná časť" {
+  [Úvodná stránka ( / )]
+  [Požiadavky ( /requirements )]
+}
+
+node "Rozvrhy" {
+  [Zoznam rozvrhov ( /timetables )]
+  [Aktivity rozvrhu ( /timetables/:id/activities )]
+}
+
+node "Administrácia ( /admin )" {
+  [Dashboard]
+
+  node "Budovy" {
+    [Zoznam budov ( /admin/buildings )]
+    [Miestnosti budovy ( /admin/buildings/:buildingId/rooms )]
+    [Detail miestnosti ( /admin/buildings/:buildingId/rooms/:roomId )]
+  }
+
+  [Predmety ( /admin/subjects )]
+  [Vybavenie ( /admin/equipment )]
+  [Schémy ( /admin/schemas )]
+  [Import ( /admin/import )]
+}
+
+Používateľ --> [Úvodná stránka ( / )]
+Používateľ --> [Požiadavky ( /requirements )]
+Používateľ --> [Zoznam rozvrhov ( /timetables )]
+Používateľ --> [Dashboard]
+@enduml
+
+
+@startuml
+title Uloženie aktivity a notifikácia cez WebSocket
+
+actor "Používateľ A" as PA
+actor "Používateľ B" as PB
+participant "Backend" as BE
+participant "WebSocket Server" as WS
+
+== Inicializácia WebSocketu ==
+PA -> WS: Pripojenie na WebSocket
+activate WS
+WS -> PA: Potvrdenie pripojenia
+PA -> WS: Subscribe na 'timetable_activity'
+
+PB -> WS: Pripojenie na WebSocket
+WS -> PB: Potvrdenie pripojenia
+PB -> WS: Subscribe na 'timetable_activity'
+deactivate WS
+
+== HTTP Požiadavka na uloženie ==
+PA -> BE: Upraví existujúcu aktivitu
+activate BE
+BE -> BE: Uloží aktivitu do databázy
+
+BE -> WS: Notifikácia na 'timetable_activity' s payloadom
+deactivate BE
+
+== WebSocket distribúcia ==
+activate WS
+WS -> PA: Posiela upravenú aktivitu
+WS -> PB: Posiela upravenú aktivitu
+deactivate WS
+
+@enduml
+
+
+
+@startuml
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+left to right direction
+
+package "Timetable" {
+  
+  package "TimeTableRow 1" as Row1 {
+    [TimeTableItem 1a] --> [TimeTableItem 1b]
+  }
+
+  package "TimeTableRow 2" as Row2 {
+    [TimeTableItem 2a] --> [TimeTableItem 2b]
+  }
+
+  package "TimeTableRow n" as Row3 {
+    [TimeTableItem 3a] --> [TimeTableItem 3b]
+    [TimeTableItem 3b] --> [TimeTableItem 3n]
+  }
+}
+@enduml
+

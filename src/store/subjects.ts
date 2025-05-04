@@ -40,14 +40,10 @@ export const useSubjectStore = defineStore('subjects', () => {
     }
   }
 
-  // Use watchEffect to automatically fetch subjects when active schema changes
-  // This also runs once initially to get the subjects for the current active schema
   watchEffect(() => {
-    // This will re-execute whenever schemaStore.activeSchema?.id changes
     if (schemaStore.activeSchema?.id) {
       fetchSubjects()
     } else {
-      // Clear subjects when no active schema
       subjects.value = []
     }
   })

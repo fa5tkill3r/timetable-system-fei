@@ -116,6 +116,136 @@ export interface paths {
         patch: operations["buildings_partial_update"];
         trace?: never;
     };
+    "/api/conflicts/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all objects
+         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+         */
+        get: operations["conflicts_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conflicts/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get single object
+         * @description Retrieves a specific object by its unique identifier (ID).
+         */
+        get: operations["conflicts_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conflicts/{id}/update_status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Update the status of a conflict */
+        patch: operations["conflicts_update_status_partial_update"];
+        trace?: never;
+    };
+    "/api/constraints/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all objects
+         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+         */
+        get: operations["constraints_list"];
+        put?: never;
+        /**
+         * Create new object
+         * @description Creates a new object with the provided data. Returns the created object.
+         */
+        post: operations["constraints_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/constraints/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get single object
+         * @description Retrieves a specific object by its unique identifier (ID).
+         */
+        get: operations["constraints_retrieve"];
+        /**
+         * Update object
+         * @description Fully updates an existing object. All fields must be provided.
+         */
+        put: operations["constraints_update"];
+        post?: never;
+        /**
+         * Delete object
+         * @description Permanently removes the specified object from the database.
+         */
+        delete: operations["constraints_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial update object
+         * @description Partially updates an existing object. Only specified fields will be modified.
+         */
+        patch: operations["constraints_partial_update"];
+        trace?: never;
+    };
+    "/api/constraints/all_constraint_data_schema/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Schema for all constraint data types (for OpenAPI component registration only) */
+        post: operations["constraints_all_constraint_data_schema_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/equipment/": {
         parameters: {
             query?: never;
@@ -1240,6 +1370,8 @@ export interface components {
             /** Format: date-time */
             end_date: string;
         };
+        AllConstraintData: components["schemas"]["RootConstraintData"] | components["schemas"]["OperationData"] | components["schemas"]["TimeRangeData"];
+        AllConstraintMainRequest: components["schemas"]["RootConstraintRequest"] | components["schemas"]["OperationConstraintRequest"] | components["schemas"]["TimeRangeConstraintRequest"];
         /** @description Base serializer that automatically handles nested serialization with caching */
         Allowance: {
             readonly id?: number;
@@ -1262,6 +1394,112 @@ export interface components {
             name: string;
             abbrev: string;
         };
+        /** @description Serializer for constraint conflicts */
+        Conflict: {
+            readonly id?: number;
+            ttevent: number;
+            constraint: number;
+            /**
+             * @description * `ACTIVE` - Active
+             *     * `RESOLVED` - Resolved
+             *     * `IGNORED` - Ignored
+             * @enum {string}
+             */
+            status: "ACTIVE" | "RESOLVED" | "IGNORED";
+            /** @description JSON data for conflict details(constraint_type specific) */
+            data: {
+                [key: string]: string;
+            };
+        };
+        Constraint: {
+            readonly id?: number;
+            /**
+             * @description * `NONE` - None
+             *     * `ROOT` - Root Constraint
+             *     * `OPERATION` - Operation Constraint
+             *     * `TIMERANGE` - Time Range Constraint
+             *     * `RESOURCE` - Resource Constraint
+             * @default NONE
+             * @enum {string}
+             */
+            type: "NONE" | "ROOT" | "OPERATION" | "TIMERANGE" | "RESOURCE";
+            /**
+             * @description * `WEAK` - Weak
+             *     * `MEDIUM` - Medium
+             *     * `STRONG` - Strong
+             * @default WEAK
+             * @enum {string}
+             */
+            strength: "WEAK" | "MEDIUM" | "STRONG";
+            /** @description JSON data for constraint parameters (constraint_type specific) */
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Return IDs of child constraints
+             * @default []
+             */
+            readonly children: number[];
+            readonly owner?: number | null;
+            readonly parent?: number | null;
+        };
+        ConstraintRequest: {
+            /**
+             * @description * `NONE` - None
+             *     * `ROOT` - Root Constraint
+             *     * `OPERATION` - Operation Constraint
+             *     * `TIMERANGE` - Time Range Constraint
+             *     * `RESOURCE` - Resource Constraint
+             * @default NONE
+             * @enum {string}
+             */
+            type: "NONE" | "ROOT" | "OPERATION" | "TIMERANGE" | "RESOURCE";
+            /**
+             * @description * `WEAK` - Weak
+             *     * `MEDIUM` - Medium
+             *     * `STRONG` - Strong
+             * @default WEAK
+             * @enum {string}
+             */
+            strength: "WEAK" | "MEDIUM" | "STRONG";
+            /** @description JSON data for constraint parameters (constraint_type specific) */
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Nested children constraints. Only used during creation.
+             * @default [
+             *       {
+             *         "type": "ROOT",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "target_type": "USER",
+             *           "target_id": 0
+             *         }
+             *       },
+             *       {
+             *         "type": "OPERATION",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "operator": "AND"
+             *         }
+             *       },
+             *       {
+             *         "type": "TIMERANGE",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "start_time": 0,
+             *           "duration": 2,
+             *           "day_of_week": 0
+             *         }
+             *       }
+             *     ]
+             */
+            nested_children: unknown;
+        };
         CrossSubjectCollision: {
             subject_a: number | null;
             subject_b: number | null;
@@ -1281,29 +1519,79 @@ export interface components {
         Err_serializer: {
             code: number;
             message: string;
-            /**
-             * Format: date-time
-             * @default 2025-04-26T11:16:12.885487
-             */
+            /** Format: date-time */
             timestamp: string;
         };
         Ok_serializer: {
             code: number;
             message: string;
-            /**
-             * Format: date-time
-             * @default 2025-04-26T11:16:12.885554
-             */
+            /** Format: date-time */
             timestamp: string;
         };
-        Ok_serializerRequest: {
-            code: number;
-            message: string;
+        OperationConstraintRequest: {
             /**
-             * Format: date-time
-             * @default 2025-04-26T11:16:12.885554
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
              */
-            timestamp: string;
+            type: "OperationConstraintRequest";
+            /**
+             * @description * `WEAK` - Weak
+             *     * `MEDIUM` - Medium
+             *     * `STRONG` - Strong
+             * @default WEAK
+             * @enum {string}
+             */
+            strength: "WEAK" | "MEDIUM" | "STRONG";
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Nested children constraints. Only used during creation.
+             * @default [
+             *       {
+             *         "type": "ROOT",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "target_type": "USER",
+             *           "target_id": 0
+             *         }
+             *       },
+             *       {
+             *         "type": "OPERATION",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "operator": "AND"
+             *         }
+             *       },
+             *       {
+             *         "type": "TIMERANGE",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "start_time": 0,
+             *           "duration": 2,
+             *           "day_of_week": 0
+             *         }
+             *       }
+             *     ]
+             */
+            nested_children: unknown;
+        };
+        OperationData: {
+            /**
+             * @description * `AND` - AND
+             *     * `OR` - OR
+             * @default AND
+             * @enum {string}
+             */
+            operator: "AND" | "OR";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            "parent.type": "OperationData";
         };
         PaginatedAISObdobieList: {
             /** @example 123 */
@@ -1349,6 +1637,36 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Building"][];
+        };
+        PaginatedConflictList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Conflict"][];
+        };
+        PaginatedConstraintList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Constraint"][];
         };
         PaginatedCrossSubjectCollisionList: {
             /** @example 123 */
@@ -1630,6 +1948,79 @@ export interface components {
             name?: string;
             abbrev?: string;
         };
+        /** @description Serializer for constraint conflicts */
+        PatchedConflictRequest: {
+            ttevent?: number;
+            constraint?: number;
+            /**
+             * @description * `ACTIVE` - Active
+             *     * `RESOLVED` - Resolved
+             *     * `IGNORED` - Ignored
+             * @enum {string}
+             */
+            status?: "ACTIVE" | "RESOLVED" | "IGNORED";
+            /** @description JSON data for conflict details(constraint_type specific) */
+            data?: {
+                [key: string]: string;
+            };
+        };
+        PatchedConstraintRequest: {
+            /**
+             * @description * `NONE` - None
+             *     * `ROOT` - Root Constraint
+             *     * `OPERATION` - Operation Constraint
+             *     * `TIMERANGE` - Time Range Constraint
+             *     * `RESOURCE` - Resource Constraint
+             * @default NONE
+             * @enum {string}
+             */
+            type: "NONE" | "ROOT" | "OPERATION" | "TIMERANGE" | "RESOURCE";
+            /**
+             * @description * `WEAK` - Weak
+             *     * `MEDIUM` - Medium
+             *     * `STRONG` - Strong
+             * @default WEAK
+             * @enum {string}
+             */
+            strength: "WEAK" | "MEDIUM" | "STRONG";
+            /** @description JSON data for constraint parameters (constraint_type specific) */
+            data?: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Nested children constraints. Only used during creation.
+             * @default [
+             *       {
+             *         "type": "ROOT",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "target_type": "USER",
+             *           "target_id": 0
+             *         }
+             *       },
+             *       {
+             *         "type": "OPERATION",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "operator": "AND"
+             *         }
+             *       },
+             *       {
+             *         "type": "TIMERANGE",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "start_time": 0,
+             *           "duration": 2,
+             *           "day_of_week": 0
+             *         }
+             *       }
+             *     ]
+             */
+            nested_children: unknown;
+        };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedEquipmentRequest: {
             name?: string;
@@ -1692,22 +2083,21 @@ export interface components {
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTGroupRequest: {
             name?: string;
-            description?: string | null;
-            timetables?: number[];
-            owner?: number;
+            tt?: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTRequest: {
             name?: string;
             description?: string | null;
-            owner?: number;
             /**
-             * @description * `PUBLISHED` - Published
-             *     * `HIDDEN` - Hidden
-             *     * `WIP` - Work In Progress
+             * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
+             *
+             *     * `PUBLISHED` - Published - Published final version
+             *     * `FINAL` - Final - Representative of group
+             *     * `TEST` - Test - Minor version in group
              * @enum {string}
              */
-            status?: "PUBLISHED" | "HIDDEN" | "WIP";
+            status?: "PUBLISHED" | "FINAL" | "TEST";
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedUserRequest: {
@@ -1765,12 +2155,81 @@ export interface components {
             capacity: number;
             building: number | null;
         };
+        RootConstraintData: {
+            /**
+             * @description * `USER` - USER
+             *     * `ROOM` - ROOM
+             *     * `TTA` - TTA
+             * @default USER
+             * @enum {string}
+             */
+            target_type: "USER" | "ROOM" | "TTA";
+            /** @default 0 */
+            target_id: number;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            "parent.type": "RootConstraintData";
+        };
+        RootConstraintRequest: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "RootConstraintRequest";
+            /**
+             * @description * `WEAK` - Weak
+             *     * `MEDIUM` - Medium
+             *     * `STRONG` - Strong
+             * @default WEAK
+             * @enum {string}
+             */
+            strength: "WEAK" | "MEDIUM" | "STRONG";
+            /** @description Data specific to ROOT constraint */
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Nested children constraints. Only used during creation.
+             * @default [
+             *       {
+             *         "type": "ROOT",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "target_type": "USER",
+             *           "target_id": 0
+             *         }
+             *       },
+             *       {
+             *         "type": "OPERATION",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "operator": "AND"
+             *         }
+             *       },
+             *       {
+             *         "type": "TIMERANGE",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "start_time": 0,
+             *           "duration": 2,
+             *           "day_of_week": 0
+             *         }
+             *       }
+             *     ]
+             */
+            nested_children: unknown;
+        };
         /** @description Base serializer that automatically handles nested serialization with caching */
         Subject: {
             readonly id?: number;
             name: string;
             code: string;
-            nominal_semester: number | null;
+            nominal_semester?: number | null;
             building?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
@@ -1795,7 +2254,7 @@ export interface components {
         SubjectRequest: {
             name: string;
             code: string;
-            nominal_semester: number | null;
+            nominal_semester?: number | null;
             building?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
@@ -1815,14 +2274,15 @@ export interface components {
             readonly id?: number;
             name: string;
             description?: string | null;
-            owner: number;
             /**
-             * @description * `PUBLISHED` - Published
-             *     * `HIDDEN` - Hidden
-             *     * `WIP` - Work In Progress
+             * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
+             *
+             *     * `PUBLISHED` - Published - Published final version
+             *     * `FINAL` - Final - Representative of group
+             *     * `TEST` - Test - Minor version in group
              * @enum {string}
              */
-            status?: "PUBLISHED" | "HIDDEN" | "WIP";
+            status?: "PUBLISHED" | "FINAL" | "TEST";
             /** Format: date-time */
             readonly created_at?: string;
             /** Format: date-time */
@@ -1875,9 +2335,7 @@ export interface components {
         TTGroup: {
             readonly id?: number;
             name: string;
-            description?: string | null;
-            timetables: number[];
-            owner: number;
+            tt: number;
         };
         TTGroupCounts: {
             /** @description Name of the tt group */
@@ -1888,22 +2346,85 @@ export interface components {
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTGroupRequest: {
             name: string;
-            description?: string | null;
-            timetables: number[];
-            owner: number;
+            tt: number;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         TTRequest: {
             name: string;
             description?: string | null;
-            owner: number;
             /**
-             * @description * `PUBLISHED` - Published
-             *     * `HIDDEN` - Hidden
-             *     * `WIP` - Work In Progress
+             * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
+             *
+             *     * `PUBLISHED` - Published - Published final version
+             *     * `FINAL` - Final - Representative of group
+             *     * `TEST` - Test - Minor version in group
              * @enum {string}
              */
-            status?: "PUBLISHED" | "HIDDEN" | "WIP";
+            status?: "PUBLISHED" | "FINAL" | "TEST";
+        };
+        TimeRangeConstraintRequest: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "None";
+            /**
+             * @description * `WEAK` - Weak
+             *     * `MEDIUM` - Medium
+             *     * `STRONG` - Strong
+             * @default WEAK
+             * @enum {string}
+             */
+            strength: "WEAK" | "MEDIUM" | "STRONG";
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Nested children constraints. Only used during creation.
+             * @default [
+             *       {
+             *         "type": "ROOT",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "target_type": "USER",
+             *           "target_id": 0
+             *         }
+             *       },
+             *       {
+             *         "type": "OPERATION",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "operator": "AND"
+             *         }
+             *       },
+             *       {
+             *         "type": "TIMERANGE",
+             *         "strength": "MEDIUM",
+             *         "parent": 0,
+             *         "data": {
+             *           "start_time": 0,
+             *           "duration": 2,
+             *           "day_of_week": 0
+             *         }
+             *       }
+             *     ]
+             */
+            nested_children: unknown;
+        };
+        TimeRangeData: {
+            /** @default 0 */
+            start_time: number;
+            /** @default 2 */
+            duration: number;
+            /** @default 0 */
+            day_of_week: number;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            "parent.type": "TimeRangeData";
         };
         TokenObtainPair: {
             readonly access?: string;
@@ -1992,6 +2513,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedAllowanceList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     allowence_create: {
@@ -2020,6 +2559,24 @@ export interface operations {
                     "application/json": components["schemas"]["Allowance"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     allowence_retrieve: {
@@ -2046,6 +2603,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Allowance"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -2079,6 +2654,24 @@ export interface operations {
                     "application/json": components["schemas"]["Allowance"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     allowence_destroy: {
@@ -2102,6 +2695,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -2132,6 +2743,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Allowance"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -2167,6 +2796,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedBuildingList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     buildings_create: {
@@ -2195,6 +2842,24 @@ export interface operations {
                     "application/json": components["schemas"]["Building"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     buildings_retrieve: {
@@ -2221,6 +2886,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Building"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -2254,6 +2937,24 @@ export interface operations {
                     "application/json": components["schemas"]["Building"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     buildings_destroy: {
@@ -2277,6 +2978,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -2307,6 +3026,492 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Building"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    conflicts_list: {
+        parameters: {
+            query?: {
+                constraint?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                status?: string;
+                ttevent?: number;
+                ttevent__tta?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedConflictList"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    conflicts_retrieve: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this conflict. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conflict"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    conflicts_update_status_partial_update: {
+        parameters: {
+            query: {
+                /** @description The NEW status of the conflict */
+                status: string;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this conflict. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedConflictRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedConflictRequest"];
+                "multipart/form-data": components["schemas"]["PatchedConflictRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conflict"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    constraints_list: {
+        parameters: {
+            query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedConstraintList"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    constraints_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConstraintRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ConstraintRequest"];
+                "multipart/form-data": components["schemas"]["ConstraintRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Constraint"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    constraints_retrieve: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this constraint. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Constraint"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    constraints_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this constraint. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConstraintRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ConstraintRequest"];
+                "multipart/form-data": components["schemas"]["ConstraintRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Constraint"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    constraints_destroy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this constraint. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    constraints_partial_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this constraint. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedConstraintRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedConstraintRequest"];
+                "multipart/form-data": components["schemas"]["PatchedConstraintRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Constraint"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    constraints_all_constraint_data_schema_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AllConstraintMainRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AllConstraintMainRequest"];
+                "multipart/form-data": components["schemas"]["AllConstraintMainRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AllConstraintData"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -2346,6 +3551,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedEquipmentList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     equipment_create: {
@@ -2374,6 +3597,24 @@ export interface operations {
                     "application/json": components["schemas"]["Equipment"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     equipment_retrieve: {
@@ -2400,6 +3641,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Equipment"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -2433,6 +3692,24 @@ export interface operations {
                     "application/json": components["schemas"]["Equipment"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     equipment_destroy: {
@@ -2456,6 +3733,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -2488,6 +3783,24 @@ export interface operations {
                     "application/json": components["schemas"]["Equipment"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     import_lsData_retrieve: {
@@ -2509,12 +3822,14 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description The specified path points to a file. */
+            /** @description Default Error Model */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
             /** @description No such path or directory. */
             404: {
@@ -2522,6 +3837,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -2538,13 +3862,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Ok_serializerRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["Ok_serializerRequest"];
-                "multipart/form-data": components["schemas"]["Ok_serializerRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -2554,6 +3872,16 @@ export interface operations {
                     "application/json": components["schemas"]["Ok_serializer"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2579,13 +3907,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Ok_serializerRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["Ok_serializerRequest"];
-                "multipart/form-data": components["schemas"]["Ok_serializerRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -2595,6 +3917,7 @@ export interface operations {
                     "application/json": components["schemas"]["Ok_serializer"];
                 };
             };
+            /** @description Default Error Model */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2611,6 +3934,7 @@ export interface operations {
                     "application/json": components["schemas"]["Err_serializer"];
                 };
             };
+            /** @description Default Error Model */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2661,6 +3985,7 @@ export interface operations {
                     "application/json": components["schemas"]["Ok_serializer"];
                 };
             };
+            /** @description Default Error Model */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2669,6 +3994,7 @@ export interface operations {
                     "application/json": components["schemas"]["Err_serializer"];
                 };
             };
+            /** @description Default Error Model */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2725,6 +4051,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedAISObdobieList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     imports_exports_fei_terms_retrieve: {
@@ -2745,6 +4089,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AISObdobie"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -2769,6 +4131,7 @@ export interface operations {
                     "application/json": components["schemas"]["Ok_serializer"];
                 };
             };
+            /** @description Default Error Model */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2785,6 +4148,7 @@ export interface operations {
                     "application/json": components["schemas"]["Err_serializer"];
                 };
             };
+            /** @description Default Error Model */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2821,6 +4185,7 @@ export interface operations {
                     "application/json": components["schemas"]["Ok_serializer"];
                 };
             };
+            /** @description Default Error Model */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2829,6 +4194,7 @@ export interface operations {
                     "application/json": components["schemas"]["Err_serializer"];
                 };
             };
+            /** @description Default Error Model */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2892,6 +4258,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedRoomEquipmentList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     room_equipment_create: {
@@ -2920,6 +4304,24 @@ export interface operations {
                     "application/json": components["schemas"]["RoomEquipment"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     room_equipment_retrieve: {
@@ -2946,6 +4348,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoomEquipment"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -2979,6 +4399,24 @@ export interface operations {
                     "application/json": components["schemas"]["RoomEquipment"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     room_equipment_destroy: {
@@ -3002,6 +4440,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -3032,6 +4488,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoomEquipment"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3098,6 +4572,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedRoomGroupList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     room_groups_create: {
@@ -3126,6 +4618,24 @@ export interface operations {
                     "application/json": components["schemas"]["RoomGroup"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     room_groups_retrieve: {
@@ -3152,6 +4662,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoomGroup"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3185,6 +4713,24 @@ export interface operations {
                     "application/json": components["schemas"]["RoomGroup"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     room_groups_destroy: {
@@ -3208,6 +4754,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -3240,6 +4804,24 @@ export interface operations {
                     "application/json": components["schemas"]["RoomGroup"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     room_groups_list_groups_list: {
@@ -3265,6 +4847,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedRoomGroupNameCountList"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3322,6 +4922,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedRoomList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     rooms_create: {
@@ -3350,6 +4968,24 @@ export interface operations {
                     "application/json": components["schemas"]["Room"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     rooms_retrieve: {
@@ -3376,6 +5012,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Room"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3409,6 +5063,24 @@ export interface operations {
                     "application/json": components["schemas"]["Room"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     rooms_destroy: {
@@ -3432,6 +5104,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -3464,6 +5154,24 @@ export interface operations {
                     "application/json": components["schemas"]["Room"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     schemas_list: {
@@ -3486,6 +5194,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedschemaList"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3513,6 +5239,24 @@ export interface operations {
                     "application/json": components["schemas"]["schema"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     schemas_retrieve: {
@@ -3533,6 +5277,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["schema"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3563,6 +5325,24 @@ export interface operations {
                     "application/json": components["schemas"]["schema"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     schemas_destroy: {
@@ -3586,6 +5366,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -3615,6 +5413,24 @@ export interface operations {
                     "application/json": components["schemas"]["schema"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     schemas_activate_create: {
@@ -3635,6 +5451,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["schema"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3672,6 +5506,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedSubjectGroupList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subject_groups_create: {
@@ -3700,6 +5552,24 @@ export interface operations {
                     "application/json": components["schemas"]["SubjectGroup"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subject_groups_retrieve: {
@@ -3726,6 +5596,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubjectGroup"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3759,6 +5647,24 @@ export interface operations {
                     "application/json": components["schemas"]["SubjectGroup"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subject_groups_destroy: {
@@ -3782,6 +5688,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -3812,6 +5736,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubjectGroup"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3847,6 +5789,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedSubjectGroupCountsList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subject_user_collisions_list: {
@@ -3876,6 +5836,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedCrossSubjectCollisionList"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -3922,6 +5900,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedSubjectUserRoleList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subject_user_roles_create: {
@@ -3950,6 +5946,24 @@ export interface operations {
                     "application/json": components["schemas"]["SubjectUserRole"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subject_user_roles_retrieve: {
@@ -3976,6 +5990,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubjectUserRole"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4009,6 +6041,24 @@ export interface operations {
                     "application/json": components["schemas"]["SubjectUserRole"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subject_user_roles_destroy: {
@@ -4032,6 +6082,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -4062,6 +6130,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubjectUserRole"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4098,6 +6184,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedSubjectList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subjects_create: {
@@ -4126,6 +6230,24 @@ export interface operations {
                     "application/json": components["schemas"]["Subject"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subjects_retrieve: {
@@ -4152,6 +6274,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Subject"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4185,6 +6325,24 @@ export interface operations {
                     "application/json": components["schemas"]["Subject"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subjects_destroy: {
@@ -4208,6 +6366,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -4240,6 +6416,24 @@ export interface operations {
                     "application/json": components["schemas"]["Subject"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     subjects_get_student_count_retrieve: {
@@ -4269,6 +6463,24 @@ export interface operations {
                     }[];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     token_create: {
@@ -4292,6 +6504,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TokenObtainPair"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4319,6 +6549,24 @@ export interface operations {
                     "application/json": components["schemas"]["TokenRefresh"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     tt_list: {
@@ -4326,8 +6574,6 @@ export interface operations {
             query?: {
                 /** @description Filter by creation date (format: YYYY-MM-DD) */
                 created_at?: string;
-                /** @description Regex-based search for TT by description text */
-                description?: string;
                 /** @description Number of results to return per page. */
                 limit?: number;
                 /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
@@ -4338,12 +6584,12 @@ export interface operations {
                 offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                /** @description Filter by status: draft (initial), published (visible), archived (historical)
+                /** @description Filter by timetable status
                  *
-                 *     * `PUBLISHED` - Published
-                 *     * `HIDDEN` - Hidden
-                 *     * `WIP` - Work In Progress */
-                status?: "HIDDEN" | "PUBLISHED" | "WIP";
+                 *     * `PUBLISHED` - Published - Published final version
+                 *     * `FINAL` - Final - Representative of group
+                 *     * `TEST` - Test - Minor version in group */
+                status?: "FINAL" | "PUBLISHED" | "TEST";
                 /** @description Filter by last update date (format: YYYY-MM-DD) */
                 updated_at?: string;
             };
@@ -4364,11 +6610,32 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedTTList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     tt_create: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+                force?: boolean;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -4390,6 +6657,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TT"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4420,11 +6705,32 @@ export interface operations {
                     "application/json": components["schemas"]["TT"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     tt_update: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+                force?: boolean;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -4451,6 +6757,24 @@ export interface operations {
                     "application/json": components["schemas"]["TT"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     tt_destroy: {
@@ -4475,11 +6799,32 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     tt_partial_update: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+                force?: boolean;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -4504,6 +6849,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TT"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4541,6 +6904,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedTTActivityList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttactivity_create: {
@@ -4569,6 +6950,24 @@ export interface operations {
                     "application/json": components["schemas"]["TTActivity"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttactivity_retrieve: {
@@ -4595,6 +6994,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTActivity"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4628,6 +7045,24 @@ export interface operations {
                     "application/json": components["schemas"]["TTActivity"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttactivity_destroy: {
@@ -4651,6 +7086,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -4681,6 +7134,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTActivity"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4716,6 +7187,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedTTEventList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttetype_list: {
@@ -4749,6 +7238,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedTTEventTypeList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttetype_create: {
@@ -4777,6 +7284,24 @@ export interface operations {
                     "application/json": components["schemas"]["TTEventType"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttetype_retrieve: {
@@ -4803,6 +7328,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTEventType"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4836,6 +7379,24 @@ export interface operations {
                     "application/json": components["schemas"]["TTEventType"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttetype_destroy: {
@@ -4859,6 +7420,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -4889,6 +7468,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTEventType"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -4940,6 +7537,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedTTEventList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttevent_create: {
@@ -4968,6 +7583,24 @@ export interface operations {
                     "application/json": components["schemas"]["TTEvent"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttevent_retrieve: {
@@ -4994,6 +7627,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTEvent"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -5027,6 +7678,24 @@ export interface operations {
                     "application/json": components["schemas"]["TTEvent"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttevent_destroy: {
@@ -5050,6 +7719,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -5080,6 +7767,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTEvent"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -5117,11 +7822,32 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedTTGroupList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttgroup_create: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+                force?: boolean;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -5143,6 +7869,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTGroup"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -5173,11 +7917,32 @@ export interface operations {
                     "application/json": components["schemas"]["TTGroup"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttgroup_update: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+                force?: boolean;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -5204,6 +7969,24 @@ export interface operations {
                     "application/json": components["schemas"]["TTGroup"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttgroup_destroy: {
@@ -5228,11 +8011,32 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     ttgroup_partial_update: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+                force?: boolean;
+            };
             header: {
                 /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
                 "X-Term": string;
@@ -5257,6 +8061,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTGroup"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -5292,6 +8114,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedTTGroupCountsList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     users_list: {
@@ -5322,6 +8162,24 @@ export interface operations {
                     "application/json": components["schemas"]["PaginatedUserList"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     users_create: {
@@ -5347,6 +8205,24 @@ export interface operations {
                     "application/json": components["schemas"]["User"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     users_retrieve: {
@@ -5370,6 +8246,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["User"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
@@ -5400,6 +8294,24 @@ export interface operations {
                     "application/json": components["schemas"]["User"];
                 };
             };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
         };
     };
     users_destroy: {
@@ -5420,6 +8332,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
             };
         };
     };
@@ -5447,6 +8377,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["User"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
                 };
             };
         };
