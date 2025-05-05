@@ -1129,68 +1129,89 @@ const getConflictingEvents = computed(() => {
   })
 })
 
-const hasRoomConflict = computed(() => {
-  return getConflictingEvents.value.length > 0
-})
+// Single source of truth for drag state
+const dragState = computed(() => {
+  if (!draggedEvent.value && !draggedTemplate.value) return null;
+  
+  const eventToCheck = draggedEvent.value || draggedTemplate.value!;
+  const duration = draggedEvent.value
+    ? getEventDuration(draggedEvent.value)
+    : eventToCheck.duration || 1;
+    
+  return { eventToCheck, duration };
+});
 
-const isDragging = computed(() => {
-  return draggedEvent.value !== null || draggedTemplate.value !== null
-})
+// Single computed property for isDragging
+const isDragging = computed(() => dragState.value !== null);
 
-const cellHasConflict = (dayIndex: number, timeIndex: number | undefined): { hasConflict: boolean; types: string[] } => {
-  if (!isDragging.value || (!draggedEvent.value && !draggedTemplate.value) || timeIndex === undefined)
-    return { hasConflict: false, types: [] };
-
+// Centralized conflict checking function
+const checkConflicts = (day: string | number, timeIndex: number | undefined) => {
+  // Early returns for invalid inputs
+  if (!dragState.value || timeIndex === undefined) 
+    return { hasConflict: false, types: [], events: [] };
+  
   try {
-    // Create a temporary event at this position to check for conflicts
-    const eventToCheck = draggedEvent.value || draggedTemplate.value!;
-    const duration = draggedEvent.value
-      ? getEventDuration(draggedEvent.value)
-      : eventToCheck.duration || 1;
-
-    // Existing event exclude from conflicts
-    const eventsToCheck = draggedEvent.value
-      ? events.value.filter(e => e.id !== draggedEvent.value!.id)
-      : events.value;
-
+    const { eventToCheck, duration } = dragState.value;
+    const dayName = typeof day === 'number' ? days[day] : day;
+    
+    // Exclude current event from check
+    const eventsToCheck = eventToCheck.id ? 
+      events.value.filter(e => e.id !== eventToCheck.id) : 
+      events.value;
+    
     const endTimeIndex = timeIndex + duration - 1;
     const conflictTypes = new Set<string>();
-
-    const conflictingEvents = eventsToCheck.filter(e => {
-      if (!e.day || !e.start_time || !e.end_time) return false;
-
-      if (e.day !== days[dayIndex]) return false;
-
+    const conflictingEvents: CalendarEvent[] = [];
+    
+    // Find conflicts
+    for (const e of eventsToCheck) {
+      if (!e.day || !e.start_time || !e.end_time) continue;
+      if (e.day !== dayName) continue;
+      
       const eventStartIndex = timeToIndex(e.start_time);
       const eventEndIndex = eventStartIndex + getEventDuration(e) - 1;
-
-      const timeOverlap = timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex;
-
-      if (!timeOverlap) return false;
-
-      let hasConflict = false;
-
-      const roomConflict = (eventToCheck.room_id === e.room_id) ||
-        (preferredRoom.value === e.room_id && !eventToCheck.room_id);
-
-      if (roomConflict) {
-        conflictTypes.add('room');
-        hasConflict = true;
+      
+      // Check time overlap
+      if (timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) {
+        // Room conflict check
+        const roomConflict = (eventToCheck.room_id === e.room_id) ||
+          (preferredRoom.value === e.room_id && !eventToCheck.room_id);
+        
+        if (roomConflict) {
+          conflictTypes.add('room');
+          conflictingEvents.push(e);
+        }
       }
-
-
-      return hasConflict;
-    });
-
+    }
+    
     return {
       hasConflict: conflictingEvents.length > 0,
-      types: Array.from(conflictTypes)
+      types: Array.from(conflictTypes),
+      events: conflictingEvents
     };
   } catch (error) {
-    console.error("Error in cellHasConflict:", error);
-    return { hasConflict: false, types: [] };
+    console.error("Error checking conflicts:", error);
+    return { hasConflict: false, types: [], events: [] };
   }
-}
+};
+
+// Current drag conflicts
+const currentDragConflicts = computed(() => {
+  if (!isDragging.value || !draggedOverDay.value || !draggedOverTime.value) 
+    return { hasConflict: false, types: [], events: [] };
+    
+  const timeIndex = timeToIndex(draggedOverTime.value.from);
+  return checkConflicts(draggedOverDay.value, timeIndex);
+});
+
+// Room conflict indicator
+const hasRoomConflict = computed(() => currentDragConflicts.value.hasConflict);
+
+// Simplified cell conflict check
+const cellHasConflict = (dayIndex: number, timeIndex: number | undefined) => {
+  const result = checkConflicts(dayIndex, timeIndex);
+  return { hasConflict: result.hasConflict, types: result.types };
+};
 
 function setupGlobalDragHandlers() {
   document.addEventListener('dragover', handleDocumentDragOver);
