@@ -56,6 +56,8 @@ import {
   DEFAULT_TIME_CONFIG as TIME_CONFIG,
 } from '@/utils/timetable'
 import ConflictIcons from '@/components/timetables/ConflictIcons.vue';
+import EventContextMenu from '@/components/timetables/EventContextMenu.vue';
+import { templateRef } from '@vueuse/core'
 
 type Room = components['schemas']['Room']
 
@@ -129,6 +131,9 @@ const draggedOverTime = ref<TimeSlot | null>(null)
 const mousePosition = ref({ x: 0, y: 0 });
 const TimeTableGrid = useTemplateRef('TimeTableGrid')
 
+const contextMenuVisible = ref(false)
+const contextMenuPosition = ref({ x: 0, y: 0 })
+const selectedEvent = ref<CalendarEvent | null>(null)
 
 const timetableId = computed(() => {
   return route.params.id ? parseInt(route.params.id as string) : null
@@ -494,7 +499,6 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
     zIndex: 25, // Use consistent z-index
     cursor: 'move',
     opacity: isDraggingNow ? (isBeingDragged ? 0.4 : 0.85) : 1, // Make semi-transparent but not invisible
-    pointerEvents: 'auto', // Always allow interactions to ensure draggability
   }
 }
 
@@ -1049,6 +1053,27 @@ watch([subjectId, roomId, viewType], async () => {
   }
 })
 
+const handleDocumentClick = (event: MouseEvent) => {
+  if (!contextMenuVisible.value) return;
+
+  const element = contextMenuRef.value?.$el || contextMenuRef.value;
+
+  if (element && !element.contains(event.target as Node)) {
+    contextMenuVisible.value = false;
+  }
+};
+
+const contextMenuRef = templateRef('contextMenuRef')
+
+watch(() => contextMenuVisible.value, (isVisible) => {
+  if (isVisible) {
+    setTimeout(() => {
+      document.addEventListener('mousedown', handleDocumentClick);
+    }, 10);
+  } else {
+    document.removeEventListener('mousedown', handleDocumentClick);
+  }
+});
 
 
 
@@ -1132,12 +1157,12 @@ const getConflictingEvents = computed(() => {
 // Single source of truth for drag state
 const dragState = computed(() => {
   if (!draggedEvent.value && !draggedTemplate.value) return null;
-  
+
   const eventToCheck = draggedEvent.value || draggedTemplate.value!;
   const duration = draggedEvent.value
     ? getEventDuration(draggedEvent.value)
     : eventToCheck.duration || 1;
-    
+
   return { eventToCheck, duration };
 });
 
@@ -1147,43 +1172,43 @@ const isDragging = computed(() => dragState.value !== null);
 // Centralized conflict checking function
 const checkConflicts = (day: string | number, timeIndex: number | undefined) => {
   // Early returns for invalid inputs
-  if (!dragState.value || timeIndex === undefined) 
+  if (!dragState.value || timeIndex === undefined)
     return { hasConflict: false, types: [], events: [] };
-  
+
   try {
     const { eventToCheck, duration } = dragState.value;
     const dayName = typeof day === 'number' ? days[day] : day;
-    
+
     // Exclude current event from check
-    const eventsToCheck = eventToCheck.id ? 
-      events.value.filter(e => e.id !== eventToCheck.id) : 
+    const eventsToCheck = eventToCheck.id ?
+      events.value.filter(e => e.id !== eventToCheck.id) :
       events.value;
-    
+
     const endTimeIndex = timeIndex + duration - 1;
     const conflictTypes = new Set<string>();
     const conflictingEvents: CalendarEvent[] = [];
-    
+
     // Find conflicts
     for (const e of eventsToCheck) {
       if (!e.day || !e.start_time || !e.end_time) continue;
       if (e.day !== dayName) continue;
-      
+
       const eventStartIndex = timeToIndex(e.start_time);
       const eventEndIndex = eventStartIndex + getEventDuration(e) - 1;
-      
+
       // Check time overlap
       if (timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) {
         // Room conflict check
         const roomConflict = (eventToCheck.room_id === e.room_id) ||
           (preferredRoom.value === e.room_id && !eventToCheck.room_id);
-        
+
         if (roomConflict) {
           conflictTypes.add('room');
           conflictingEvents.push(e);
         }
       }
     }
-    
+
     return {
       hasConflict: conflictingEvents.length > 0,
       types: Array.from(conflictTypes),
@@ -1197,9 +1222,9 @@ const checkConflicts = (day: string | number, timeIndex: number | undefined) => 
 
 // Current drag conflicts
 const currentDragConflicts = computed(() => {
-  if (!isDragging.value || !draggedOverDay.value || !draggedOverTime.value) 
+  if (!isDragging.value || !draggedOverDay.value || !draggedOverTime.value)
     return { hasConflict: false, types: [], events: [] };
-    
+
   const timeIndex = timeToIndex(draggedOverTime.value.from);
   return checkConflicts(draggedOverDay.value, timeIndex);
 });
@@ -1254,6 +1279,84 @@ onUnmounted(() => {
   document.removeEventListener('dragover', handleDocumentDragOver);
   document.removeEventListener('dragend', handleDragEnd);
 });
+
+function handleEventContextMenu(event: MouseEvent, calendarEvent: CalendarEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+
+  // Position the context menu at the cursor position
+  contextMenuPosition.value = { x: event.clientX, y: event.clientY }
+  selectedEvent.value = calendarEvent
+  contextMenuVisible.value = true
+}
+
+async function updateEventWeeksBitmask(eventId: number, newBitmask: number) {
+  try {
+    const eventIndex = events.value.findIndex(e => e.id === eventId)
+    if (eventIndex !== -1) {
+      // Update local state
+      events.value[eventIndex].weeks_bitmask = newBitmask
+
+      // Save to server
+      await timetableEventStore.updateEvent(eventId, { weeks_bitmask: newBitmask })
+
+      toast({
+        title: "Success",
+        description: "Event weeks updated successfully."
+      })
+    }
+  } catch (error) {
+    console.error("Error updating event weeks:", error)
+    toast({
+      title: "Error",
+      description: "Failed to update event weeks.",
+      variant: "destructive"
+    })
+  }
+}
+
+async function deleteEvent(event: CalendarEvent) {
+  if (!event.id) return
+
+  try {
+    await toggleEventPlacement(event)
+    contextMenuVisible.value = false
+
+    toast({
+      title: "Success",
+      description: "Event removed from timetable."
+    })
+  } catch (error) {
+    console.error("Error removing event:", error)
+    toast({
+      title: "Error",
+      description: "Failed to remove event.",
+      variant: "destructive"
+    })
+  }
+}
+
+function duplicateEvent(event: CalendarEvent) {
+  const duplicatedEvent = { ...event, id: -nextEventId++ }
+  events.value.push(duplicatedEvent)
+
+  saveEventPlacement(duplicatedEvent).then(() => {
+    toast({
+      title: "Success",
+      description: "Event duplicated."
+    })
+  })
+
+  contextMenuVisible.value = false
+}
+
+function editEvent(event: CalendarEvent) {
+  toast({
+    title: "Not implemented",
+    description: "Event editing will be implemented soon."
+  })
+  contextMenuVisible.value = false
+}
 
 </script>
 
@@ -1406,7 +1509,8 @@ onUnmounted(() => {
                   <!-- Add events as slots in the TimetableGrid -->
                   <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
                     <div :style="getEventStyle(event)" class="event rounded-lg shadow-md hover:shadow-lg transition-all"
-                      draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
+                      draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd"
+                      @contextmenu="handleEventContextMenu($event, event)">
                       <div class="flex justify-between items-center">
                         <div class="event-title font-semibold text-gray-800 truncate">
                           {{ event.shortcut }}
@@ -1502,5 +1606,9 @@ onUnmounted(() => {
     </div>
   </div>
 </div> -->
+    <EventContextMenu v-if="selectedEvent" ref="contextMenuRef" :event="selectedEvent" :visible="contextMenuVisible"
+      :position="contextMenuPosition" @update:visible="contextMenuVisible = $event" @delete-event="deleteEvent"
+      @duplicate-event="duplicateEvent" @edit-event="editEvent" @drag-start="handleDragStart"
+      @update-weeks-bitmask="updateEventWeeksBitmask" />
   </div>
 </template>
