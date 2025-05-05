@@ -45,6 +45,10 @@ const props = defineProps({
   compact: {
     type: Boolean,
     default: false
+  },
+  isDragging: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -166,8 +170,10 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
         </div>
       </template>
       
-      <!-- Slot for events and other content -->
-      <slot></slot>
+      <!-- Apply moderate opacity to events during drag -->
+      <div :class="{ 'opacity-85': isDragging }" style="z-index: 20">
+        <slot></slot>
+      </div>
     </div>
     
     <ScrollBar orientation="horizontal" />

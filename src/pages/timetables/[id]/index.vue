@@ -51,10 +51,11 @@ import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 import { components } from '@/types/schema'
 import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
-import { 
+import {
   DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
-  DEFAULT_TIME_CONFIG as TIME_CONFIG, 
+  DEFAULT_TIME_CONFIG as TIME_CONFIG,
 } from '@/utils/timetable'
+import ConflictIcons from '@/components/timetables/ConflictIcons.vue';
 
 type Room = components['schemas']['Room']
 
@@ -289,19 +290,19 @@ function processTimetableEvents() {
     } else {
       const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
 
-        eventTemplates.value.push({
-          id: event.id!,
-          day: null,
-          start_time: null,
-          end_time: null,
-          title: subjectName!,
-          shortcut: subjectCode || '',
-          color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-          duration: event.duration || 1,
-          subject_id: subjectId,
-          original_eventId: event.id,
-          event_type: eventType
-        })
+      eventTemplates.value.push({
+        id: event.id!,
+        day: null,
+        start_time: null,
+        end_time: null,
+        title: subjectName!,
+        shortcut: subjectCode || '',
+        color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
+        duration: event.duration || 1,
+        subject_id: subjectId,
+        original_eventId: event.id,
+        event_type: eventType
+      })
     }
   })
 }
@@ -410,7 +411,7 @@ const getRowEventPositions = computed<Map<number, { row: number, maxRows: number
   const eventPositions = new Map()
 
   Object.entries(eventsByDay).forEach(([, dayEvents]) => {
-    const sortedEvents = [...dayEvents].sort((a, b) => 
+    const sortedEvents = [...dayEvents].sort((a, b) =>
       timeToIndex(a.start_time!) - timeToIndex(b.start_time!)
     )
 
@@ -456,6 +457,7 @@ const getRowEventPositions = computed<Map<number, { row: number, maxRows: number
   return eventPositions
 })
 
+// Update the getEventStyle function to ensure dragging works
 const getEventStyle = (event: CalendarEvent): CSSProperties => {
   if (!event.day || !event.start_time || !event.end_time) {
     return {}
@@ -472,6 +474,10 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const rowSpacing = 4 * maxRows / (maxRows + 1)
   const topOffset = row * (eventHeight + rowSpacing)
 
+  // Adjust opacity - keep events more visible during drag
+  const isDraggingNow = draggedEvent.value !== null || draggedTemplate.value !== null
+  const isBeingDragged = draggedEvent.value?.id === event.id
+
   return {
     position: 'absolute',
     left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * startIndex}px`,
@@ -483,8 +489,10 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
     padding: '8px',
     boxSizing: 'border-box',
     overflow: 'hidden',
-    zIndex: 2,
+    zIndex: 25, // Use consistent z-index
     cursor: 'move',
+    opacity: isDraggingNow ? (isBeingDragged ? 0.4 : 0.85) : 1, // Make semi-transparent but not invisible
+    pointerEvents: 'auto', // Always allow interactions to ensure draggability
   }
 }
 
@@ -500,6 +508,64 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
 
   const cellHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
 
+  // Calculate if this cell is within the dragged area
+  const isDraggedOver = Boolean(
+    draggedOverDay.value === days[dayIndex] &&
+    draggedOverTime.value &&
+    timeIndex >= draggedOverTime.value.index &&
+    timeIndex < draggedOverTime.value.index + (
+      draggedEvent.value
+        ? getEventDuration(draggedEvent.value)
+        : draggedTemplate.value?.duration || 1
+    )
+  )
+
+  // Check if cell would cause a conflict if the dragged event was placed here
+  const wouldConflict = Boolean(isDragging.value && (() => {
+    if (!draggedEvent.value && !draggedTemplate.value) return false;
+
+    // Create a temporary event at this position to check for conflicts
+    const eventToCheck = draggedEvent.value || draggedTemplate.value!;
+    const duration = draggedEvent.value
+      ? getEventDuration(draggedEvent.value)
+      : eventToCheck.duration || 1;
+
+    // If we're dragging an existing event, we need to exclude it from conflicts
+    const eventsToCheck = draggedEvent.value
+      ? events.value.filter(e => e.id !== draggedEvent.value!.id)
+      : events.value;
+
+    const endTimeIndex = timeIndex + duration - 1;
+
+    // Find events that would overlap with this position
+    const conflictingEvents = eventsToCheck.filter(e => {
+      if (!e.day || !e.start_time || !e.end_time) return false;
+
+      // Check if same day
+      if (e.day !== days[dayIndex]) return false;
+
+      // Get event time range
+      const eventStartIndex = timeToIndex(e.start_time);
+      const eventEndIndex = eventStartIndex + getEventDuration(e) - 1;
+
+      // Check for overlap
+      return (
+        (timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) &&
+        // Room conflict check - if same room is used
+        (eventToCheck.room_id === e.room_id || preferredRoom.value === e.room_id)
+      );
+    });
+
+    return conflictingEvents.length > 0;
+  })());
+
+  // Get current conflicts based on mouse position
+  const conflicts = getConflictingEvents.value;
+
+  // Calculate if this cell has a conflict
+  const conflictResult = cellHasConflict(dayIndex, timeIndex);
+  const hasConflict = isDraggedOver && conflictResult.hasConflict;
+
   return {
     position: 'absolute',
     left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeIndex}px`,
@@ -509,37 +575,32 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
     boxSizing: 'border-box',
-    zIndex: 1,
+    zIndex: 5, // Lower z-index for backgrounds to be below events
     backgroundColor: (() => {
-      if (!draggedEvent.value && !draggedTemplate.value) return 'transparent'
+      if (!draggedEvent.value && !draggedTemplate.value) return 'transparent';
 
-      const duration = draggedEvent.value
-        ? timeSlots.findIndex(
-          (slot) => slot.to === draggedEvent.value?.end_time,
-        ) -
-        timeSlots.findIndex(
-          (slot) => slot.from === draggedEvent.value?.start_time,
-        ) +
-        1
-        : draggedTemplate.value?.duration || 0
-
-      if (
-        draggedOverDay.value === days[dayIndex] &&
-        _.isEqual(draggedOverTime.value, timeSlots[timeIndex]) &&
-        timeIndex + duration <= timeSlots.length
-      ) {
-        return '#e3f2fd'
+      // If conflict detected, use orange background
+      if (isDraggedOver && hasConflict) {
+        return 'rgba(255, 171, 145, 0.7)'; // Semi-transparent orange for conflicts 
       }
 
-      if (
-        draggedOverDay.value === days[dayIndex] &&
-        _.isEqual(draggedOverTime.value, timeSlots[timeIndex])
-      ) {
-        return '#fb0101'
+      // Show ALL conflicting cells in light orange when dragging
+      if (wouldConflict) {
+        return 'rgba(255, 224, 178, 0.7)'; // Semi-transparent light orange for conflicts
       }
 
-      return 'transparent'
+      // For regular hover during drag
+      if (isDraggedOver) {
+        return timeIndex + (draggedEvent.value
+          ? getEventDuration(draggedEvent.value)
+          : draggedTemplate.value?.duration || 1) <= timeSlots.length
+          ? 'rgba(227, 242, 253, 0.7)' // Semi-transparent blue for valid placement
+          : 'rgba(255, 205, 210, 0.7)'; // Semi-transparent red for invalid placement
+      }
+
+      return 'transparent';
     })(),
+    // No longer using background image for icons
   }
 }
 
@@ -661,12 +722,25 @@ const handleDragStart = (
   event: DragEvent,
   eventData: CalendarEvent,
 ) => {
-  if (!eventData.day && !eventData.start_time) {
-    draggedTemplate.value = eventData
-  } else {
-    draggedEvent.value = eventData
+  // First set drag properties
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', eventData.id.toString());
+    
+    // Set ghost image (optional but helps with drag preview)
+    const elem = event.target as HTMLElement;
+    if (elem) {
+      event.dataTransfer.setDragImage(elem, 10, 10);
+    }
   }
-  event.dataTransfer!.effectAllowed = 'move'
+  
+  setTimeout(() => {
+    if (!eventData.day && !eventData.start_time) {
+      draggedTemplate.value = eventData;
+    } else {
+      draggedEvent.value = eventData;
+    }
+  }, 0);
 }
 
 // Handle event from EventSelectionPanel for template drag start
@@ -884,11 +958,11 @@ async function saveEventPlacement(event: CalendarEvent) {
     await timetableEventStore.updateEvent(event.id, eventData)
 
     toast({
-        title: "Success",
-        description: "Event has been placed in the timetable."
-      })
+      title: "Success",
+      description: "Event has been placed in the timetable."
+    })
 
-      await fetchTimetableEvents(timetableId.value)
+    await fetchTimetableEvents(timetableId.value)
   } catch (error) {
     console.error("Error saving event placement:", error)
     toast({
@@ -988,6 +1062,161 @@ function handleCellClick(dayIndex: number, timeIndex: number) {
 }
 
 function handleContextMenu(dayIndex: number, timeIndex: number) {
+}
+
+// Add this after the other computed properties
+const getConflictingEvents = computed(() => {
+  if (!draggedEvent.value && !draggedTemplate.value) return []
+  if (!draggedOverDay.value || !draggedOverTime.value) return []
+
+  const eventToCheck = draggedEvent.value || draggedTemplate.value!
+  const duration = draggedEvent.value
+    ? getEventDuration(draggedEvent.value)
+    : eventToCheck.duration || 1
+
+  // If we're dragging an existing event, we need to exclude it from conflicts
+  const eventsToCheck = draggedEvent.value
+    ? events.value.filter(e => e.id !== draggedEvent.value!.id)
+    : events.value
+
+  const startTimeIndex = timeToIndex(draggedOverTime.value.from)
+  const endTimeIndex = startTimeIndex + duration - 1
+
+  // Find events that overlap with the dragged position
+  return eventsToCheck.filter(e => {
+    if (!e.day || !e.start_time || !e.end_time) return false
+
+    // Check if same day
+    if (e.day !== draggedOverDay.value) return false
+
+    // Get event time range
+    const eventStartIndex = timeToIndex(e.start_time)
+    const eventEndIndex = eventStartIndex + getEventDuration(e) - 1
+
+    // Check for overlap
+    return (
+      (startTimeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) &&
+      // Room conflict check - if same room is used
+      (eventToCheck.room_id === e.room_id || preferredRoom.value === e.room_id)
+    )
+  })
+})
+
+const hasRoomConflict = computed(() => {
+  return getConflictingEvents.value.length > 0
+})
+
+const isDragging = computed(() => {
+  return draggedEvent.value !== null || draggedTemplate.value !== null
+})
+
+// Add this new function in your script setup
+const getDragPreviewStyle = (): CSSProperties => {
+  if (!draggedOverDay.value || !draggedOverTime.value) return {}
+
+  const dayIndex = days.indexOf(draggedOverDay.value)
+  const timeIndex = timeToIndex(draggedOverTime.value.from)
+  const duration = draggedEvent.value
+    ? getEventDuration(draggedEvent.value)
+    : draggedTemplate.value?.duration || 1
+  const dayPositions = getDayRowPositions.value
+
+  // Check for conflicts
+  const hasConflict = getConflictingEvents.value.length > 0
+
+  return {
+    position: 'absolute',
+    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeIndex}px`,
+    top: `${dayPositions[dayIndex] + 2}px`,
+    width: `${TIMETABLE_CONFIG.CELL_WIDTH * duration - 4}px`,
+    height: `${TIMETABLE_CONFIG.CELL_HEIGHT - 4}px`,
+    backgroundColor: hasConflict ? 'rgba(255, 171, 145, 0.95)' :
+      draggedEvent?.color || draggedTemplate?.color || '#e3f2fd',
+    padding: '8px',
+    boxSizing: 'border-box',
+    opacity: 1, // Full opacity for drag preview
+    borderColor: hasConflict ? '#e53935' : '#2196f3', // More visible borders
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    overflow: 'hidden',
+    zIndex: 50, // Very high z-index to stay on top
+    boxShadow: '0 4px 8px rgba(0,0,0,0.2)', // Add shadow for more visual prominence
+    pointerEvents: 'none', // Make sure this doesn't interfere with interactions
+  }
+}
+
+// Add function to check if a cell has conflicts
+const cellHasConflict = (dayIndex: number, timeIndex: number | undefined): { hasConflict: boolean; types: string[] } => {
+  if (!isDragging.value || (!draggedEvent.value && !draggedTemplate.value) || timeIndex === undefined) 
+    return { hasConflict: false, types: [] };
+
+  try {
+    // Create a temporary event at this position to check for conflicts
+    const eventToCheck = draggedEvent.value || draggedTemplate.value!;
+    const duration = draggedEvent.value
+      ? getEventDuration(draggedEvent.value)
+      : eventToCheck.duration || 1;
+
+    // If we're dragging an existing event, we need to exclude it from conflicts
+    const eventsToCheck = draggedEvent.value
+      ? events.value.filter(e => e.id !== draggedEvent.value!.id)
+      : events.value;
+
+    const endTimeIndex = timeIndex + duration - 1;
+    const conflictTypes = new Set<string>();
+
+    // Find events that would overlap with this position
+    const conflictingEvents = eventsToCheck.filter(e => {
+      if (!e.day || !e.start_time || !e.end_time) return false;
+
+      // Check if same day
+      if (e.day !== days[dayIndex]) return false;
+
+      // Get event time range
+      const eventStartIndex = timeToIndex(e.start_time);
+      const eventEndIndex = eventStartIndex + getEventDuration(e) - 1;
+
+      // Check for overlap
+      const timeOverlap = timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex;
+      
+      if (!timeOverlap) return false;
+
+      // Check different types of conflicts
+      let hasConflict = false;
+
+      // Room conflict check
+      const roomConflict = (eventToCheck.room_id === e.room_id) ||
+        (preferredRoom.value === e.room_id && !eventToCheck.room_id);
+      
+      if (roomConflict) {
+        conflictTypes.add('room');
+        hasConflict = true;
+      }
+
+      // Teacher conflict could be added here (if teacher data is available)
+      // Example:
+      // if (eventToCheck.teacher_id === e.teacher_id) {
+      //   conflictTypes.add('teacher');
+      //   hasConflict = true;
+      // }
+      
+      // Other conflict types can be added similarly
+
+      return hasConflict;
+    });
+
+    return { 
+      hasConflict: conflictingEvents.length > 0, 
+      types: Array.from(conflictTypes)
+    };
+  } catch (error) {
+    console.error("Error in cellHasConflict:", error);
+    return { hasConflict: false, types: [] };
+  }
+}
+
+function $nextTick(arg0: () => void) {
+  throw new Error('Function not implemented.')
 }
 </script>
 
@@ -1107,21 +1336,11 @@ function handleContextMenu(dayIndex: number, timeIndex: number) {
 
             <ScrollArea class="overflow-auto p-1">
               <!-- Replace custom timetable with TimetableGrid component -->
-              <TimetableGrid
-                :days="days"
-                :time-slots="timeSlots"
-                :get-cell-style="getCellStyle"
-                :get-header-style="getHeaderStyle"
-                :get-day-style="getDayStyle"
-                :corner-cell-style="cornerCellStyle"
-                :container-style="containerStyle"
-                :is-resizing="isResizing"
-                @cell-click="handleCellClick"
-                @drag-over="handleDragOver"
-                @drop="handleDrop"
-                @drag-end="handleDragEnd"
-                @cell-context-menu="handleContextMenu"
-              >
+              <TimetableGrid :days="days" :time-slots="timeSlots" :get-cell-style="getCellStyle"
+                :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
+                :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
+                @cell-click="handleCellClick" @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd"
+                @cell-context-menu="handleContextMenu">
                 <!-- Show placeholder message when no room is selected in rooms view -->
                 <div v-if="viewType === 'rooms' && !preferredRoom"
                   class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
@@ -1130,40 +1349,67 @@ function handleContextMenu(dayIndex: number, timeIndex: number) {
                   </div>
                 </div>
 
+                <!-- Replace the current conflict icons implementation with this -->
+                <!-- Add conflict icons to cells -->
+                <div v-for="(day, dayIndex) in days" :key="`conflict-icons-${day}`">
+                  <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
+                    <div v-if="isDragging && cellHasConflict(dayIndex, slot.index).hasConflict" :style="{
+                      position: 'absolute',
+                      left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * slot.index + 4}px`,
+                      top: `${getDayRowPositions[dayIndex] ?? TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
+                      zIndex: 30,
+                      pointerEvents: 'none',
+                    }">
+                      <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
+                    </div>
+                  </template>
+                </div>
+
                 <!-- Add events as slots in the TimetableGrid -->
                 <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <div :style="getEventStyle(event)"
-                        class="event rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
-                        draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
-                        <div class="flex justify-between items-center">
-                          <div class="event-title font-semibold text-gray-800 truncate">
-                            {{ event.shortcut }}
-                            <span class="sr-only">{{ event.title }}</span>
-                          </div>
-                          <MoreVertical
-                            class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                        </div>
-                        <div class="flex justify-between text-sm text-gray-600">
-                          <div>{{ event.start_time }} - {{ event.end_time }}</div>
-                          <div v-if="event.room_name"
-                            class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-                            <Building class="w-4 h-4" /> {{ event.room_name }}
-                          </div>
-                        </div>
+                  <div :style="getEventStyle(event)"
+                    class="event rounded-lg shadow-md hover:shadow-lg transition-all"
+                    draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
+                    <div class="flex justify-between items-center">
+                      <div class="event-title font-semibold text-gray-800 truncate">
+                        {{ event.shortcut }}
+                        <span class="sr-only">{{ event.title }}</span>
                       </div>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent class="w-64">
-                      <ContextMenuLabel>{{ event.title }}</ContextMenuLabel>
-                      <ContextMenuItem @click="editEvent(event)">Edit</ContextMenuItem>
-                      <ContextMenuItem @click="deleteCalendarEvent(event)">Delete</ContextMenuItem>
-                      <ContextMenuSeparator />
-                      <ContextMenuItem @click="duplicateEvent(event)">Duplicate</ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
+                      <button @click.stop.prevent="() => { }" class="event-menu-button">
+                        <MoreVertical
+                          class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                      </button>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600">
+                      <div>{{ event.start_time }} - {{ event.end_time }}</div>
+                      <div v-if="event.room_name"
+                        class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
+                        <Building class="w-4 h-4" /> {{ event.room_name }}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </TimetableGrid>
+
+              <!-- Add this right after your TimetableGrid component -->
+              <!-- Drag preview element -->
+              <div v-if="isDragging && draggedOverDay && draggedOverTime" :style="getDragPreviewStyle()"
+                class="absolute rounded-lg shadow-md z-30 pointer-events-none">
+                <div class="flex justify-between items-center">
+                  <div class="event-title font-semibold text-gray-800 truncate">
+                    {{ draggedEvent?.shortcut || draggedTemplate?.shortcut }}
+                  </div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                  <div>{{ draggedOverTime?.from }} - {{ calculateEndTime(draggedOverTime?.from, draggedEvent ?
+                    getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) }}</div>
+                  <div v-if="draggedEvent?.room_name || preferredRoom"
+                    class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
+                    <Building class="w-4 h-4" />
+                    {{draggedEvent?.room_name || buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+                  </div>
+                </div>
+              </div>
 
               <ScrollBar orientation="horizontal" />
               <ScrollBar orientation="vertical" />
