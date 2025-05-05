@@ -168,7 +168,7 @@ watch(() => selection.value, (newValue) => {
             </Button>
           </FormControl>
         </PopoverTrigger>
-        <PopoverContent class="w-[var(--radix-popover-trigger-width)] p-0">
+        <PopoverContent class="min-w-[200px] w-fit max-w-[400px] p-0">
           <Command>
             <CommandInput :placeholder="searchPlaceholder" />
             <!-- Selected tags/pills for multi-select -->
