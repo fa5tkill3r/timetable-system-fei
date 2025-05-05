@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
-import { ref, computed, CSSProperties, watch, onMounted } from 'vue'
-import _ from 'lodash'
+import { ref, computed, CSSProperties, watch, onMounted, onUnmounted, useTemplateRef, nextTick } from 'vue'
+import _, { has } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
 import { useTimetableStore } from '@/store/timetables'
 import { useTimetableEventStore } from '@/store/timetableEvents'
@@ -126,6 +126,8 @@ const draggedEvent = ref<CalendarEvent | null>(null)
 const draggedTemplate = ref<CalendarEvent | null>(null)
 const draggedOverDay = ref<string | null>(null)
 const draggedOverTime = ref<TimeSlot | null>(null)
+const mousePosition = ref({ x: 0, y: 0 });
+const TimeTableGrid = useTemplateRef('TimeTableGrid')
 
 
 const timetableId = computed(() => {
@@ -467,7 +469,7 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const startIndex = timeToIndex(event.start_time)
   const duration = getEventDuration(event)
   const dayPositions = getDayRowPositions.value
-  
+
   const { row = 0, maxRows = 1 } = getRowEventPositions.value.get(event.id) || {}
 
   const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
@@ -720,33 +722,31 @@ const containerStyle = computed<CSSProperties>(() => {
 
 const handleDragStart = (
   event: DragEvent,
-  eventData: CalendarEvent,
+  itemData: CalendarEvent,
+  isTemplate: boolean = false
 ) => {
-  // First set drag properties
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', eventData.id.toString());
-    
-    // Set ghost image (optional but helps with drag preview)
-    const elem = event.target as HTMLElement;
-    if (elem) {
-      event.dataTransfer.setDragImage(elem, 10, 10);
-    }
-  }
-  
-  setTimeout(() => {
-    if (!eventData.day && !eventData.start_time) {
-      draggedTemplate.value = eventData;
-    } else {
-      draggedEvent.value = eventData;
-    }
-  }, 0);
-}
+    event.dataTransfer.setData('text/plain', itemData.id.toString());
 
-// Handle event from EventSelectionPanel for template drag start
-function handleTemplateStart(event: DragEvent, template: CalendarEvent) {
-  draggedTemplate.value = template
-  event.dataTransfer!.effectAllowed = 'move'
+    // Create an empty, transparent element to use as the drag image
+    const emptyImg = document.createElement('div');
+    emptyImg.style.position = 'absolute';
+    emptyImg.style.top = '-9999px';
+    emptyImg.style.opacity = '0';
+    document.body.appendChild(emptyImg);
+
+    event.dataTransfer.setDragImage(emptyImg, 0, 0);
+
+    setTimeout(() => {
+      document.body.removeChild(emptyImg);
+      if (isTemplate || (!itemData.day && !itemData.start_time)) {
+        draggedTemplate.value = itemData;
+      } else {
+        draggedEvent.value = itemData;
+      }
+    }, 100);
+  }
 }
 
 const getMousePosition = (event: DragEvent): { day: string; time: TimeSlot } | null => {
@@ -789,18 +789,30 @@ const getMousePosition = (event: DragEvent): { day: string; time: TimeSlot } | n
 }
 
 const handleDragOver = (event: DragEvent) => {
-  event.preventDefault()
-  const position = getMousePosition(event)
+  event.preventDefault();
+
+  mousePosition.value = {
+    x: event.clientX,
+    y: event.clientY
+  };
+
+  const position = getMousePosition(event);
   if (position) {
-    draggedOverDay.value = position.day
-    draggedOverTime.value = position.time
+    draggedOverDay.value = position.day;
+    draggedOverTime.value = position.time;
   }
-}
+};
 
 const handleMenuDragOver = (event: DragEvent) => {
-  event.preventDefault()
-  isOverMenu.value = true
-}
+  event.preventDefault();
+
+  mousePosition.value = {
+    x: event.clientX,
+    y: event.clientY
+  };
+
+  isOverMenu.value = true;
+};
 
 const handleMenuDrop = async (event: DragEvent) => {
   event.preventDefault()
@@ -1037,26 +1049,42 @@ watch([subjectId, roomId, viewType], async () => {
   }
 })
 
-onMounted(async () => {
-  await subjectStore.fetchSubjects()
-  await buildingStore.fetchRooms()
-  await ttEventTypeStore.fetchEventTypes()
-  await subjectGroupStore.fetchSubjectGroups()
-  await subjectGroupStore.fetchSubjectGroupGroups()
 
-  if (subjectGroupStore.subjectGroupGroups.length > 0) {
-    selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0]?.name ?? null
-  }
 
-  if (route.query.subject) {
-    subjectId.value = parseInt(route.query.subject as string)
-  }
-  if (route.query.room) {
-    roomId.value = parseInt(route.query.room as string)
-  }
 
-  loadTimetableData()
-})
+function handleDocumentDragOver(e: DragEvent) {
+  e.preventDefault();
+
+  mousePosition.value = {
+    x: e.clientX,
+    y: e.clientY
+  };
+
+  if (e.dataTransfer) {
+    if (isOverTimetable(e)) {
+      e.dataTransfer.dropEffect = "move";
+
+    } else if (isOverMenu.value) {
+      e.dataTransfer.dropEffect = "move";
+    } else {
+      e.dataTransfer.dropEffect = "none";
+    }
+  }
+}
+
+function isOverTimetable(event: DragEvent): boolean {
+  if (!TimeTableGrid.value) return false;
+  const timetableEl = TimeTableGrid.value.$el || TimeTableGrid.value;
+
+  const rect = timetableEl.getBoundingClientRect();
+  return (
+    event.clientX >= rect.left &&
+    event.clientX <= rect.right &&
+    event.clientY >= rect.top &&
+    event.clientY <= rect.bottom
+  );
+}
+
 
 function handleCellClick(dayIndex: number, timeIndex: number) {
 }
@@ -1064,7 +1092,6 @@ function handleCellClick(dayIndex: number, timeIndex: number) {
 function handleContextMenu(dayIndex: number, timeIndex: number) {
 }
 
-// Add this after the other computed properties
 const getConflictingEvents = computed(() => {
   if (!draggedEvent.value && !draggedTemplate.value) return []
   if (!draggedOverDay.value || !draggedOverTime.value) return []
@@ -1110,44 +1137,8 @@ const isDragging = computed(() => {
   return draggedEvent.value !== null || draggedTemplate.value !== null
 })
 
-// Add this new function in your script setup
-const getDragPreviewStyle = (): CSSProperties => {
-  if (!draggedOverDay.value || !draggedOverTime.value) return {}
-
-  const dayIndex = days.indexOf(draggedOverDay.value)
-  const timeIndex = timeToIndex(draggedOverTime.value.from)
-  const duration = draggedEvent.value
-    ? getEventDuration(draggedEvent.value)
-    : draggedTemplate.value?.duration || 1
-  const dayPositions = getDayRowPositions.value
-
-  // Check for conflicts
-  const hasConflict = getConflictingEvents.value.length > 0
-
-  return {
-    position: 'absolute',
-    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeIndex}px`,
-    top: `${dayPositions[dayIndex] + 2}px`,
-    width: `${TIMETABLE_CONFIG.CELL_WIDTH * duration - 4}px`,
-    height: `${TIMETABLE_CONFIG.CELL_HEIGHT - 4}px`,
-    backgroundColor: hasConflict ? 'rgba(255, 171, 145, 0.95)' :
-      draggedEvent?.color || draggedTemplate?.color || '#e3f2fd',
-    padding: '8px',
-    boxSizing: 'border-box',
-    opacity: 1, // Full opacity for drag preview
-    borderColor: hasConflict ? '#e53935' : '#2196f3', // More visible borders
-    borderWidth: '2px',
-    borderStyle: 'solid',
-    overflow: 'hidden',
-    zIndex: 50, // Very high z-index to stay on top
-    boxShadow: '0 4px 8px rgba(0,0,0,0.2)', // Add shadow for more visual prominence
-    pointerEvents: 'none', // Make sure this doesn't interfere with interactions
-  }
-}
-
-// Add function to check if a cell has conflicts
 const cellHasConflict = (dayIndex: number, timeIndex: number | undefined): { hasConflict: boolean; types: string[] } => {
-  if (!isDragging.value || (!draggedEvent.value && !draggedTemplate.value) || timeIndex === undefined) 
+  if (!isDragging.value || (!draggedEvent.value && !draggedTemplate.value) || timeIndex === undefined)
     return { hasConflict: false, types: [] };
 
   try {
@@ -1157,7 +1148,7 @@ const cellHasConflict = (dayIndex: number, timeIndex: number | undefined): { has
       ? getEventDuration(draggedEvent.value)
       : eventToCheck.duration || 1;
 
-    // If we're dragging an existing event, we need to exclude it from conflicts
+    // Existing event exclude from conflicts
     const eventsToCheck = draggedEvent.value
       ? events.value.filter(e => e.id !== draggedEvent.value!.id)
       : events.value;
@@ -1165,48 +1156,34 @@ const cellHasConflict = (dayIndex: number, timeIndex: number | undefined): { has
     const endTimeIndex = timeIndex + duration - 1;
     const conflictTypes = new Set<string>();
 
-    // Find events that would overlap with this position
     const conflictingEvents = eventsToCheck.filter(e => {
       if (!e.day || !e.start_time || !e.end_time) return false;
 
-      // Check if same day
       if (e.day !== days[dayIndex]) return false;
 
-      // Get event time range
       const eventStartIndex = timeToIndex(e.start_time);
       const eventEndIndex = eventStartIndex + getEventDuration(e) - 1;
 
-      // Check for overlap
       const timeOverlap = timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex;
-      
+
       if (!timeOverlap) return false;
 
-      // Check different types of conflicts
       let hasConflict = false;
 
-      // Room conflict check
       const roomConflict = (eventToCheck.room_id === e.room_id) ||
         (preferredRoom.value === e.room_id && !eventToCheck.room_id);
-      
+
       if (roomConflict) {
         conflictTypes.add('room');
         hasConflict = true;
       }
 
-      // Teacher conflict could be added here (if teacher data is available)
-      // Example:
-      // if (eventToCheck.teacher_id === e.teacher_id) {
-      //   conflictTypes.add('teacher');
-      //   hasConflict = true;
-      // }
-      
-      // Other conflict types can be added similarly
 
       return hasConflict;
     });
 
-    return { 
-      hasConflict: conflictingEvents.length > 0, 
+    return {
+      hasConflict: conflictingEvents.length > 0,
       types: Array.from(conflictTypes)
     };
   } catch (error) {
@@ -1215,224 +1192,294 @@ const cellHasConflict = (dayIndex: number, timeIndex: number | undefined): { has
   }
 }
 
-function $nextTick(arg0: () => void) {
-  throw new Error('Function not implemented.')
+function setupGlobalDragHandlers() {
+  document.addEventListener('dragover', handleDocumentDragOver);
+
+  document.addEventListener('dragend', () => {
+    draggedEvent.value = null;
+    draggedTemplate.value = null;
+    draggedOverDay.value = null;
+    draggedOverTime.value = null;
+  });
 }
+
+onMounted(async () => {
+  await subjectStore.fetchSubjects()
+  await buildingStore.fetchRooms()
+  await ttEventTypeStore.fetchEventTypes()
+  await subjectGroupStore.fetchSubjectGroups()
+  await subjectGroupStore.fetchSubjectGroupGroups()
+
+  if (subjectGroupStore.subjectGroupGroups.length > 0) {
+    selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0]?.name ?? null
+  }
+
+  if (route.query.subject) {
+    subjectId.value = parseInt(route.query.subject as string)
+  }
+  if (route.query.room) {
+    roomId.value = parseInt(route.query.room as string)
+  }
+
+  loadTimetableData()
+  setupGlobalDragHandlers();
+});
+
+
+
+
+// Make sure to clean up when component unmounts
+onUnmounted(() => {
+  document.removeEventListener('dragover', handleDocumentDragOver);
+  document.removeEventListener('dragend', handleDragEnd);
+});
+
 </script>
 
 <template>
-  <ResizablePanelGroup direction="horizontal" class="rounded-lg border h-[calc(100vh-180px)]">
-    <ResizablePanel :default-size="75">
-      <ResizablePanelGroup direction="vertical">
-        <ResizablePanel :default-size="80">
-          <div class="flex flex-col h-full">
-            <div class="flex items-center">
-              <div class="flex flex-col w-full">
-                <div class="flex justify-center">
-                  <!-- Replace separate buttons with proper tabs implementation -->
-                  <Tabs v-model="viewType" default-value="parallels"
-                    class="w-full h-[100px] flex flex-row justify-between items-center">
-                    <TabsList class="h-fit">
-                      <TabsTrigger value="parallels">Parallels</TabsTrigger>
-                      <TabsTrigger value="rooms">Rooms</TabsTrigger>
-                      <TabsTrigger value="teacher">Teacher</TabsTrigger>
-                      <TabsTrigger value="student">Student</TabsTrigger>
-                    </TabsList>
+  <div>
+    <ResizablePanelGroup direction="horizontal" class="rounded-lg border h-[calc(100vh-180px)]">
+      <ResizablePanel :default-size="75">
+        <ResizablePanelGroup direction="vertical">
+          <ResizablePanel :default-size="80">
+            <div class="flex flex-col h-full">
+              <div class="flex items-center">
+                <div class="flex flex-col w-full">
+                  <div class="flex justify-center">
+                    <!-- Replace separate buttons with proper tabs implementation -->
+                    <Tabs v-model="viewType" default-value="parallels"
+                      class="w-full h-[100px] flex flex-row justify-between items-center">
+                      <TabsList class="h-fit">
+                        <TabsTrigger value="parallels">Parallels</TabsTrigger>
+                        <TabsTrigger value="rooms">Rooms</TabsTrigger>
+                        <TabsTrigger value="teacher">Teacher</TabsTrigger>
+                        <TabsTrigger value="student">Student</TabsTrigger>
+                      </TabsList>
 
-                    <!-- Content specific to each tab view -->
-                    <div class="mr-2">
-                      <TabsContent value="parallels">
-                        <!-- Add filtering controls for parallels view -->
-                        <div class="flex flex-wrap gap-3 justify-center items-center">
-                          <ComboBox :options="semesterOptions" title="Semester" search-placeholder="Select semester..."
-                            v-model:selection="selectedSemester" />
+                      <!-- Content specific to each tab view -->
+                      <div class="mr-2">
+                        <TabsContent value="parallels">
+                          <!-- Add filtering controls for parallels view -->
+                          <div class="flex flex-wrap gap-3 justify-center items-center">
+                            <ComboBox :options="semesterOptions" title="Semester"
+                              search-placeholder="Select semester..." v-model:selection="selectedSemester" />
 
-                          <ComboBox :options="yearOptions" title="Year" search-placeholder="Select year..."
-                            v-model:selection="selectedYear" />
+                            <ComboBox :options="yearOptions" title="Year" search-placeholder="Select year..."
+                              v-model:selection="selectedYear" />
 
-                          <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(g => ({
-                            id: g.name,
-                            name: g.name
-                          }))" title="Subject Group" search-placeholder="Select subject group..."
-                            v-model:selection="selectedSubjectGroup" />
+                            <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(g => ({
+                              id: g.name,
+                              name: g.name
+                            }))" title="Subject Group" search-placeholder="Select subject group..."
+                              v-model:selection="selectedSubjectGroup" />
 
-                          <Badge class="h-fit" variant="outline">
-                            Nominal Semester: {{ nominalSemester }}
-                          </Badge>
-                        </div>
-                      </TabsContent>
-
-                      <TabsContent value="rooms">
-                        <div class="flex flex-col items-center gap-4 p-4">
-                          <div v-if="!preferredRoom" class="text-center text-muted-foreground">
-                            Please select a room from bottom panel to view its timetable.
-                          </div>
-                          <div v-else>
-                            Now showing timetable for room:
-                            <Badge variant="default">
-                              {{buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+                            <Badge class="h-fit" variant="outline">
+                              Nominal Semester: {{ nominalSemester }}
                             </Badge>
                           </div>
-                        </div>
-                      </TabsContent>
+                        </TabsContent>
 
-                      <TabsContent value="teacher">
-                        <div class="p-4 text-center text-muted-foreground">
-                          Teacher view shows schedules organized by teaching staff
-                        </div>
-                      </TabsContent>
+                        <TabsContent value="rooms">
+                          <div class="flex flex-col items-center gap-4 p-4">
+                            <div v-if="!preferredRoom" class="text-center text-muted-foreground">
+                              Please select a room from bottom panel to view its timetable.
+                            </div>
+                            <div v-else>
+                              Now showing timetable for room:
+                              <Badge variant="default">
+                                {{buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+                              </Badge>
+                            </div>
+                          </div>
+                        </TabsContent>
 
-                      <TabsContent value="student">
-                        <div class="p-4 text-center text-muted-foreground">
-                          Student view shows schedules organized by student groups
-                        </div>
-                      </TabsContent>
+                        <TabsContent value="teacher">
+                          <div class="p-4 text-center text-muted-foreground">
+                            Teacher view shows schedules organized by teaching staff
+                          </div>
+                        </TabsContent>
+
+                        <TabsContent value="student">
+                          <div class="p-4 text-center text-muted-foreground">
+                            Student view shows schedules organized by student groups
+                          </div>
+                        </TabsContent>
+                      </div>
+                    </Tabs>
+                  </div>
+
+                  <div class="flex flex-wrap justify-center gap-3 items-center">
+
+
+                    <div v-if="subjectId || roomId" class="flex gap-2 items-center">
+                      <Badge variant="outline" v-if="subjectId">
+                        Subject: {{ getSubjectName(subjectId) || subjectId }}
+                        <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="subjectId = null">
+                          <span class="sr-only">Remove</span>
+                          &times;
+                        </Button>
+                      </Badge>
+                      <Badge variant="outline" v-if="roomId">
+                        Room ID: {{ roomId }}
+                        <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="roomId = null">
+                          <span class="sr-only">Remove</span>
+                          &times;
+                        </Button>
+                      </Badge>
                     </div>
-                  </Tabs>
-                </div>
-
-                <div class="flex flex-wrap justify-center gap-3 items-center">
-
-
-                  <div v-if="subjectId || roomId" class="flex gap-2 items-center">
-                    <Badge variant="outline" v-if="subjectId">
-                      Subject: {{ getSubjectName(subjectId) || subjectId }}
-                      <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="subjectId = null">
-                        <span class="sr-only">Remove</span>
-                        &times;
-                      </Button>
-                    </Badge>
-                    <Badge variant="outline" v-if="roomId">
-                      Room ID: {{ roomId }}
-                      <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="roomId = null">
-                        <span class="sr-only">Remove</span>
-                        &times;
-                      </Button>
-                    </Badge>
                   </div>
-                </div>
 
-                <div v-if="timetableId && timetableStore.selectedTimetable?.status"
-                  class="flex justify-between pb-2 pr-3">
-                  <div class="flex gap-2 items-end pl-10">
-                    <Badge :variant="timetableStore.selectedTimetable?.status === 'PUBLISHED' ? 'default' :
-                      timetableStore.selectedTimetable?.status === 'WIP' ? 'secondary' : 'destructive'
-                      ">
-                      {{ timetableStore.selectedTimetable?.status }}
-                    </Badge>
+                  <div v-if="timetableId && timetableStore.selectedTimetable?.status"
+                    class="flex justify-between pb-2 pr-3">
+                    <div class="flex gap-2 items-end pl-10">
+                      <Badge :variant="timetableStore.selectedTimetable?.status === 'PUBLISHED' ? 'default' :
+                        timetableStore.selectedTimetable?.status === 'WIP' ? 'secondary' : 'destructive'
+                        ">
+                        {{ timetableStore.selectedTimetable?.status }}
+                      </Badge>
 
-                    <Badge variant="outline" v-if="timetableStore.selectedTimetable?.owner">
-                      Owner: {{ timetableStore.selectedTimetable?.owner }}
-                    </Badge>
+                      <Badge variant="outline" v-if="timetableStore.selectedTimetable?.owner">
+                        Owner: {{ timetableStore.selectedTimetable?.owner }}
+                      </Badge>
 
-                  </div>
-                  <!-- <div class="min-w-[150px]">
+                    </div>
+                    <!-- <div class="min-w-[150px]">
                     <ComboBox :options="roomOptions" title="Preferred Room"
                       search-placeholder="Select preferred room..." @update:selection="preferredRoom = $event" />
                   </div> -->
+                  </div>
                 </div>
               </div>
+
+              <ScrollArea class="overflow-auto p-1">
+                <!-- Replace custom timetable with TimetableGrid component -->
+                <TimetableGrid ref="TimeTableGrid" :days="days" :time-slots="timeSlots" :get-cell-style="getCellStyle"
+                  :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
+                  :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
+                  @cell-click="handleCellClick" @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd"
+                  @cell-context-menu="handleContextMenu">
+                  <!-- Show placeholder message when no room is selected in rooms view -->
+                  <div v-if="viewType === 'rooms' && !preferredRoom"
+                    class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
+                    <div class="text-lg text-gray-500 font-medium">
+                      Please select a room to view its schedule
+                    </div>
+                  </div>
+
+                  <!-- Replace the current conflict icons implementation with this -->
+                  <!-- Add conflict icons to cells -->
+                  <div v-for="(day, dayIndex) in days" :key="`conflict-icons-${day}`">
+                    <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
+                      <div v-if="isDragging && cellHasConflict(dayIndex, slot.index).hasConflict" :style="{
+                        position: 'absolute',
+                        left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * slot.index + 4}px`,
+                        top: `${getDayRowPositions[dayIndex] ?? TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
+                        zIndex: 30,
+                        pointerEvents: 'none',
+                      }">
+                        <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
+                      </div>
+                    </template>
+                  </div>
+
+                  <!-- Add events as slots in the TimetableGrid -->
+                  <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
+                    <div :style="getEventStyle(event)" class="event rounded-lg shadow-md hover:shadow-lg transition-all"
+                      draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
+                      <div class="flex justify-between items-center">
+                        <div class="event-title font-semibold text-gray-800 truncate">
+                          {{ event.shortcut }}
+                          <span class="sr-only">{{ event.title }}</span>
+                        </div>
+                        <button @click.stop.prevent="() => { }" class="event-menu-button">
+                          <MoreVertical
+                            class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        </button>
+                      </div>
+                      <div class="flex justify-between text-sm text-gray-600">
+                        <div>{{ event.start_time }} - {{ event.end_time }}</div>
+                        <div v-if="event.room_name"
+                          class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
+                          <Building class="w-4 h-4" /> {{ event.room_name }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TimetableGrid>
+
+                <!-- Add this right after your TimetableGrid component -->
+                <!-- Drag preview element -->
+
+
+                <ScrollBar orientation="horizontal" />
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
             </div>
+          </ResizablePanel>
 
-            <ScrollArea class="overflow-auto p-1">
-              <!-- Replace custom timetable with TimetableGrid component -->
-              <TimetableGrid :days="days" :time-slots="timeSlots" :get-cell-style="getCellStyle"
-                :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
-                :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
-                @cell-click="handleCellClick" @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd"
-                @cell-context-menu="handleContextMenu">
-                <!-- Show placeholder message when no room is selected in rooms view -->
-                <div v-if="viewType === 'rooms' && !preferredRoom"
-                  class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
-                  <div class="text-lg text-gray-500 font-medium">
-                    Please select a room to view its schedule
-                  </div>
-                </div>
+          <ResizableHandle @dragging="isResizing = $event" with-handle />
 
-                <!-- Replace the current conflict icons implementation with this -->
-                <!-- Add conflict icons to cells -->
-                <div v-for="(day, dayIndex) in days" :key="`conflict-icons-${day}`">
-                  <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
-                    <div v-if="isDragging && cellHasConflict(dayIndex, slot.index).hasConflict" :style="{
-                      position: 'absolute',
-                      left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * slot.index + 4}px`,
-                      top: `${getDayRowPositions[dayIndex] ?? TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
-                      zIndex: 30,
-                      pointerEvents: 'none',
-                    }">
-                      <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
-                    </div>
-                  </template>
-                </div>
+          <ResizablePanel :default-size="20">
 
-                <!-- Add events as slots in the TimetableGrid -->
-                <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
-                  <div :style="getEventStyle(event)"
-                    class="event rounded-lg shadow-md hover:shadow-lg transition-all"
-                    draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd">
-                    <div class="flex justify-between items-center">
-                      <div class="event-title font-semibold text-gray-800 truncate">
-                        {{ event.shortcut }}
-                        <span class="sr-only">{{ event.title }}</span>
-                      </div>
-                      <button @click.stop.prevent="() => { }" class="event-menu-button">
-                        <MoreVertical
-                          class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                      </button>
-                    </div>
-                    <div class="flex justify-between text-sm text-gray-600">
-                      <div>{{ event.start_time }} - {{ event.end_time }}</div>
-                      <div v-if="event.room_name"
-                        class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-                        <Building class="w-4 h-4" /> {{ event.room_name }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </TimetableGrid>
+            <!-- Room selection panel -->
+            <RoomSelectionPanel v-model:selected-room-id="preferredRoom" v-model:override-rooms="overrideRooms" />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </ResizablePanel>
 
-              <!-- Add this right after your TimetableGrid component -->
-              <!-- Drag preview element -->
-              <div v-if="isDragging && draggedOverDay && draggedOverTime" :style="getDragPreviewStyle()"
-                class="absolute rounded-lg shadow-md z-30 pointer-events-none">
-                <div class="flex justify-between items-center">
-                  <div class="event-title font-semibold text-gray-800 truncate">
-                    {{ draggedEvent?.shortcut || draggedTemplate?.shortcut }}
-                  </div>
-                </div>
-                <div class="flex justify-between text-sm text-gray-600">
-                  <div>{{ draggedOverTime?.from }} - {{ calculateEndTime(draggedOverTime?.from, draggedEvent ?
-                    getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) }}</div>
-                  <div v-if="draggedEvent?.room_name || preferredRoom"
-                    class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-                    <Building class="w-4 h-4" />
-                    {{draggedEvent?.room_name || buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
-                  </div>
-                </div>
-              </div>
+      <ResizableHandle @dragging="isResizing = $event" with-handle />
 
-              <ScrollBar orientation="horizontal" />
-              <ScrollBar orientation="vertical" />
-            </ScrollArea>
-          </div>
-        </ResizablePanel>
+      <ResizablePanel :default-size="25">
+        <EventSelectionPanel :event-templates="filteredEventTemplates" :is-loading="timetableEventStore.isLoading"
+          @drag-start="(event, template) => handleDragStart(event, template, true)" @drag-end="handleDragEnd"
+          @menu-drag-over="handleMenuDragOver" @menu-drag-leave="isOverMenu = false" @menu-drop="handleMenuDrop" />
+      </ResizablePanel>
+    </ResizablePanelGroup>
 
-        <ResizableHandle @dragging="isResizing = $event" with-handle />
+    <div v-if="isDragging" :style="{
+      position: 'fixed',
+      left: mousePosition.x + 15 + 'px',
+      top: mousePosition.y + 15 + 'px',
+      width: `${TIMETABLE_CONFIG.CELL_WIDTH * (draggedEvent ? getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) - 4}px`,
+      height: `${TIMETABLE_CONFIG.CELL_HEIGHT - 4}px`,
+      border: hasRoomConflict ? '2px solid #e53935' : '2px solid #2196f3',
+      pointerEvents: 'none'
+    }" :class="{ 'bg-blue-100': !hasRoomConflict, 'bg-red-100': hasRoomConflict }"
+      class="p-[4px] rounded-lg shadow-md z-50 border-2 border-solid border-gray-300">
+      <div class="flex justify-between items-center">
+        <div class="font-semibold text-gray-800 truncate">
+          {{ draggedEvent?.shortcut || draggedTemplate?.shortcut }}
+        </div>
+      </div>
 
-        <ResizablePanel :default-size="20">
-
-          <!-- Room selection panel -->
-          <RoomSelectionPanel v-model:selected-room-id="preferredRoom" v-model:override-rooms="overrideRooms" />
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </ResizablePanel>
-
-    <ResizableHandle @dragging="isResizing = $event" with-handle />
-
-    <ResizablePanel :default-size="25">
-      <EventSelectionPanel :event-templates="filteredEventTemplates" :is-loading="timetableEventStore.isLoading"
-        @drag-start="handleTemplateStart" @drag-end="handleDragEnd" @menu-drag-over="handleMenuDragOver"
-        @menu-drag-leave="isOverMenu = false" @menu-drop="handleMenuDrop" />
-    </ResizablePanel>
-  </ResizablePanelGroup>
+      <div class="flex justify-between text-sm text-gray-600 mt-1">
+        <div v-if="draggedOverTime">
+          {{ draggedOverTime.from }} - {{ calculateEndTime(draggedOverTime.from,
+            draggedEvent ? getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) }}
+        </div>
+        <div v-if="draggedEvent?.room_name || preferredRoom"
+          class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
+          <Building class="w-4 h-4" />
+          {{draggedEvent?.room_name || buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+        </div>
+      </div>
+    </div>
+    <!-- <div v-if="isDragging && draggedOverDay && draggedOverTime" :style="getDragPreviewStyle()"
+  class="absolute rounded-lg shadow-md z-30 pointer-events-none">
+  <div class="flex justify-between items-center">
+    <div class="event-title font-semibold text-gray-800 truncate">
+      {{ draggedEvent?.shortcut || draggedTemplate?.shortcut }}
+    </div>
+  </div>
+  <div class="flex justify-between text-sm text-gray-600">
+    <div>{{ draggedOverTime?.from }} - {{ calculateEndTime(draggedOverTime?.from, draggedEvent ?
+      getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) }}</div>
+    <div v-if="draggedEvent?.room_name || preferredRoom"
+      class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
+      <Building class="w-4 h-4" />
+      {{draggedEvent?.room_name || buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+    </div>
+  </div>
+</div> -->
+  </div>
 </template>
