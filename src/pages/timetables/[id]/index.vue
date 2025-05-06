@@ -1,6 +1,14 @@
 <script setup lang="ts">
-
-import { ref, computed, CSSProperties, watch, onMounted, onUnmounted, useTemplateRef, nextTick } from 'vue'
+import {
+  ref,
+  computed,
+  CSSProperties,
+  watch,
+  onMounted,
+  onUnmounted,
+  useTemplateRef,
+  nextTick,
+} from 'vue'
 import _, { has } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
 import { useTimetableStore } from '@/store/timetables'
@@ -15,19 +23,21 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import {
-  MoreVertical,
-  Building,
-} from 'lucide-vue-next'
+import { MoreVertical, Building } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { Skeleton } from '@/components/ui/skeleton'
-
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 import ComboBox from '@/components/common/ComboBox.vue'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/resizable'
 import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
 import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
@@ -37,8 +47,8 @@ import {
   DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
   DEFAULT_TIME_CONFIG as TIME_CONFIG,
 } from '@/utils/timetable'
-import ConflictIcons from '@/components/timetables/ConflictIcons.vue';
-import EventContextMenu from '@/components/timetables/EventContextMenu.vue';
+import ConflictIcons from '@/components/timetables/ConflictIcons.vue'
+import EventContextMenu from '@/components/timetables/EventContextMenu.vue'
 import { templateRef } from '@vueuse/core'
 import { CalendarEvent, TimeSlot } from '@/types/types'
 
@@ -46,19 +56,17 @@ type Room = components['schemas']['Room']
 
 const semesterOptions = [
   { id: 'LS', name: 'Summer Semester (LS)' },
-  { id: 'ZS', name: 'Winter Semester (ZS)' }
+  { id: 'ZS', name: 'Winter Semester (ZS)' },
 ]
 const yearOptions = [
   { id: '1bc', name: '1. Bachelor' },
   { id: '2bc', name: '2. Bachelor' },
   { id: '3bc', name: '3. Bachelor' },
   { id: '1i', name: '1. Master' },
-  { id: '2i', name: '2. Master' }
+  { id: '2i', name: '2. Master' },
 ]
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
-
 
 const timetableStore = useTimetableStore()
 const timetableEventStore = useTimetableEventStore()
@@ -86,7 +94,7 @@ const overrideRooms = ref<boolean>(false)
 const draggedEvent = ref<CalendarEvent | null>(null)
 const draggedOverDay = ref<string | null>(null)
 const draggedOverTime = ref<TimeSlot | null>(null)
-const mousePosition = ref({ x: 0, y: 0 });
+const mousePosition = ref({ x: 0, y: 0 })
 const TimeTableGrid = useTemplateRef('TimeTableGrid')
 
 const contextMenuVisible = ref(false)
@@ -97,13 +105,22 @@ const timetableId = computed(() => {
   return route.params.id ? parseInt(route.params.id as string) : null
 })
 
-
 const unplacedEvents = computed<CalendarEvent[]>(() => {
-  return events.value.filter(event => event.start_time === null || event.end_time === null || event.day === null)
+  return events.value.filter(
+    (event) =>
+      event.start_time === null ||
+      event.end_time === null ||
+      event.day === null,
+  )
 })
 
 const placedEvents = computed<CalendarEvent[]>(() => {
-  return events.value.filter(event => event.start_time !== null && event.end_time !== null && event.day !== null)
+  return events.value.filter(
+    (event) =>
+      event.start_time !== null &&
+      event.end_time !== null &&
+      event.day !== null,
+  )
 })
 
 const timeSlots: TimeSlot[] = (() => {
@@ -140,12 +157,10 @@ const timeSlots: TimeSlot[] = (() => {
   return slots
 })()
 
-
-
 function getSubjectCode(subjectId?: number | null): string | null {
   if (!subjectId) return null
 
-  const subject = subjectStore.subjects.find(s => s.id === subjectId)
+  const subject = subjectStore.subjects.find((s) => s.id === subjectId)
   return subject ? subject.code : null
 }
 
@@ -182,24 +197,23 @@ async function loadTimetableData() {
         await fetchTimetableEvents(timetableId.value)
       } else {
         toast({
-          title: "Timetable not found",
-          description: "The requested timetable does not exist.",
-          variant: "destructive"
+          title: 'Timetable not found',
+          description: 'The requested timetable does not exist.',
+          variant: 'destructive',
         })
       }
     }
   } catch (error) {
     toast({
-      title: "Error loading data",
-      description: "Failed to load timetable. Please try again.",
-      variant: "destructive"
+      title: 'Error loading data',
+      description: 'Failed to load timetable. Please try again.',
+      variant: 'destructive',
     })
   }
 }
 
 async function fetchTimetableEvents(timetableId: number) {
   try {
-
     let queryParams: any = { timetable: timetableId }
     if (subjectId.value) {
       queryParams.subject = subjectId.value
@@ -211,11 +225,11 @@ async function fetchTimetableEvents(timetableId: number) {
     await timetableEventStore.fetchEvents(timetableId)
     processTimetableEvents()
   } catch (error) {
-    console.error("Error fetching timetable events:", error)
+    console.error('Error fetching timetable events:', error)
     toast({
-      title: "Error loading events",
-      description: "Failed to load timetable events. Please try again.",
-      variant: "destructive"
+      title: 'Error loading events',
+      description: 'Failed to load timetable events. Please try again.',
+      variant: 'destructive',
     })
   }
 }
@@ -223,7 +237,7 @@ async function fetchTimetableEvents(timetableId: number) {
 function processTimetableEvents() {
   events.value = []
 
-  timetableEventStore.events.forEach(event => {
+  timetableEventStore.events.forEach((event) => {
     const ttaData = event.tta as any
     const subjectId = ttaData?.subject
     const eventType = ttaData?.event_type
@@ -309,17 +323,18 @@ function processTimetableEvents() {
 }
 
 function timeToIndex(time: string): number {
-  const index = timeSlots.findIndex(slot => slot.from === time)
+  const index = timeSlots.findIndex((slot) => slot.from === time)
   return index >= 0 ? index : 0
 }
 
 function calculateEndTime(startTime: string, duration: number): string {
-
   const startIndex = timeToIndex(startTime)
 
   if (startIndex === -1) {
-    console.warn(`Could not find time slot for: "${startTime}". Available slots:`,
-      timeSlots.map(slot => slot.from))
+    console.warn(
+      `Could not find time slot for: "${startTime}". Available slots:`,
+      timeSlots.map((slot) => slot.from),
+    )
     return startTime
   }
 
@@ -332,22 +347,27 @@ function calculateEndTime(startTime: string, duration: number): string {
 function getSubjectName(subjectId?: number | null): string | null {
   if (!subjectId) return null
 
-  const subject = subjectStore.subjects.find(s => s.id === subjectId)
+  const subject = subjectStore.subjects.find((s) => s.id === subjectId)
   return subject ? subject.name : null
 }
 
-const isSubjectInGroup = (subjectId: number | null, groupName: string | null): boolean => {
+const isSubjectInGroup = (
+  subjectId: number | null,
+  groupName: string | null,
+): boolean => {
   if (!subjectId || !groupName) return true
 
-  const matchingGroups = subjectGroupStore.subjectGroups.filter(group => group.subject === subjectId)
+  const matchingGroups = subjectGroupStore.subjectGroups.filter(
+    (group) => group.subject === subjectId,
+  )
 
-  return matchingGroups.some(group => group.name === groupName)
+  return matchingGroups.some((group) => group.name === groupName)
 }
 
 const applyParallelsFilter = (item: CalendarEvent) => {
   if (!item.subject_id) return false
 
-  const subject = subjectStore.subjects.find(s => s.id === item.subject_id)
+  const subject = subjectStore.subjects.find((s) => s.id === item.subject_id)
   if (!subject) return false
 
   const subjectCode = subject.code || null
@@ -359,23 +379,41 @@ const applyParallelsFilter = (item: CalendarEvent) => {
 
   const isCorrectSemester = subject.nominal_semester === nominalSemester.value
 
-  const isInSelectedGroup = !selectedSubjectGroup.value ||
+  const isInSelectedGroup =
+    !selectedSubjectGroup.value ||
     isSubjectInGroup(item.subject_id, selectedSubjectGroup.value)
 
   return isCorrectLevel && isCorrectSemester && isInSelectedGroup
 }
 
+const applyWeekPatternMatch = (event: CalendarEvent) => {
+  const eventWeeksBitmask = event.weeks_bitmask || 0
+
+  if (exactWeekMatch.value) {
+    // Exact match - patterns must be identical
+    return eventWeeksBitmask === filterWeeksBitmask.value
+  } else {
+    // Partial match - any selected week in the filter must be present in the event
+    // This is a bitwise AND to check if there's any overlap
+    return (eventWeeksBitmask & filterWeeksBitmask.value) > 0
+  }
+}
+
 const filteredEvents = computed(() => {
+  let events = placedEvents.value
+
+  events = events.filter(applyWeekPatternMatch)
+
   if (viewType.value === 'parallels') {
-    return placedEvents.value.filter(applyParallelsFilter)
+    return events.filter(applyParallelsFilter)
   } else if (viewType.value === 'rooms') {
     if (!preferredRoom.value) {
       return []
     }
-    return placedEvents.value.filter(event => event.room_id === preferredRoom.value)
+    return events.filter((event) => event.room_id === preferredRoom.value)
   }
 
-  return placedEvents.value
+  return events
 })
 
 // Update filteredEventTemplates to use the same filter approach
@@ -407,19 +445,23 @@ const getEventDuration = (event: CalendarEvent): number => {
   const endIndex = timeSlots.findIndex((slot) => slot.to === event.end_time)
   return endIndex - startIndex + 1
 }
-const getRowEventPositions = computed<Map<number, { row: number, maxRows: number }>>(() => {
+const getRowEventPositions = computed<
+  Map<number, { row: number; maxRows: number }>
+>(() => {
   const eventsByDay = _.groupBy(filteredEvents.value, 'day')
   const eventPositions = new Map()
 
   Object.entries(eventsByDay).forEach(([, dayEvents]) => {
-    const sortedEvents = [...dayEvents].sort((a, b) =>
-      timeToIndex(a.start_time!) - timeToIndex(b.start_time!)
+    const sortedEvents = [...dayEvents].sort(
+      (a, b) => timeToIndex(a.start_time!) - timeToIndex(b.start_time!),
     )
 
     const rows: { end_time: string; event: CalendarEvent }[][] = []
 
-    sortedEvents.forEach(event => {
-      const startIndex = timeSlots.findIndex(slot => slot.from === event.start_time)
+    sortedEvents.forEach((event) => {
+      const startIndex = timeSlots.findIndex(
+        (slot) => slot.from === event.start_time,
+      )
 
       let rowIndex = 0
       let foundRow = false
@@ -429,8 +471,10 @@ const getRowEventPositions = computed<Map<number, { row: number, maxRows: number
           rows[rowIndex] = []
           foundRow = true
         } else {
-          const overlaps = rows[rowIndex]?.some(occupiedSlot => {
-            const occupiedEndIndex = timeSlots.findIndex(slot => slot.to === occupiedSlot.event.end_time)
+          const overlaps = rows[rowIndex]?.some((occupiedSlot) => {
+            const occupiedEndIndex = timeSlots.findIndex(
+              (slot) => slot.to === occupiedSlot.event.end_time,
+            )
             return startIndex <= occupiedEndIndex
           })
 
@@ -447,7 +491,7 @@ const getRowEventPositions = computed<Map<number, { row: number, maxRows: number
     })
 
     const maxRows = rows.length
-    sortedEvents.forEach(event => {
+    sortedEvents.forEach((event) => {
       const position = eventPositions.get(event.id)
       if (position) {
         position.maxRows = maxRows
@@ -469,10 +513,11 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const duration = getEventDuration(event)
   const dayPositions = getDayRowPositions.value
 
-  const { row = 0, maxRows = 1 } = getRowEventPositions.value.get(event.id) || {}
+  const { row = 0, maxRows = 1 } =
+    getRowEventPositions.value.get(event.id) || {}
 
   const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
-  const rowSpacing = 4 * maxRows / (maxRows + 1)
+  const rowSpacing = (4 * maxRows) / (maxRows + 1)
   const topOffset = row * (eventHeight + rowSpacing)
 
   // Adjust opacity - keep events more visible during drag
@@ -498,7 +543,9 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
 
 const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
   const eventPositions = getRowEventPositions.value
-  const dayEvents = filteredEvents.value.filter(e => e.day === days[dayIndex])
+  const dayEvents = filteredEvents.value.filter(
+    (e) => e.day === days[dayIndex],
+  )
   const dayPositions = getDayRowPositions.value
 
   let maxRows = 1
@@ -513,54 +560,60 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     draggedOverDay.value === days[dayIndex] &&
     draggedOverTime.value &&
     timeIndex >= draggedOverTime.value.index &&
-    timeIndex < draggedOverTime.value.index + getEventDuration(draggedEvent.value)
+    timeIndex <
+    draggedOverTime.value.index + getEventDuration(draggedEvent.value),
   )
 
   // Check if cell would cause a conflict if the dragged event was placed here
-  const wouldConflict = Boolean(isDragging.value && (() => {
-    if (!draggedEvent.value) return false;
+  const wouldConflict = Boolean(
+    isDragging.value &&
+    (() => {
+      if (!draggedEvent.value) return false
 
-    // Create a temporary event at this position to check for conflicts
-    const eventToCheck = draggedEvent.value;
-    const duration = draggedEvent.value
-      ? getEventDuration(draggedEvent.value)
-      : eventToCheck.duration || 1;
+      // Create a temporary event at this position to check for conflicts
+      const eventToCheck = draggedEvent.value
+      const duration = draggedEvent.value
+        ? getEventDuration(draggedEvent.value)
+        : eventToCheck.duration || 1
 
-    // If we're dragging an existing event, we need to exclude it from conflicts
-    const eventsToCheck = draggedEvent.value?.id
-      ? placedEvents.value.filter(e => e.id !== draggedEvent.value!.id)
-      : placedEvents.value;
+      // If we're dragging an existing event, we need to exclude it from conflicts
+      const eventsToCheck = draggedEvent.value?.id
+        ? placedEvents.value.filter((e) => e.id !== draggedEvent.value!.id)
+        : placedEvents.value
 
-    const endTimeIndex = timeIndex + duration - 1;
+      const endTimeIndex = timeIndex + duration - 1
 
-    // Find events that would overlap with this position
-    const conflictingEvents = eventsToCheck.filter(e => {
-      if (!e.day || !e.start_time || !e.end_time) return false;
+      // Find events that would overlap with this position
+      const conflictingEvents = eventsToCheck.filter((e) => {
+        if (!e.day || !e.start_time || !e.end_time) return false
 
-      // Check if same day
-      if (e.day !== days[dayIndex]) return false;
+        // Check if same day
+        if (e.day !== days[dayIndex]) return false
 
-      // Get event time range
-      const eventStartIndex = timeToIndex(e.start_time);
-      const eventEndIndex = eventStartIndex + getEventDuration(e) - 1;
+        // Get event time range
+        const eventStartIndex = timeToIndex(e.start_time)
+        const eventEndIndex = eventStartIndex + getEventDuration(e) - 1
 
-      // Check for overlap
-      return (
-        (timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) &&
-        // Room conflict check - if same room is used
-        (eventToCheck.room_id === e.room_id || preferredRoom.value === e.room_id)
-      );
-    });
+        // Check for overlap
+        return (
+          timeIndex <= eventEndIndex &&
+          endTimeIndex >= eventStartIndex &&
+          // Room conflict check - if same room is used
+          (eventToCheck.room_id === e.room_id ||
+            preferredRoom.value === e.room_id)
+        )
+      })
 
-    return conflictingEvents.length > 0;
-  })());
+      return conflictingEvents.length > 0
+    })(),
+  )
 
   // Get current conflicts based on mouse position
-  const conflicts = getConflictingEvents.value;
+  const conflicts = getConflictingEvents.value
 
   // Calculate if this cell has a conflict
-  const conflictResult = cellHasConflict(dayIndex, timeIndex);
-  const hasConflict = isDraggedOver && conflictResult.hasConflict;
+  const conflictResult = cellHasConflict(dayIndex, timeIndex)
+  const hasConflict = isDraggedOver && conflictResult.hasConflict
 
   return {
     position: 'absolute',
@@ -573,26 +626,27 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     boxSizing: 'border-box',
     zIndex: 5, // Lower z-index for backgrounds to be below events
     backgroundColor: (() => {
-      if (!draggedEvent.value) return 'transparent';
+      if (!draggedEvent.value) return 'transparent'
 
       // If conflict detected, use orange background
       if (isDraggedOver && hasConflict) {
-        return 'rgba(255, 171, 145, 0.7)'; // Semi-transparent orange for conflicts 
+        return 'rgba(255, 171, 145, 0.7)' // Semi-transparent orange for conflicts
       }
 
       // Show ALL conflicting cells in light orange when dragging
       if (wouldConflict) {
-        return 'rgba(255, 224, 178, 0.7)'; // Semi-transparent light orange for conflicts
+        return 'rgba(255, 224, 178, 0.7)' // Semi-transparent light orange for conflicts
       }
 
       // For regular hover during drag
       if (isDraggedOver) {
-        return timeIndex + getEventDuration(draggedEvent.value) <= timeSlots.length
+        return timeIndex + getEventDuration(draggedEvent.value) <=
+          timeSlots.length
           ? 'rgba(227, 242, 253, 0.7)' // Semi-transparent blue for valid placement
-          : 'rgba(255, 205, 210, 0.7)'; // Semi-transparent red for invalid placement
+          : 'rgba(255, 205, 210, 0.7)' // Semi-transparent red for invalid placement
       }
 
-      return 'transparent';
+      return 'transparent'
     })(),
     // No longer using background image for icons
   }
@@ -625,13 +679,13 @@ const getDayRowPositions = computed<number[]>(() => {
   days.forEach((day, index) => {
     positions[index] = currentTop
 
-    const dayEvents = filteredEvents.value.filter(e => e.day === day)
+    const dayEvents = filteredEvents.value.filter((e) => e.day === day)
     let maxRows = 1
 
     if (dayEvents.length > 0) {
       const dayPositions = dayEvents
-        .map(e => eventPositions.get(e.id))
-        .filter(Boolean) as { row: number, maxRows: number }[]
+        .map((e) => eventPositions.get(e.id))
+        .filter(Boolean) as { row: number; maxRows: number }[]
 
       if (dayPositions.length > 0) {
         maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
@@ -646,7 +700,7 @@ const getDayRowPositions = computed<number[]>(() => {
 
 const getDayStyle = (index: number): CSSProperties => {
   const eventPositions = getRowEventPositions.value
-  const dayEvents = filteredEvents.value.filter(e => e.day === days[index])
+  const dayEvents = filteredEvents.value.filter((e) => e.day === days[index])
   const dayPositions = getDayRowPositions.value
 
   let maxRows = 1
@@ -692,7 +746,9 @@ const containerStyle = computed<CSSProperties>(() => {
   const lastDayIndex = days.length - 1
   let lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT
 
-  const lastDayEvents = filteredEvents.value.filter(e => e.day === days[lastDayIndex])
+  const lastDayEvents = filteredEvents.value.filter(
+    (e) => e.day === days[lastDayIndex],
+  )
 
   if (lastDayEvents.length > 0) {
     const maxRows = eventPositions.get(lastDayEvents[0]!.id!)?.maxRows || 1
@@ -712,36 +768,36 @@ const containerStyle = computed<CSSProperties>(() => {
   }
 })
 
-const handleDragStart = (
-  event: DragEvent,
-  itemData: CalendarEvent,
-) => {
+const handleDragStart = (event: DragEvent, itemData: CalendarEvent) => {
   if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', (itemData.id?.toString() || ''));
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', itemData.id?.toString() || '')
 
     // Create an empty, transparent element to use as the drag image
-    const emptyImg = document.createElement('div');
-    emptyImg.style.position = 'absolute';
-    emptyImg.style.top = '-9999px';
-    emptyImg.style.opacity = '0';
-    document.body.appendChild(emptyImg);
+    const emptyImg = document.createElement('div')
+    emptyImg.style.position = 'absolute'
+    emptyImg.style.top = '-9999px'
+    emptyImg.style.opacity = '0'
+    document.body.appendChild(emptyImg)
 
-    event.dataTransfer.setDragImage(emptyImg, 0, 0);
+    event.dataTransfer.setDragImage(emptyImg, 0, 0)
 
     setTimeout(() => {
-      document.body.removeChild(emptyImg);
+      document.body.removeChild(emptyImg)
       draggedEvent.value = {
         ...itemData,
-        room_id: overrideRooms.value || !itemData.room_id
-          ? preferredRoom.value
-          : itemData.room_id,
-      };
-    }, 1);
+        room_id:
+          overrideRooms.value || !itemData.room_id
+            ? preferredRoom.value
+            : itemData.room_id,
+      }
+    }, 1)
   }
 }
 
-const getMousePosition = (event: DragEvent): { day: string; time: TimeSlot } | null => {
+const getMousePosition = (
+  event: DragEvent,
+): { day: string; time: TimeSlot } | null => {
   const rect = (event.currentTarget as HTMLElement)?.getBoundingClientRect()
   if (!rect) return null
 
@@ -750,21 +806,24 @@ const getMousePosition = (event: DragEvent): { day: string; time: TimeSlot } | n
 
   // Use the day row positions to determine which day we're hovering over
   const dayPositions = getDayRowPositions.value
-  let dayIndex = -1;
+  let dayIndex = -1
 
   // Find which day row contains our current mouse position
   for (let i = 0; i < days.length; i++) {
-    const nextDayIndex = i + 1;
-    const currentDayTop = dayPositions[i];
-    const nextDayTop = nextDayIndex < days.length ? dayPositions[nextDayIndex] : Infinity;
+    const nextDayIndex = i + 1
+    const currentDayTop = dayPositions[i]
+    const nextDayTop =
+      nextDayIndex < days.length ? dayPositions[nextDayIndex] : Infinity
 
     if (y >= currentDayTop! && y < nextDayTop!) {
-      dayIndex = i;
-      break;
+      dayIndex = i
+      break
     }
   }
 
-  const timeIndex = Math.floor((x - TIMETABLE_CONFIG.DAY_COLUMN_WIDTH) / TIMETABLE_CONFIG.CELL_WIDTH)
+  const timeIndex = Math.floor(
+    (x - TIMETABLE_CONFIG.DAY_COLUMN_WIDTH) / TIMETABLE_CONFIG.CELL_WIDTH,
+  )
 
   if (
     dayIndex >= 0 &&
@@ -781,36 +840,35 @@ const getMousePosition = (event: DragEvent): { day: string; time: TimeSlot } | n
 }
 
 const handleDragOver = (event: DragEvent) => {
-  event.preventDefault();
+  event.preventDefault()
 
   mousePosition.value = {
     x: event.clientX,
-    y: event.clientY
-  };
-
-  const position = getMousePosition(event);
-  if (position) {
-    draggedOverDay.value = position.day;
-    draggedOverTime.value = position.time;
+    y: event.clientY,
   }
-};
+
+  const position = getMousePosition(event)
+  if (position) {
+    draggedOverDay.value = position.day
+    draggedOverTime.value = position.time
+  }
+}
 
 const handleMenuDragOver = (event: DragEvent) => {
-  event.preventDefault();
+  event.preventDefault()
 
   mousePosition.value = {
     x: event.clientX,
-    y: event.clientY
-  };
+    y: event.clientY,
+  }
 
-  isOverMenu.value = true;
-};
+  isOverMenu.value = true
+}
 
 const handleMenuDrop = async (event: DragEvent) => {
   event.preventDefault()
 
   if (draggedEvent.value) {
-
     await toggleEventPlacement(draggedEvent.value)
   }
 
@@ -818,10 +876,15 @@ const handleMenuDrop = async (event: DragEvent) => {
   isOverMenu.value = false
 }
 
-const isValidEventPlacement = (position: { day: string, time: TimeSlot }, duration: number): boolean => {
+const isValidEventPlacement = (
+  position: { day: string; time: TimeSlot },
+  duration: number,
+): boolean => {
   if (!position) return false
 
-  const timeIndex = timeSlots.findIndex(slot => slot.from === position.time.from)
+  const timeIndex = timeSlots.findIndex(
+    (slot) => slot.from === position.time.from,
+  )
   const newEndIndex = timeIndex + duration - 1
 
   return timeIndex >= 0 && newEndIndex < timeSlots.length
@@ -832,47 +895,50 @@ const handleDrop = async (event: DragEvent) => {
 
   try {
     const position = getMousePosition(event)
-    if (!position) throw new Error("Invalid drop position")
-    if (!draggedEvent.value) throw new Error("No event to drop")
+    if (!position) throw new Error('Invalid drop position')
+    if (!draggedEvent.value) throw new Error('No event to drop')
 
     if (!isValidEventPlacement(position, draggedEvent.value?.duration || 1)) {
       toast({
-        title: "Invalid Placement",
-        description: "The event cannot be placed here.",
-        variant: "destructive"
+        title: 'Invalid Placement',
+        description: 'The event cannot be placed here.',
+        variant: 'destructive',
       })
-      throw new Error("Invalid placement")
+      throw new Error('Invalid placement')
     }
 
     const draggedActivity = draggedEvent.value
 
-    if (!draggedActivity) throw new Error("No event to drop")
-
-
+    if (!draggedActivity) throw new Error('No event to drop')
 
     const updatedEvent: CalendarEvent = {
       ...draggedActivity,
       day: position.day,
       start_time: position.time.from,
       duration: draggedActivity.duration || 1,
-      end_time: calculateEndTime(position.time.from, draggedActivity.duration || 1),
+      end_time: calculateEndTime(
+        position.time.from,
+        draggedActivity.duration || 1,
+      ),
       start_index: timeToIndex(position.time.from),
-      room_id: overrideRooms.value || !draggedActivity.room_id
-        ? preferredRoom.value
-        : draggedActivity.room_id
+      room_id:
+        overrideRooms.value || !draggedActivity.room_id
+          ? preferredRoom.value
+          : draggedActivity.room_id,
     }
 
     if (!draggedActivity.room_id) {
       toast({
-        title: "Room Required",
-        description: "Please select a preferred room before placing events.",
-        variant: "destructive"
+        title: 'Room Required',
+        description: 'Please select a preferred room before placing events.',
+        variant: 'destructive',
       })
       return
     }
 
-
-    const eventIndex = placedEvents.value.findIndex(e => e.id === draggedActivity?.id)
+    const eventIndex = placedEvents.value.findIndex(
+      (e) => e.id === draggedActivity?.id,
+    )
     if (eventIndex !== -1) {
       placedEvents.value[eventIndex] = updatedEvent
     } else {
@@ -880,9 +946,8 @@ const handleDrop = async (event: DragEvent) => {
     }
 
     await saveEventPlacement(updatedEvent)
-
   } catch (error) {
-    console.error("Error during drop:", error)
+    console.error('Error during drop:', error)
   } finally {
     handleDragEnd()
   }
@@ -891,18 +956,18 @@ const handleDrop = async (event: DragEvent) => {
 async function saveEventPlacement(event: CalendarEvent) {
   if (!timetableId.value) {
     toast({
-      title: "Error",
-      description: "No timetable ID found. Please check the URL.",
-      variant: "destructive"
+      title: 'Error',
+      description: 'No timetable ID found. Please check the URL.',
+      variant: 'destructive',
     })
     return
   }
 
   if (!event.room_id) {
     toast({
-      title: "Room Required",
-      description: "Please select a preferred room before placing events.",
-      variant: "destructive"
+      title: 'Room Required',
+      description: 'Please select a preferred room before placing events.',
+      variant: 'destructive',
     })
     return
   }
@@ -917,11 +982,12 @@ async function saveEventPlacement(event: CalendarEvent) {
       room: event.room_id,
     }
 
-
     if (event.id == null) {
-      const originalEvent = timetableEventStore.events.find(e => e.id === event.original_eventId)
+      const originalEvent = timetableEventStore.events.find(
+        (e) => e.id === event.original_eventId,
+      )
       if (!originalEvent) {
-        throw new Error("Original event not found")
+        throw new Error('Original event not found')
       }
 
       await timetableEventStore.createEvent({
@@ -936,17 +1002,17 @@ async function saveEventPlacement(event: CalendarEvent) {
     }
 
     toast({
-      title: "Success",
-      description: "Event has been placed in the timetable."
+      title: 'Success',
+      description: 'Event has been placed in the timetable.',
     })
 
     await fetchTimetableEvents(timetableId.value)
   } catch (error) {
-    console.error("Error saving event placement:", error)
+    console.error('Error saving event placement:', error)
     toast({
-      title: "Error",
-      description: "Failed to save event placement.",
-      variant: "destructive"
+      title: 'Error',
+      description: 'Failed to save event placement.',
+      variant: 'destructive',
     })
   }
 }
@@ -955,7 +1021,9 @@ async function toggleEventPlacement(event: CalendarEvent) {
   if (!timetableId.value || !event.id) return
 
   try {
-    const currentEvent = timetableEventStore.events.find(e => e.id === event.id)
+    const currentEvent = timetableEventStore.events.find(
+      (e) => e.id === event.id,
+    )
     if (!currentEvent) return
 
     const eventData = {
@@ -969,21 +1037,19 @@ async function toggleEventPlacement(event: CalendarEvent) {
     const result = await timetableEventStore.updateEvent(event.id, eventData)
     if (result) {
       toast({
-        title: "Success",
-        description: "Event has been moved to unplaced events."
+        title: 'Success',
+        description: 'Event has been moved to unplaced events.',
       })
       await fetchTimetableEvents(timetableId.value)
     }
   } catch (error) {
     toast({
-      title: "Error",
-      description: "Failed to update event placement.",
-      variant: "destructive"
+      title: 'Error',
+      description: 'Failed to update event placement.',
+      variant: 'destructive',
     })
   }
 }
-
-
 
 watch([subjectId, roomId, viewType], async () => {
   if (timetableId.value) {
@@ -1003,7 +1069,7 @@ watch([subjectId, roomId, viewType], async () => {
 
     router.replace({
       path: route.path,
-      query
+      query,
     })
 
     await fetchTimetableEvents(timetableId.value)
@@ -1011,69 +1077,107 @@ watch([subjectId, roomId, viewType], async () => {
 })
 
 const handleDocumentClick = (event: MouseEvent) => {
-  if (!contextMenuVisible.value) return;
+  if (!contextMenuVisible.value) return
 
-  const element = contextMenuRef.value?.$el || contextMenuRef.value;
+  const element = contextMenuRef.value?.$el || contextMenuRef.value
 
   if (element && !element.contains(event.target as Node)) {
-    contextMenuVisible.value = false;
+    contextMenuVisible.value = false
   }
-};
+}
 
 const contextMenuRef = templateRef('contextMenuRef')
 
-watch(() => contextMenuVisible.value, (isVisible) => {
-  if (isVisible) {
-    setTimeout(() => {
-      document.addEventListener('mousedown', handleDocumentClick);
-    }, 10);
-  } else {
-    document.removeEventListener('mousedown', handleDocumentClick);
-  }
-});
-
-
+watch(
+  () => contextMenuVisible.value,
+  (isVisible) => {
+    if (isVisible) {
+      setTimeout(() => {
+        document.addEventListener('mousedown', handleDocumentClick)
+      }, 10)
+    } else {
+      document.removeEventListener('mousedown', handleDocumentClick)
+    }
+  },
+)
 
 function handleDocumentDragOver(e: DragEvent) {
-  e.preventDefault();
+  e.preventDefault()
 
   mousePosition.value = {
     x: e.clientX,
-    y: e.clientY
-  };
+    y: e.clientY,
+  }
 
   if (e.dataTransfer) {
     if (isOverTimetable(e)) {
-      e.dataTransfer.dropEffect = "move";
-
+      e.dataTransfer.dropEffect = 'move'
     } else if (isOverMenu.value) {
-      e.dataTransfer.dropEffect = "move";
+      e.dataTransfer.dropEffect = 'move'
     } else {
-      e.dataTransfer.dropEffect = "none";
+      e.dataTransfer.dropEffect = 'none'
     }
   }
 }
 
 function isOverTimetable(event: DragEvent): boolean {
-  if (!TimeTableGrid.value) return false;
-  const timetableEl = TimeTableGrid.value.$el || TimeTableGrid.value;
+  if (!TimeTableGrid.value) return false
+  const timetableEl = TimeTableGrid.value.$el || TimeTableGrid.value
 
-  const rect = timetableEl.getBoundingClientRect();
+  const rect = timetableEl.getBoundingClientRect()
   return (
     event.clientX >= rect.left &&
     event.clientX <= rect.right &&
     event.clientY >= rect.top &&
     event.clientY <= rect.bottom
-  );
+  )
 }
 
+const filterWeeksBitmask = ref(parseInt('111111111111', 2)) // Default to all weeks selected
+const exactWeekMatch = ref(false) // Default to inexact matching
 
-function handleCellClick(dayIndex: number, timeIndex: number) {
+const filterWeekBits = computed(() => {
+  const binaryString = (filterWeeksBitmask.value || 0)
+    .toString(2)
+    .padStart(12, '0')
+  return binaryString.split('').map((bit) => bit === '1')
+})
+
+const isFilterOddWeeksPattern = computed(() => {
+  const oddWeeksMask = parseInt('101010101010', 2)
+  return filterWeeksBitmask.value === oddWeeksMask
+})
+
+const isFilterEvenWeeksPattern = computed(() => {
+  const evenWeeksMask = parseInt('010101010101', 2)
+  return filterWeeksBitmask.value === evenWeeksMask
+})
+
+const isFilterAllWeeksPattern = computed(() => {
+  const allWeeksMask = parseInt('111111111111', 2)
+  return filterWeeksBitmask.value === allWeeksMask
+})
+
+function toggleFilterWeek(index: number) {
+  const bitArray = filterWeekBits.value.slice()
+  bitArray[index] = !bitArray[index]
+  filterWeeksBitmask.value = parseInt(
+    bitArray.map((bit) => (bit ? '1' : '0')).join(''),
+    2,
+  )
 }
 
-function handleContextMenu(dayIndex: number, timeIndex: number) {
+function selectOddWeeks() {
+  filterWeeksBitmask.value = parseInt('101010101010', 2)
 }
 
+function selectEvenWeeks() {
+  filterWeeksBitmask.value = parseInt('010101010101', 2)
+}
+
+function selectAllWeeks() {
+  filterWeeksBitmask.value = parseInt('111111111111', 2)
+}
 const getConflictingEvents = computed(() => {
   if (!draggedEvent.value) return []
   if (!draggedOverDay.value || !draggedOverTime.value) return []
@@ -1085,14 +1189,14 @@ const getConflictingEvents = computed(() => {
 
   // If we're dragging an existing event, we need to exclude it from conflicts
   const eventsToCheck = draggedEvent.value
-    ? placedEvents.value.filter(e => e.id !== draggedEvent.value!.id)
+    ? placedEvents.value.filter((e) => e.id !== draggedEvent.value!.id)
     : placedEvents.value
 
   const startTimeIndex = timeToIndex(draggedOverTime.value.from)
   const endTimeIndex = startTimeIndex + duration - 1
 
   // Find events that overlap with the dragged position
-  return eventsToCheck.filter(e => {
+  return eventsToCheck.filter((e) => {
     if (!e.day || !e.start_time || !e.end_time) return false
 
     // Check if same day
@@ -1104,64 +1208,70 @@ const getConflictingEvents = computed(() => {
 
     // Check for overlap
     return (
-      (startTimeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) &&
+      startTimeIndex <= eventEndIndex &&
+      endTimeIndex >= eventStartIndex &&
       // Room conflict check - if same room is used
-      (eventToCheck.room_id === e.room_id || preferredRoom.value === e.room_id)
+      (eventToCheck.room_id === e.room_id ||
+        preferredRoom.value === e.room_id)
     )
   })
 })
 
 // Single source of truth for drag state
 const dragState = computed(() => {
-  if (!draggedEvent.value) return null;
+  if (!draggedEvent.value) return null
 
-  const eventToCheck = draggedEvent.value;
+  const eventToCheck = draggedEvent.value
   const duration = draggedEvent.value
     ? getEventDuration(draggedEvent.value)
-    : eventToCheck.duration || 1;
+    : eventToCheck.duration || 1
 
-  return { eventToCheck, duration };
-});
+  return { eventToCheck, duration }
+})
 
 // Single computed property for isDragging
-const isDragging = computed(() => dragState.value !== null);
+const isDragging = computed(() => dragState.value !== null)
 
 // Centralized conflict checking function
-const checkConflicts = (day: string | number, timeIndex: number | undefined) => {
+const checkConflicts = (
+  day: string | number,
+  timeIndex: number | undefined,
+) => {
   // Early returns for invalid inputs
   if (!dragState.value || timeIndex === undefined)
-    return { hasConflict: false, types: [], events: [] };
+    return { hasConflict: false, types: [], events: [] }
 
   try {
-    const { eventToCheck, duration } = dragState.value;
-    const dayName = typeof day === 'number' ? days[day] : day;
+    const { eventToCheck, duration } = dragState.value
+    const dayName = typeof day === 'number' ? days[day] : day
 
     // Exclude current event from check
-    const eventsToCheck = eventToCheck.id ?
-      placedEvents.value.filter(e => e.id !== eventToCheck.id) :
-      placedEvents.value;
+    const eventsToCheck = eventToCheck.id
+      ? placedEvents.value.filter((e) => e.id !== eventToCheck.id)
+      : placedEvents.value
 
-    const endTimeIndex = timeIndex + duration - 1;
-    const conflictTypes = new Set<string>();
-    const conflictingEvents: CalendarEvent[] = [];
+    const endTimeIndex = timeIndex + duration - 1
+    const conflictTypes = new Set<string>()
+    const conflictingEvents: CalendarEvent[] = []
 
     // Find conflicts
     for (const e of eventsToCheck) {
-      if (!e.day || !e.start_time || !e.end_time) continue;
-      if (e.day !== dayName) continue;
+      if (!e.day || !e.start_time || !e.end_time) continue
+      if (e.day !== dayName) continue
 
-      const eventStartIndex = timeToIndex(e.start_time);
-      const eventEndIndex = eventStartIndex + getEventDuration(e) - 1;
+      const eventStartIndex = timeToIndex(e.start_time)
+      const eventEndIndex = eventStartIndex + getEventDuration(e) - 1
 
       // Check time overlap
       if (timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) {
         // Room conflict check
-        const roomConflict = (eventToCheck.room_id === e.room_id) ||
-          (preferredRoom.value === e.room_id && !eventToCheck.room_id);
+        const roomConflict =
+          eventToCheck.room_id === e.room_id ||
+          (preferredRoom.value === e.room_id && !eventToCheck.room_id)
 
         if (roomConflict) {
-          conflictTypes.add('room');
-          conflictingEvents.push(e);
+          conflictTypes.add('room')
+          conflictingEvents.push(e)
         }
       }
     }
@@ -1169,38 +1279,37 @@ const checkConflicts = (day: string | number, timeIndex: number | undefined) => 
     return {
       hasConflict: conflictingEvents.length > 0,
       types: Array.from(conflictTypes),
-      events: conflictingEvents
-    };
+      events: conflictingEvents,
+    }
   } catch (error) {
-    console.error("Error checking conflicts:", error);
-    return { hasConflict: false, types: [], events: [] };
+    console.error('Error checking conflicts:', error)
+    return { hasConflict: false, types: [], events: [] }
   }
-};
+}
 
 // Current drag conflicts
 const currentDragConflicts = computed(() => {
   if (!isDragging.value || !draggedOverDay.value || !draggedOverTime.value)
-    return { hasConflict: false, types: [], events: [] };
+    return { hasConflict: false, types: [], events: [] }
 
-  const timeIndex = timeToIndex(draggedOverTime.value.from);
-  return checkConflicts(draggedOverDay.value, timeIndex);
-});
+  const timeIndex = timeToIndex(draggedOverTime.value.from)
+  return checkConflicts(draggedOverDay.value, timeIndex)
+})
 
 // Room conflict indicator
-const hasRoomConflict = computed(() => currentDragConflicts.value.hasConflict);
+const hasRoomConflict = computed(() => currentDragConflicts.value.hasConflict)
 
 // Simplified cell conflict check
 const cellHasConflict = (dayIndex: number, timeIndex: number | undefined) => {
-  const result = checkConflicts(dayIndex, timeIndex);
-  return { hasConflict: result.hasConflict, types: result.types };
-};
+  const result = checkConflicts(dayIndex, timeIndex)
+  return { hasConflict: result.hasConflict, types: result.types }
+}
 
 function setupGlobalDragHandlers() {
-  document.addEventListener('dragover', handleDocumentDragOver);
+  document.addEventListener('dragover', handleDocumentDragOver)
 
-  document.addEventListener('dragend', handleDragEnd);
-  window.addEventListener('dragend', handleDragEnd);
-
+  document.addEventListener('dragend', handleDragEnd)
+  window.addEventListener('dragend', handleDragEnd)
 }
 
 onMounted(async () => {
@@ -1211,7 +1320,8 @@ onMounted(async () => {
   await subjectGroupStore.fetchSubjectGroupGroups()
 
   if (subjectGroupStore.subjectGroupGroups.length > 0) {
-    selectedSubjectGroup.value = subjectGroupStore.subjectGroupGroups[0]?.name ?? null
+    selectedSubjectGroup.value =
+      subjectGroupStore.subjectGroupGroups[0]?.name ?? null
   }
 
   if (route.query.subject) {
@@ -1222,8 +1332,8 @@ onMounted(async () => {
   }
 
   loadTimetableData()
-  setupGlobalDragHandlers();
-});
+  setupGlobalDragHandlers()
+})
 
 function handleDragEnd() {
   draggedEvent.value = null
@@ -1231,15 +1341,16 @@ function handleDragEnd() {
   draggedOverTime.value = null
 }
 
-
-
 // Make sure to clean up when component unmounts
 onUnmounted(() => {
-  document.removeEventListener('dragover', handleDocumentDragOver);
-  document.removeEventListener('dragend', handleDragEnd);
-});
+  document.removeEventListener('dragover', handleDocumentDragOver)
+  document.removeEventListener('dragend', handleDragEnd)
+})
 
-function handleEventContextMenu(event: MouseEvent, calendarEvent: CalendarEvent) {
+function handleEventContextMenu(
+  event: MouseEvent,
+  calendarEvent: CalendarEvent,
+) {
   event.preventDefault()
   event.stopPropagation()
 
@@ -1251,25 +1362,27 @@ function handleEventContextMenu(event: MouseEvent, calendarEvent: CalendarEvent)
 
 async function updateEventWeeksBitmask(eventId: number, newBitmask: number) {
   try {
-    const eventIndex = placedEvents.value.findIndex(e => e.id === eventId)
+    const eventIndex = placedEvents.value.findIndex((e) => e.id === eventId)
     if (eventIndex !== -1) {
       // Update local state
       placedEvents.value[eventIndex].weeks_bitmask = newBitmask
 
       // Save to server
-      await timetableEventStore.updateEvent(eventId, { weeks_bitmask: newBitmask })
+      await timetableEventStore.updateEvent(eventId, {
+        weeks_bitmask: newBitmask,
+      })
 
       toast({
-        title: "Success",
-        description: "Event weeks updated successfully."
+        title: 'Success',
+        description: 'Event weeks updated successfully.',
       })
     }
   } catch (error) {
-    console.error("Error updating event weeks:", error)
+    console.error('Error updating event weeks:', error)
     toast({
-      title: "Error",
-      description: "Failed to update event weeks.",
-      variant: "destructive"
+      title: 'Error',
+      description: 'Failed to update event weeks.',
+      variant: 'destructive',
     })
   }
 }
@@ -1282,42 +1395,81 @@ async function deleteEvent(event: CalendarEvent) {
     contextMenuVisible.value = false
 
     toast({
-      title: "Success",
-      description: "Event removed from timetable."
+      title: 'Success',
+      description: 'Event removed from timetable.',
     })
   } catch (error) {
-    console.error("Error removing event:", error)
+    console.error('Error removing event:', error)
     toast({
-      title: "Error",
-      description: "Failed to remove event.",
-      variant: "destructive"
+      title: 'Error',
+      description: 'Failed to remove event.',
+      variant: 'destructive',
     })
   }
 }
 
 function editEvent(event: CalendarEvent) {
   toast({
-    title: "Not implemented",
-    description: "Event editing will be implemented soon."
+    title: 'Not implemented',
+    description: 'Event editing will be implemented soon.',
   })
   contextMenuVisible.value = false
 }
-
 </script>
 
 <template>
   <div>
-    <ResizablePanelGroup direction="horizontal" class="rounded-lg border h-[calc(100vh-180px)]">
+    <ResizablePanelGroup direction="horizontal" class="h-[calc(100vh-180px)] rounded-lg border">
       <ResizablePanel :default-size="75">
         <ResizablePanelGroup direction="vertical">
           <ResizablePanel :default-size="80">
-            <div class="flex flex-col h-full">
+            <div class="flex h-full flex-col">
+              <div class="border-b bg-muted/20 px-2 py-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <h4 class="flex items-center text-sm font-medium">
+                      <Calendar class="mr-1 h-4 w-4" /> Week Filter
+                    </h4>
+                    <div class="flex gap-1">
+                      <Button size="sm" :variant="isFilterOddWeeksPattern ? 'default' : 'secondary'
+                        " class="h-7 text-xs" @click="selectOddWeeks">
+                        Odd (A)
+                      </Button>
+                      <Button size="sm" :variant="isFilterEvenWeeksPattern ? 'default' : 'secondary'
+                        " class="h-7 text-xs" @click="selectEvenWeeks">
+                        Even (B)
+                      </Button>
+                      <Button size="sm" :variant="isFilterAllWeeksPattern ? 'default' : 'secondary'
+                        " class="h-7 text-xs" @click="selectAllWeeks">
+                        All Weeks
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div class="flex justify-center gap-1">
+                    <button v-for="(active, index) in filterWeekBits" :key="index" @click="toggleFilterWeek(index)"
+                      class="flex h-6 w-6 items-center justify-center rounded-full border text-xs" :class="active
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background text-muted-foreground'
+                        ">
+                      {{ index + 1 }}
+                    </button>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <div class="ml-4 flex items-center gap-2">
+                      <label class="text-sm font-medium">Exact Match</label>
+                      <Switch v-model:checked="exactWeekMatch" />
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div class="flex items-center">
-                <div class="flex flex-col w-full">
+                <div class="flex w-full flex-col">
                   <div class="flex justify-center">
                     <!-- Replace separate buttons with proper tabs implementation -->
                     <Tabs v-model="viewType" default-value="parallels"
-                      class="w-full h-[100px] flex flex-row justify-between items-center">
+                      class="flex h-[100px] w-full flex-row items-start justify-between">
                       <TabsList class="h-fit">
                         <TabsTrigger value="parallels">Parallels</TabsTrigger>
                         <TabsTrigger value="rooms">Rooms</TabsTrigger>
@@ -1329,17 +1481,20 @@ function editEvent(event: CalendarEvent) {
                       <div class="mr-2">
                         <TabsContent value="parallels">
                           <!-- Add filtering controls for parallels view -->
-                          <div class="flex flex-wrap gap-3 justify-center items-center">
+                          <div class="flex flex-wrap items-center justify-center gap-3">
                             <ComboBox :options="semesterOptions" title="Semester"
                               search-placeholder="Select semester..." v-model:selection="selectedSemester" />
 
                             <ComboBox :options="yearOptions" title="Year" search-placeholder="Select year..."
                               v-model:selection="selectedYear" />
 
-                            <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(g => ({
-                              id: g.name,
-                              name: g.name
-                            }))" title="Subject Group" search-placeholder="Select subject group..."
+                            <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(
+                              (g) => ({
+                                id: g.name,
+                                name: g.name,
+                              }),
+                            )
+                              " title="Subject Group" search-placeholder="Select subject group..."
                               v-model:selection="selectedSubjectGroup" />
 
                             <Badge class="h-fit" variant="outline">
@@ -1349,48 +1504,53 @@ function editEvent(event: CalendarEvent) {
                         </TabsContent>
 
                         <TabsContent value="rooms">
-                          <div class="flex flex-col items-center gap-4 p-4">
+                          <div class="flex flex-col items-center gap-4 px-4">
                             <div v-if="!preferredRoom" class="text-center text-muted-foreground">
-                              Please select a room from bottom panel to view its timetable.
+                              Please select a room from bottom panel to view its
+                              timetable.
                             </div>
                             <div v-else>
                               Now showing timetable for room:
                               <Badge variant="default">
-                                {{buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+                                {{
+                                  buildingStore.rooms.find(
+                                    (r) => r.id === preferredRoom,
+                                  )?.name
+                                }}
                               </Badge>
                             </div>
                           </div>
                         </TabsContent>
 
                         <TabsContent value="teacher">
-                          <div class="p-4 text-center text-muted-foreground">
-                            Teacher view shows schedules organized by teaching staff
+                          <div class="px-4 text-center text-muted-foreground">
+                            Teacher view shows schedules organized by teaching
+                            staff
                           </div>
                         </TabsContent>
 
                         <TabsContent value="student">
-                          <div class="p-4 text-center text-muted-foreground">
-                            Student view shows schedules organized by student groups
+                          <div class="px-4 text-center text-muted-foreground">
+                            Student view shows schedules organized by student
+                            groups
                           </div>
                         </TabsContent>
                       </div>
                     </Tabs>
                   </div>
 
-                  <div class="flex flex-wrap justify-center gap-3 items-center">
-
-
-                    <div v-if="subjectId || roomId" class="flex gap-2 items-center">
+                  <div class="flex flex-wrap items-center justify-center gap-3">
+                    <div v-if="subjectId || roomId" class="flex items-center gap-2">
                       <Badge variant="outline" v-if="subjectId">
                         Subject: {{ getSubjectName(subjectId) || subjectId }}
-                        <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="subjectId = null">
+                        <Button variant="ghost" size="icon" class="ml-1 h-4 w-4" @click="subjectId = null">
                           <span class="sr-only">Remove</span>
                           &times;
                         </Button>
                       </Badge>
                       <Badge variant="outline" v-if="roomId">
                         Room ID: {{ roomId }}
-                        <Button variant="ghost" size="icon" class="h-4 w-4 ml-1" @click="roomId = null">
+                        <Button variant="ghost" size="icon" class="ml-1 h-4 w-4" @click="roomId = null">
                           <span class="sr-only">Remove</span>
                           &times;
                         </Button>
@@ -1398,11 +1558,16 @@ function editEvent(event: CalendarEvent) {
                     </div>
                   </div>
 
-                  <div v-if="timetableId && timetableStore.selectedTimetable?.status"
-                    class="flex justify-between pb-2 pr-3">
-                    <div class="flex gap-2 items-end pl-10">
-                      <Badge :variant="timetableStore.selectedTimetable?.status === 'PUBLISHED' ? 'default' :
-                        timetableStore.selectedTimetable?.status === 'WIP' ? 'secondary' : 'destructive'
+                  <div v-if="
+                    timetableId && timetableStore.selectedTimetable?.status
+                  " class="flex justify-between pb-2 pr-3">
+                    <div class="flex items-end gap-2 pl-10">
+                      <Badge :variant="timetableStore.selectedTimetable?.status ===
+                        'PUBLISHED'
+                        ? 'default'
+                        : timetableStore.selectedTimetable?.status === 'WIP'
+                          ? 'secondary'
+                          : 'destructive'
                         ">
                         {{ timetableStore.selectedTimetable?.status }}
                       </Badge>
@@ -1410,7 +1575,6 @@ function editEvent(event: CalendarEvent) {
                       <Badge variant="outline" v-if="timetableStore.selectedTimetable?.owner">
                         Owner: {{ timetableStore.selectedTimetable?.owner }}
                       </Badge>
-
                     </div>
                     <!-- <div class="min-w-[150px]">
                     <ComboBox :options="roomOptions" title="Preferred Room"
@@ -1429,8 +1593,8 @@ function editEvent(event: CalendarEvent) {
                   @cell-context-menu="handleContextMenu">
                   <!-- Show placeholder message when no room is selected in rooms view -->
                   <div v-if="viewType === 'rooms' && !preferredRoom"
-                    class="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-10">
-                    <div class="text-lg text-gray-500 font-medium">
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 bg-opacity-80">
+                    <div class="text-lg font-medium text-gray-500">
                       Please select a room to view its schedule
                     </div>
                   </div>
@@ -1439,38 +1603,42 @@ function editEvent(event: CalendarEvent) {
                   <!-- Add conflict icons to cells -->
                   <div v-for="(day, dayIndex) in days" :key="`conflict-icons-${day}`">
                     <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
-                      <div v-if="isDragging && cellHasConflict(dayIndex, slot.index).hasConflict" :style="{
+                      <div v-if="
+                        isDragging &&
+                        cellHasConflict(dayIndex, slot.index).hasConflict
+                      " :style="{
                         position: 'absolute',
                         left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * slot.index + 4}px`,
                         top: `${getDayRowPositions[dayIndex] ?? TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
                         zIndex: 30,
                         pointerEvents: 'none',
                       }">
-                        <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
+                        <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types
+                          " />
                       </div>
                     </template>
                   </div>
 
                   <!-- Add events as slots in the TimetableGrid -->
-                  <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="relative group">
-                    <div :style="getEventStyle(event)" class="event rounded-lg shadow-md hover:shadow-lg transition-all"
+                  <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="group relative">
+                    <div :style="getEventStyle(event)" class="event rounded-lg shadow-md transition-all hover:shadow-lg"
                       draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd"
                       @contextmenu="handleEventContextMenu($event, event)">
-                      <div class="flex justify-between items-center">
-                        <div class="event-title font-semibold text-gray-800 truncate">
+                      <div class="flex items-center justify-between">
+                        <div class="event-title truncate font-semibold text-gray-800">
                           {{ event.shortcut }}
                           <span class="sr-only">{{ event.title }}</span>
                         </div>
                         <button @click.stop.prevent="() => { }" class="event-menu-button">
                           <MoreVertical
-                            class="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                            class="h-4 w-4 shrink-0 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100" />
                         </button>
                       </div>
                       <div class="flex justify-between text-sm text-gray-600">
                         <div>{{ event.start_time }} - {{ event.end_time }}</div>
                         <div v-if="event.room_name"
-                          class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-                          <Building class="w-4 h-4" /> {{ event.room_name }}
+                          class="inline-flex items-center rounded-sm border-primary bg-blue-100 px-1 text-xs font-semibold">
+                          <Building class="h-4 w-4" /> {{ event.room_name }}
                         </div>
                       </div>
                     </div>
@@ -1479,7 +1647,6 @@ function editEvent(event: CalendarEvent) {
 
                 <!-- Add this right after your TimetableGrid component -->
                 <!-- Drag preview element -->
-
 
                 <ScrollBar orientation="horizontal" />
                 <ScrollBar orientation="vertical" />
@@ -1490,7 +1657,6 @@ function editEvent(event: CalendarEvent) {
           <ResizableHandle @dragging="isResizing = $event" with-handle />
 
           <ResizablePanel :default-size="20">
-
             <!-- Room selection panel -->
             <RoomSelectionPanel v-model:selected-room-id="preferredRoom" v-model:override-rooms="overrideRooms" />
           </ResizablePanel>
@@ -1510,27 +1676,37 @@ function editEvent(event: CalendarEvent) {
       position: 'fixed',
       left: mousePosition.x + 15 + 'px',
       top: mousePosition.y + 15 + 'px',
-      width: `${TIMETABLE_CONFIG.CELL_WIDTH * (getEventDuration(draggedEvent!)) - 4}px`,
+      width: `${TIMETABLE_CONFIG.CELL_WIDTH * getEventDuration(draggedEvent!) - 4}px`,
       height: `${TIMETABLE_CONFIG.CELL_HEIGHT - 4}px`,
       border: hasRoomConflict ? '2px solid #e53935' : '2px solid #2196f3',
-      pointerEvents: 'none'
-    }" :class="{ 'bg-blue-100': !hasRoomConflict, 'bg-red-100': hasRoomConflict }"
-      class="p-[4px] rounded-lg shadow-md z-50 border-2 border-solid border-gray-300">
-      <div class="flex justify-between items-center">
-        <div class="font-semibold text-gray-800 truncate">
+      pointerEvents: 'none',
+    }" :class="{
+      'bg-blue-100': !hasRoomConflict,
+      'bg-red-100': hasRoomConflict,
+    }" class="z-50 rounded-lg border-2 border-solid border-gray-300 p-[4px] shadow-md">
+      <div class="flex items-center justify-between">
+        <div class="truncate font-semibold text-gray-800">
           {{ draggedEvent?.shortcut }}
         </div>
       </div>
 
-      <div class="flex justify-between text-sm text-gray-600 mt-1">
+      <div class="mt-1 flex justify-between text-sm text-gray-600">
         <div v-if="draggedOverTime">
-          {{ draggedOverTime.from }} - {{ calculateEndTime(draggedOverTime.from,
-            getEventDuration(draggedEvent!) || 1) }}
+          {{ draggedOverTime.from }} -
+          {{
+            calculateEndTime(
+              draggedOverTime.from,
+              getEventDuration(draggedEvent!) || 1,
+            )
+          }}
         </div>
         <div v-if="draggedEvent?.room_name || preferredRoom"
-          class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-          <Building class="w-4 h-4" />
-          {{buildingStore.rooms.find(r => r.id === draggedEvent?.room_id)?.name}}
+          class="inline-flex items-center rounded-sm border-primary bg-blue-100 px-1 text-xs font-semibold">
+          <Building class="h-4 w-4" />
+          {{
+            buildingStore.rooms.find((r) => r.id === draggedEvent?.room_id)
+              ?.name
+          }}
         </div>
       </div>
     </div>
