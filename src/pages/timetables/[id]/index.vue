@@ -79,8 +79,8 @@ const subjectId = ref<number | null>(null)
 const roomId = ref<number | null>(null)
 const selectedTimetableName = ref<string>('')
 const isOverMenu = ref(false)
-const events = ref<CalendarEvent[]>([])
 const isResizing = ref(false)
+const events = ref<CalendarEvent[]>([])
 const preferredRoom = ref<number | undefined>(undefined)
 const overrideRooms = ref<boolean>(false)
 const draggedEvent = ref<CalendarEvent | null>(null)
@@ -100,6 +100,10 @@ const timetableId = computed(() => {
 
 const unplacedEvents = computed<CalendarEvent[]>(() => {
   return events.value.filter(event => event.start_time === null || event.end_time === null || event.day === null)
+})
+
+const placedEvents = computed<CalendarEvent[]>(() => {
+  return events.value.filter(event => event.start_time !== null && event.end_time !== null && event.day !== null)
 })
 
 const timeSlots: TimeSlot[] = (() => {
@@ -363,15 +367,15 @@ const applyParallelsFilter = (item: CalendarEvent) => {
 
 const filteredEvents = computed(() => {
   if (viewType.value === 'parallels') {
-    return events.value.filter(applyParallelsFilter)
+    return placedEvents.value.filter(applyParallelsFilter)
   } else if (viewType.value === 'rooms') {
     if (!preferredRoom.value) {
       return []
     }
-    return events.value.filter(event => event.room_id === preferredRoom.value)
+    return placedEvents.value.filter(event => event.room_id === preferredRoom.value)
   }
 
-  return events.value
+  return placedEvents.value
 })
 
 // Update filteredEventTemplates to use the same filter approach
@@ -524,8 +528,8 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
 
     // If we're dragging an existing event, we need to exclude it from conflicts
     const eventsToCheck = draggedEvent.value?.id
-      ? events.value.filter(e => e.id !== draggedEvent.value!.id)
-      : events.value;
+      ? placedEvents.value.filter(e => e.id !== draggedEvent.value!.id)
+      : placedEvents.value;
 
     const endTimeIndex = timeIndex + duration - 1;
 
@@ -868,11 +872,11 @@ const handleDrop = async (event: DragEvent) => {
     }
 
 
-    const eventIndex = events.value.findIndex(e => e.id === draggedActivity?.id)
+    const eventIndex = placedEvents.value.findIndex(e => e.id === draggedActivity?.id)
     if (eventIndex !== -1) {
-      events.value[eventIndex] = updatedEvent
+      placedEvents.value[eventIndex] = updatedEvent
     } else {
-      events.value.push(updatedEvent)
+      placedEvents.value.push(updatedEvent)
     }
 
     await saveEventPlacement(updatedEvent)
@@ -1081,8 +1085,8 @@ const getConflictingEvents = computed(() => {
 
   // If we're dragging an existing event, we need to exclude it from conflicts
   const eventsToCheck = draggedEvent.value
-    ? events.value.filter(e => e.id !== draggedEvent.value!.id)
-    : events.value
+    ? placedEvents.value.filter(e => e.id !== draggedEvent.value!.id)
+    : placedEvents.value
 
   const startTimeIndex = timeToIndex(draggedOverTime.value.from)
   const endTimeIndex = startTimeIndex + duration - 1
@@ -1134,8 +1138,8 @@ const checkConflicts = (day: string | number, timeIndex: number | undefined) => 
 
     // Exclude current event from check
     const eventsToCheck = eventToCheck.id ?
-      events.value.filter(e => e.id !== eventToCheck.id) :
-      events.value;
+      placedEvents.value.filter(e => e.id !== eventToCheck.id) :
+      placedEvents.value;
 
     const endTimeIndex = timeIndex + duration - 1;
     const conflictTypes = new Set<string>();
@@ -1247,10 +1251,10 @@ function handleEventContextMenu(event: MouseEvent, calendarEvent: CalendarEvent)
 
 async function updateEventWeeksBitmask(eventId: number, newBitmask: number) {
   try {
-    const eventIndex = events.value.findIndex(e => e.id === eventId)
+    const eventIndex = placedEvents.value.findIndex(e => e.id === eventId)
     if (eventIndex !== -1) {
       // Update local state
-      events.value[eventIndex].weeks_bitmask = newBitmask
+      placedEvents.value[eventIndex].weeks_bitmask = newBitmask
 
       // Save to server
       await timetableEventStore.updateEvent(eventId, { weeks_bitmask: newBitmask })

@@ -64,6 +64,21 @@ const weekBits = computed(() => {
   return binaryString.split('').map(bit => bit === '1')
 })
 
+const isOddWeeksPattern = computed(() => {
+  const oddWeeksMask = parseInt('101010101010', 2)
+  return weeksBitmask.value === oddWeeksMask
+})
+
+const isEvenWeeksPattern = computed(() => {
+  const evenWeeksMask = parseInt('010101010101', 2)
+  return weeksBitmask.value === evenWeeksMask
+})
+
+const isAllWeeksPattern = computed(() => {
+  const allWeeksMask = parseInt('111111111111', 2)
+  return weeksBitmask.value === allWeeksMask
+})
+
 const toggleWeek = (index: number) => {
   const bitArray = weekBits.value.slice()
   bitArray[index] = !bitArray[index]
@@ -165,13 +180,13 @@ const selectAllWeeks = () => {
               <Calendar class="h-3.5 w-3.5 mr-1" /> Weeks
             </div>
             <div class="h-3 flex items-center justify-center gap-1">
-              <Button size="sm" variant="secondary" class="text-xs h-fit" @click="selectOddWeeks">
+              <Button size="sm" :variant="isOddWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit" @click="selectOddWeeks">
                 A
               </Button>
-              <Button size="sm" variant="secondary" class="text-xs h-fit" @click="selectEvenWeeks">
+              <Button size="sm" :variant="isEvenWeeksPattern ? 'default' : 'secondary'"  class="text-xs h-fit" @click="selectEvenWeeks">
                 B
               </Button>
-              <Button size="sm" variant="secondary" class="text-xs h-fit" @click="selectAllWeeks">
+              <Button size="sm" :variant="isAllWeeksPattern ? 'default' : 'secondary'"  class="text-xs h-fit" @click="selectAllWeeks">
                 FULL
               </Button>
             </div>

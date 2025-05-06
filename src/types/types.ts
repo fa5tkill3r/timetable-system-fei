@@ -19,4 +19,5 @@ export interface CalendarEvent {
   event_type?: number | null
   duration?: number
   original_eventId?: number | null
+  weeks_bitmask: number
 }
