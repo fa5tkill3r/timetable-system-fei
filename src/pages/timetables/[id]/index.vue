@@ -1176,7 +1176,11 @@ function selectEvenWeeks() {
 }
 
 function selectAllWeeks() {
-  filterWeeksBitmask.value = parseInt('111111111111', 2)
+  if (!isFilterAllWeeksPattern.value) {
+    filterWeeksBitmask.value = parseInt('111111111111', 2)
+  } else {
+    filterWeeksBitmask.value = parseInt('000000000000', 2)
+  }
 }
 const getConflictingEvents = computed(() => {
   if (!draggedEvent.value) return []
@@ -1433,11 +1437,11 @@ function editEvent(event: CalendarEvent) {
                     <div class="flex gap-1">
                       <Button size="sm" :variant="isFilterOddWeeksPattern ? 'default' : 'secondary'
                         " class="h-7 text-xs" @click="selectOddWeeks">
-                        Odd (A)
+                        A
                       </Button>
                       <Button size="sm" :variant="isFilterEvenWeeksPattern ? 'default' : 'secondary'
                         " class="h-7 text-xs" @click="selectEvenWeeks">
-                        Even (B)
+                        B
                       </Button>
                       <Button size="sm" :variant="isFilterAllWeeksPattern ? 'default' : 'secondary'
                         " class="h-7 text-xs" @click="selectAllWeeks">

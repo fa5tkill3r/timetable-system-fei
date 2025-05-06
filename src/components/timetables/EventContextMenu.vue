@@ -97,17 +97,17 @@ const handleDragStart = (event: DragEvent) => {
       isCopy: true, // Flag to indicate this should create a new event
       sourceEventId: props.event.id // Keep reference to source event
     }
-    
+
     // Store as JSON string so all data is transferred
     event.dataTransfer.setData('application/json', JSON.stringify(eventData))
-    
+
     // Change to copy operation instead of move
     event.dataTransfer.effectAllowed = 'copy'
 
     const calendarEvent = {
       ...props.event,
       id: null,
-      original_eventId: props.event.id, 
+      original_eventId: props.event.id,
     }
     // props.event.original_eventId = props.event.id
     // props.event.id = null
@@ -132,11 +132,16 @@ const selectEvenWeeks = () => {
   emit('update-weeks-bitmask', props.event.id, evenWeeksMask)
 }
 
-// Select all weeks
 const selectAllWeeks = () => {
-  const allWeeksMask = parseInt('111111111111', 2)
-  weeksBitmask.value = allWeeksMask
-  emit('update-weeks-bitmask', props.event.id, allWeeksMask)
+  if (isAllWeeksPattern.value) {
+    weeksBitmask.value = 0
+    emit('update-weeks-bitmask', props.event.id, 0)
+    return
+  } else {
+    weeksBitmask.value = parseInt('111111111111', 2)
+    emit('update-weeks-bitmask', props.event.id, parseInt('111111111111', 2))
+    return
+  }
 }
 
 </script>
@@ -150,7 +155,7 @@ const selectAllWeeks = () => {
   }">
     <Card class="w-80 shadow-lg context-menu-card">
       <div class="absolute top-2 right-2 cursor-move" draggable="true" @dragstart="handleDragStart"
-      @dragend="emit('drag-end')">
+        @dragend="emit('drag-end')">
         <GripVertical class="h-4 w-4 text-muted-foreground hover:text-foreground" />
       </div>
 
@@ -180,13 +185,16 @@ const selectAllWeeks = () => {
               <Calendar class="h-3.5 w-3.5 mr-1" /> Weeks
             </div>
             <div class="h-3 flex items-center justify-center gap-1">
-              <Button size="sm" :variant="isOddWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit" @click="selectOddWeeks">
+              <Button size="sm" :variant="isOddWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit"
+                @click="selectOddWeeks">
                 A
               </Button>
-              <Button size="sm" :variant="isEvenWeeksPattern ? 'default' : 'secondary'"  class="text-xs h-fit" @click="selectEvenWeeks">
+              <Button size="sm" :variant="isEvenWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit"
+                @click="selectEvenWeeks">
                 B
               </Button>
-              <Button size="sm" :variant="isAllWeeksPattern ? 'default' : 'secondary'"  class="text-xs h-fit" @click="selectAllWeeks">
+              <Button size="sm" :variant="isAllWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit"
+                @click="selectAllWeeks">
                 FULL
               </Button>
             </div>
