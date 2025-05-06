@@ -58,31 +58,9 @@ import {
 import ConflictIcons from '@/components/timetables/ConflictIcons.vue';
 import EventContextMenu from '@/components/timetables/EventContextMenu.vue';
 import { templateRef } from '@vueuse/core'
+import { CalendarEvent, TimeSlot } from '@/types/types'
 
 type Room = components['schemas']['Room']
-
-interface TimeSlot {
-  from: string
-  to: string
-  index: number
-}
-
-export interface CalendarEvent {
-  id: number
-  day: string | null
-  start_time: string | null
-  end_time: string | null
-  start_index?: number
-  title: string
-  shortcut: string
-  color: string
-  room_id?: number | null
-  room_name?: string | null
-  subject_id?: number | null
-  event_type?: number | null
-  duration?: number
-  original_eventId?: number | null
-}
 
 const semesterOptions = [
   { id: 'LS', name: 'Summer Semester (LS)' },
@@ -292,7 +270,8 @@ function processTimetableEvents() {
         room_id: room.id,
         room_name: room.name,
         subject_id: subjectId,
-        event_type: eventType
+        event_type: eventType,
+        duration: event.duration || 1,
       })
     } else {
       const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
@@ -397,12 +376,12 @@ const filteredEventTemplates = computed(() => {
   return templates
 })
 
-
-
-let nextEventId = 1
-
 const getEventDuration = (event: CalendarEvent): number => {
   // For template events with no start/end time
+  if (event.duration) {
+    return event.duration
+  }
+
   if (!event.start_time || !event.end_time) {
     return event.duration || 1
   }
@@ -537,7 +516,7 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
       : eventToCheck.duration || 1;
 
     // If we're dragging an existing event, we need to exclude it from conflicts
-    const eventsToCheck = draggedEvent.value
+    const eventsToCheck = draggedEvent.value?.id
       ? events.value.filter(e => e.id !== draggedEvent.value!.id)
       : events.value;
 
@@ -731,7 +710,7 @@ const handleDragStart = (
 ) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', itemData.id.toString());
+    event.dataTransfer.setData('text/plain', (itemData.id?.toString() || ''));
 
     // Create an empty, transparent element to use as the drag image
     const emptyImg = document.createElement('div');
@@ -842,96 +821,47 @@ const isValidEventPlacement = (position: { day: string, time: TimeSlot }, durati
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault()
 
-  const position = getMousePosition(event)
-  if (!position || (!draggedEvent.value && !draggedTemplate.value)) return
+  try {
+    const position = getMousePosition(event)
+    if (!position) throw new Error("Invalid drop position")
+    if (!draggedEvent.value && !draggedTemplate.value) throw new Error("No event to drop")
 
-  console.log("Preferred room selected:", preferredRoom.value)
-
-  if (draggedTemplate.value && !preferredRoom.value) {
-    toast({
-      title: "Room Required",
-      description: "Please select a preferred room before placing events.",
-      variant: "destructive"
-    })
-    return
-  }
-
-  if (draggedTemplate.value) {
-    const duration = draggedTemplate.value.duration || 1
-
-    if (!isValidEventPlacement(position, duration)) {
+    if (!isValidEventPlacement(position, draggedTemplate.value?.duration || 1)) {
       toast({
         title: "Invalid Placement",
-        description: "Event cannot be placed in this position as it would exceed available time slots.",
+        description: "The event cannot be placed here.",
         variant: "destructive"
       })
-      draggedTemplate.value = null
-      draggedOverDay.value = null
-      draggedOverTime.value = null
-      return
+      throw new Error("Invalid placement")
     }
 
-    const newStartIndex = timeSlots.findIndex((slot) => slot.from === position.time.from)
-    const newEndIndex = newStartIndex + duration - 1
+    const draggedActivity = draggedEvent.value || draggedTemplate.value
 
-    // TODO: This may not be necessary cant test due to API issues
-    const eventToPlace: CalendarEvent = {
-      id: draggedTemplate.value.original_eventId || -nextEventId++,
+    if (!draggedActivity) throw new Error("No event to drop")
+
+    const updatedEvent = {
+      ...draggedActivity,
       day: position.day,
-      start_time: timeSlots[newStartIndex]!.from,
-      end_time: timeSlots[newEndIndex]!.to,
-      title: draggedTemplate.value.title,
-      shortcut: draggedTemplate.value.shortcut || getSubjectCode(draggedTemplate.value.subject_id) || '',
-      color: draggedTemplate.value.color,
-      subject_id: draggedTemplate.value.subject_id,
-      event_type: draggedTemplate.value.event_type,
-      room_id: preferredRoom.value
-    }
+      start_time: position.time.from,
+      duration: draggedActivity.duration || 1,
+      end_time: calculateEndTime(position.time.from, draggedActivity.duration || 1),
+      start_index: timeToIndex(position.time.from),
+    }    
 
-    events.value.push(eventToPlace)
-
-    await saveEventPlacement(eventToPlace)
-
-  } else if (draggedEvent.value) {
-    const duration = getEventDuration(draggedEvent.value!)
-
-    if (!isValidEventPlacement(position, duration)) {
-      toast({
-        title: "Invalid Placement",
-        description: "Event cannot be placed in this position as it would exceed available time slots.",
-        variant: "destructive"
-      })
-      draggedEvent.value = null
-      draggedOverDay.value = null
-      draggedOverTime.value = null
-      return
-    }
-
-    const newStartIndex = timeSlots.findIndex(
-      (slot) => slot.from === position.time.from,
-    )
-    const newEndIndex = newStartIndex + duration - 1
-
-    const eventIndex = events.value.findIndex(
-      (e) => e.id === draggedEvent.value!.id,
-    )
+    const eventIndex = events.value.findIndex(e => e.id === draggedActivity?.id)
     if (eventIndex !== -1) {
-      const updatedEvent = {
-        ...events.value[eventIndex],
-        day: position.day,
-        start_time: timeSlots[newStartIndex]?.from,
-        end_time: timeSlots[newEndIndex]?.to,
-      } as CalendarEvent
       events.value[eventIndex] = updatedEvent
-
-      await saveEventPlacement(updatedEvent)
+    } else {
+      events.value.push(updatedEvent)
     }
-  }
 
-  draggedEvent.value = null
-  draggedTemplate.value = null
-  draggedOverDay.value = null
-  draggedOverTime.value = null
+    await saveEventPlacement(updatedEvent)
+
+  } catch(error) {
+    console.error("Error during drop:", error)
+  } finally {
+    handleDragEnd()
+  }
 }
 
 async function saveEventPlacement(event: CalendarEvent) {
@@ -963,15 +893,29 @@ async function saveEventPlacement(event: CalendarEvent) {
 
     console.log("Room to use:", roomToUse);
 
-
-    const eventData = {
+    const commonEventData = {
       day_of_week: dayOfWeek,
       start_time: startTimeIndex,
       room: roomToUse,
-      weeks_bitmask: 4095,
     }
 
-    await timetableEventStore.updateEvent(event.id, eventData)
+
+    if (event.id == null) {
+      const originalEvent = timetableEventStore.events.find(e => e.id === event.original_eventId)
+      if (!originalEvent) {
+        throw new Error("Original event not found")
+      }
+
+      await timetableEventStore.createEvent({
+        ...commonEventData,
+        duration: event.duration,
+        tta: (originalEvent.tta as any).id,
+        tt: (originalEvent.tt as any).id,
+        weeks_bitmask: originalEvent.weeks_bitmask,
+      })
+    } else {
+      await timetableEventStore.updateEvent(event.id, commonEventData)
+    }
 
     toast({
       title: "Success",
@@ -1021,12 +965,7 @@ async function toggleEventPlacement(event: CalendarEvent) {
   }
 }
 
-function handleDragEnd() {
-  draggedEvent.value = null
-  draggedTemplate.value = null
-  draggedOverDay.value = null
-  draggedOverTime.value = null
-}
+
 
 watch([subjectId, roomId, viewType], async () => {
   if (timetableId.value) {
@@ -1241,12 +1180,9 @@ const cellHasConflict = (dayIndex: number, timeIndex: number | undefined) => {
 function setupGlobalDragHandlers() {
   document.addEventListener('dragover', handleDocumentDragOver);
 
-  document.addEventListener('dragend', () => {
-    draggedEvent.value = null;
-    draggedTemplate.value = null;
-    draggedOverDay.value = null;
-    draggedOverTime.value = null;
-  });
+  document.addEventListener('dragend', handleDragEnd);
+  window.addEventListener('dragend', handleDragEnd);
+
 }
 
 onMounted(async () => {
@@ -1271,6 +1207,12 @@ onMounted(async () => {
   setupGlobalDragHandlers();
 });
 
+function handleDragEnd() {
+  draggedEvent.value = null
+  draggedTemplate.value = null
+  draggedOverDay.value = null
+  draggedOverTime.value = null
+}
 
 
 
@@ -1334,20 +1276,6 @@ async function deleteEvent(event: CalendarEvent) {
       variant: "destructive"
     })
   }
-}
-
-function duplicateEvent(event: CalendarEvent) {
-  const duplicatedEvent = { ...event, id: -nextEventId++ }
-  events.value.push(duplicatedEvent)
-
-  saveEventPlacement(duplicatedEvent).then(() => {
-    toast({
-      title: "Success",
-      description: "Event duplicated."
-    })
-  })
-
-  contextMenuVisible.value = false
 }
 
 function editEvent(event: CalendarEvent) {
@@ -1608,7 +1536,7 @@ function editEvent(event: CalendarEvent) {
 </div> -->
     <EventContextMenu v-if="selectedEvent" ref="contextMenuRef" :event="selectedEvent" :visible="contextMenuVisible"
       :position="contextMenuPosition" @update:visible="contextMenuVisible = $event" @delete-event="deleteEvent"
-      @duplicate-event="duplicateEvent" @edit-event="editEvent" @drag-start="handleDragStart"
-      @update-weeks-bitmask="updateEventWeeksBitmask" />
+      @edit-event="editEvent" @drag-start="handleDragStart"
+      @update-weeks-bitmask="updateEventWeeksBitmask" @drag-end="handleDragEnd" />
   </div>
 </template>

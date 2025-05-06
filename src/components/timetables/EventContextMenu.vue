@@ -19,24 +19,8 @@ import { Button } from '@/components/ui/button'
 import { GripVertical, Trash2, Edit, Calendar, Copy } from 'lucide-vue-next'
 import { useSubjectUserRoleStore } from '@/store/subjectUserRoles'
 import { components } from '@/types/schema'
+import { CalendarEvent } from '@/types/types'
 
-export interface CalendarEvent {
-  id: number
-  day: string | null
-  start_time: string | null
-  end_time: string | null
-  start_index?: number
-  title: string
-  shortcut: string
-  color: string
-  room_id?: number | null
-  room_name?: string | null
-  subject_id?: number | null
-  event_type?: number | null
-  duration?: number
-  original_eventId?: number | null
-  weeks_bitmask?: number
-}
 
 interface Props {
   event: CalendarEvent
@@ -50,6 +34,7 @@ const emit = defineEmits<{
   'delete-event': [event: CalendarEvent]
   'edit-event': [event: CalendarEvent]
   'drag-start': [event: DragEvent, calendarEvent: CalendarEvent]
+  'drag-end': []
   'update-weeks-bitmask': [eventId: number, newBitmask: number]
 }>()
 
@@ -92,11 +77,27 @@ const toggleWeek = (index: number) => {
 
 const handleDragStart = (event: DragEvent) => {
   if (event.dataTransfer) {
-    event.dataTransfer.setData('text/plain', props.event.id.toString())
+    const eventData = {
+      ...props.event,
+      isCopy: true, // Flag to indicate this should create a new event
+      sourceEventId: props.event.id // Keep reference to source event
+    }
+    
+    // Store as JSON string so all data is transferred
+    event.dataTransfer.setData('application/json', JSON.stringify(eventData))
+    
+    // Change to copy operation instead of move
+    event.dataTransfer.effectAllowed = 'copy'
 
-    event.dataTransfer.effectAllowed = 'move'
+    const calendarEvent = {
+      ...props.event,
+      id: null,
+      original_eventId: props.event.id, 
+    }
+    // props.event.original_eventId = props.event.id
+    // props.event.id = null
 
-    emit('drag-start', event, props.event)
+    emit('drag-start', event, calendarEvent)
 
     setTimeout(() => {
       emit('update:visible', false)
@@ -133,7 +134,8 @@ const selectAllWeeks = () => {
     zIndex: 1000,
   }">
     <Card class="w-80 shadow-lg context-menu-card">
-      <div class="absolute top-2 right-2 cursor-move" draggable="true" @dragstart="handleDragStart">
+      <div class="absolute top-2 right-2 cursor-move" draggable="true" @dragstart="handleDragStart"
+      @dragend="emit('drag-end')">
         <GripVertical class="h-4 w-4 text-muted-foreground hover:text-foreground" />
       </div>
 
