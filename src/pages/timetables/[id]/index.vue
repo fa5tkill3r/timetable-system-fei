@@ -16,27 +16,9 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs'
 import {
-  ChevronLeft,
-  ChevronRight,
-  Trash2,
   MoreVertical,
   Building,
 } from 'lucide-vue-next'
-import {
-  ContextMenu,
-  ContextMenuCheckboxItem,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuLabel,
-  ContextMenuRadioGroup,
-  ContextMenuRadioItem,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu'
 import { Input } from '@/components/ui/input'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
@@ -98,12 +80,10 @@ const roomId = ref<number | null>(null)
 const selectedTimetableName = ref<string>('')
 const isOverMenu = ref(false)
 const events = ref<CalendarEvent[]>([])
-const eventTemplates = ref<CalendarEvent[]>([])
 const isResizing = ref(false)
 const preferredRoom = ref<number | undefined>(undefined)
 const overrideRooms = ref<boolean>(false)
 const draggedEvent = ref<CalendarEvent | null>(null)
-const draggedTemplate = ref<CalendarEvent | null>(null)
 const draggedOverDay = ref<string | null>(null)
 const draggedOverTime = ref<TimeSlot | null>(null)
 const mousePosition = ref({ x: 0, y: 0 });
@@ -117,6 +97,10 @@ const timetableId = computed(() => {
   return route.params.id ? parseInt(route.params.id as string) : null
 })
 
+
+const unplacedEvents = computed<CalendarEvent[]>(() => {
+  return events.value.filter(event => event.start_time === null || event.end_time === null || event.day === null)
+})
 
 const timeSlots: TimeSlot[] = (() => {
   const slots: TimeSlot[] = []
@@ -223,6 +207,7 @@ async function fetchTimetableEvents(timetableId: number) {
     await timetableEventStore.fetchEvents(timetableId)
     processTimetableEvents()
   } catch (error) {
+    console.error("Error fetching timetable events:", error)
     toast({
       title: "Error loading events",
       description: "Failed to load timetable events. Please try again.",
@@ -233,7 +218,6 @@ async function fetchTimetableEvents(timetableId: number) {
 
 function processTimetableEvents() {
   events.value = []
-  eventTemplates.value = []
 
   timetableEventStore.events.forEach(event => {
     const ttaData = event.tta as any
@@ -243,53 +227,80 @@ function processTimetableEvents() {
     const subjectName = getSubjectName(subjectId)
     const subjectCode = getSubjectCode(subjectId)
 
-    if (event.start_time !== null &&
-      event.day_of_week !== null &&
-      event.room !== null &&
-      event.weeks_bitmask !== null &&
-      event.weeks_bitmask !== 0) {
+    const timeIndex = Math.min(event.start_time!, timeSlots.length - 1)
+    const startTime = timeSlots[timeIndex]!.from
+    const endTime = calculateEndTime(startTime, event.duration!)
 
-      // Convert numeric time index to display time
-      const timeIndex = Math.min(event.start_time!, timeSlots.length - 1)
-      const startTime = timeSlots[timeIndex]!.from
-      const endTime = calculateEndTime(startTime, event.duration!)
+    const room = event.room as any as Room
 
-      const room = event.room as any as Room
+    const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
 
-      const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
+    events.value.push({
+      id: event.id!,
+      day: days[event.day_of_week! - 1] ?? null,
+      start_time: startTime,
+      end_time: endTime,
+      start_index: timeToIndex(startTime),
+      title: subjectName!,
+      shortcut: subjectCode!,
+      color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
+      room_id: room?.id,
+      room_name: room?.name,
+      subject_id: subjectId,
+      event_type: eventType,
+      duration: event.duration || 1,
+      weeks_bitmask: event.weeks_bitmask || 4095,
+    })
 
-      events.value.push({
-        id: event.id!,
-        day: days[event.day_of_week! - 1]!,
-        start_time: startTime,
-        end_time: endTime,
-        start_index: timeToIndex(startTime),
-        title: subjectName!,
-        shortcut: subjectCode!,
-        color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-        room_id: room.id,
-        room_name: room.name,
-        subject_id: subjectId,
-        event_type: eventType,
-        duration: event.duration || 1,
-      })
-    } else {
-      const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
+    // if (event.start_time !== null &&
+    //   event.day_of_week !== null &&
+    //   event.room !== null &&
+    //   event.weeks_bitmask !== null &&
+    //   event.weeks_bitmask !== 0) {
 
-      eventTemplates.value.push({
-        id: event.id!,
-        day: null,
-        start_time: null,
-        end_time: null,
-        title: subjectName!,
-        shortcut: subjectCode || '',
-        color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-        duration: event.duration || 1,
-        subject_id: subjectId,
-        original_eventId: event.id,
-        event_type: eventType
-      })
-    }
+    //   // Convert numeric time index to display time
+    //   const timeIndex = Math.min(event.start_time!, timeSlots.length - 1)
+    //   const startTime = timeSlots[timeIndex]!.from
+    //   const endTime = calculateEndTime(startTime, event.duration!)
+
+    //   const room = event.room as any as Room
+
+    //   const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
+
+    //   events.value.push({
+    //     id: event.id!,
+    //     day: days[event.day_of_week! - 1]!,
+    //     start_time: startTime,
+    //     end_time: endTime,
+    //     start_index: timeToIndex(startTime),
+    //     title: subjectName!,
+    //     shortcut: subjectCode!,
+    //     color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
+    //     room_id: room.id,
+    //     room_name: room.name,
+    //     subject_id: subjectId,
+    //     event_type: eventType,
+    //     duration: event.duration || 1,
+    //     weeks_bitmask: event.weeks_bitmask || 4095,
+    //   })
+    // } else {
+    //   const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
+
+    //   eventTemplates.value.push({
+    //     id: event.id!,
+    //     day: null,
+    //     start_time: null,
+    //     end_time: null,
+    //     title: subjectName!,
+    //     shortcut: subjectCode || '',
+    //     color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
+    //     duration: event.duration || 1,
+    //     subject_id: subjectId,
+    //     original_eventId: event.id,
+    //     event_type: eventType,
+    //     weeks_bitmask: event.weeks_bitmask || 4095,
+    //   })
+    // }
   })
 }
 
@@ -366,7 +377,7 @@ const filteredEvents = computed(() => {
 // Update filteredEventTemplates to use the same filter approach
 const filteredEventTemplates = computed(() => {
   // Show only events with quantity > 0
-  const templates = eventTemplates.value
+  const templates = unplacedEvents.value
   // Only apply additional filtering in parallels view
   if (viewType.value === 'parallels') {
     return templates.filter(applyParallelsFilter)
@@ -378,7 +389,7 @@ const filteredEventTemplates = computed(() => {
 
 const getEventDuration = (event: CalendarEvent): number => {
   // For template events with no start/end time
-  if (event.duration) {
+  if (event?.duration) {
     return event.duration
   }
 
@@ -461,7 +472,7 @@ const getEventStyle = (event: CalendarEvent): CSSProperties => {
   const topOffset = row * (eventHeight + rowSpacing)
 
   // Adjust opacity - keep events more visible during drag
-  const isDraggingNow = draggedEvent.value !== null || draggedTemplate.value !== null
+  const isDraggingNow = draggedEvent.value !== null
   const isBeingDragged = draggedEvent.value?.id === event.id
 
   return {
@@ -498,19 +509,15 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     draggedOverDay.value === days[dayIndex] &&
     draggedOverTime.value &&
     timeIndex >= draggedOverTime.value.index &&
-    timeIndex < draggedOverTime.value.index + (
-      draggedEvent.value
-        ? getEventDuration(draggedEvent.value)
-        : draggedTemplate.value?.duration || 1
-    )
+    timeIndex < draggedOverTime.value.index + getEventDuration(draggedEvent.value)
   )
 
   // Check if cell would cause a conflict if the dragged event was placed here
   const wouldConflict = Boolean(isDragging.value && (() => {
-    if (!draggedEvent.value && !draggedTemplate.value) return false;
+    if (!draggedEvent.value) return false;
 
     // Create a temporary event at this position to check for conflicts
-    const eventToCheck = draggedEvent.value || draggedTemplate.value!;
+    const eventToCheck = draggedEvent.value;
     const duration = draggedEvent.value
       ? getEventDuration(draggedEvent.value)
       : eventToCheck.duration || 1;
@@ -562,7 +569,7 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     boxSizing: 'border-box',
     zIndex: 5, // Lower z-index for backgrounds to be below events
     backgroundColor: (() => {
-      if (!draggedEvent.value && !draggedTemplate.value) return 'transparent';
+      if (!draggedEvent.value) return 'transparent';
 
       // If conflict detected, use orange background
       if (isDraggedOver && hasConflict) {
@@ -576,9 +583,7 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
 
       // For regular hover during drag
       if (isDraggedOver) {
-        return timeIndex + (draggedEvent.value
-          ? getEventDuration(draggedEvent.value)
-          : draggedTemplate.value?.duration || 1) <= timeSlots.length
+        return timeIndex + getEventDuration(draggedEvent.value) <= timeSlots.length
           ? 'rgba(227, 242, 253, 0.7)' // Semi-transparent blue for valid placement
           : 'rgba(255, 205, 210, 0.7)'; // Semi-transparent red for invalid placement
       }
@@ -706,7 +711,6 @@ const containerStyle = computed<CSSProperties>(() => {
 const handleDragStart = (
   event: DragEvent,
   itemData: CalendarEvent,
-  isTemplate: boolean = false
 ) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move';
@@ -723,12 +727,13 @@ const handleDragStart = (
 
     setTimeout(() => {
       document.body.removeChild(emptyImg);
-      if (isTemplate || (!itemData.day && !itemData.start_time)) {
-        draggedTemplate.value = itemData;
-      } else {
-        draggedEvent.value = itemData;
-      }
-    }, 100);
+      draggedEvent.value = {
+        ...itemData,
+        room_id: overrideRooms.value || !itemData.room_id
+          ? preferredRoom.value
+          : itemData.room_id,
+      };
+    }, 1);
   }
 }
 
@@ -824,9 +829,9 @@ const handleDrop = async (event: DragEvent) => {
   try {
     const position = getMousePosition(event)
     if (!position) throw new Error("Invalid drop position")
-    if (!draggedEvent.value && !draggedTemplate.value) throw new Error("No event to drop")
+    if (!draggedEvent.value) throw new Error("No event to drop")
 
-    if (!isValidEventPlacement(position, draggedTemplate.value?.duration || 1)) {
+    if (!isValidEventPlacement(position, draggedEvent.value?.duration || 1)) {
       toast({
         title: "Invalid Placement",
         description: "The event cannot be placed here.",
@@ -835,18 +840,33 @@ const handleDrop = async (event: DragEvent) => {
       throw new Error("Invalid placement")
     }
 
-    const draggedActivity = draggedEvent.value || draggedTemplate.value
+    const draggedActivity = draggedEvent.value
 
     if (!draggedActivity) throw new Error("No event to drop")
 
-    const updatedEvent = {
+
+
+    const updatedEvent: CalendarEvent = {
       ...draggedActivity,
       day: position.day,
       start_time: position.time.from,
       duration: draggedActivity.duration || 1,
       end_time: calculateEndTime(position.time.from, draggedActivity.duration || 1),
       start_index: timeToIndex(position.time.from),
-    }    
+      room_id: overrideRooms.value || !draggedActivity.room_id
+        ? preferredRoom.value
+        : draggedActivity.room_id
+    }
+
+    if (!draggedActivity.room_id) {
+      toast({
+        title: "Room Required",
+        description: "Please select a preferred room before placing events.",
+        variant: "destructive"
+      })
+      return
+    }
+
 
     const eventIndex = events.value.findIndex(e => e.id === draggedActivity?.id)
     if (eventIndex !== -1) {
@@ -857,7 +877,7 @@ const handleDrop = async (event: DragEvent) => {
 
     await saveEventPlacement(updatedEvent)
 
-  } catch(error) {
+  } catch (error) {
     console.error("Error during drop:", error)
   } finally {
     handleDragEnd()
@@ -874,7 +894,7 @@ async function saveEventPlacement(event: CalendarEvent) {
     return
   }
 
-  if (draggedTemplate.value && !preferredRoom.value) {
+  if (!event.room_id) {
     toast({
       title: "Room Required",
       description: "Please select a preferred room before placing events.",
@@ -887,16 +907,10 @@ async function saveEventPlacement(event: CalendarEvent) {
     const dayOfWeek = days.indexOf(event.day!) + 1
     const startTimeIndex = timeToIndex(event.start_time!)
 
-    const roomToUse = overrideRooms.value || !event.room_id
-      ? preferredRoom.value
-      : event.room_id
-
-    console.log("Room to use:", roomToUse);
-
     const commonEventData = {
       day_of_week: dayOfWeek,
       start_time: startTimeIndex,
-      room: roomToUse,
+      room: event.room_id,
     }
 
 
@@ -1057,10 +1071,10 @@ function handleContextMenu(dayIndex: number, timeIndex: number) {
 }
 
 const getConflictingEvents = computed(() => {
-  if (!draggedEvent.value && !draggedTemplate.value) return []
+  if (!draggedEvent.value) return []
   if (!draggedOverDay.value || !draggedOverTime.value) return []
 
-  const eventToCheck = draggedEvent.value || draggedTemplate.value!
+  const eventToCheck = draggedEvent.value
   const duration = draggedEvent.value
     ? getEventDuration(draggedEvent.value)
     : eventToCheck.duration || 1
@@ -1095,9 +1109,9 @@ const getConflictingEvents = computed(() => {
 
 // Single source of truth for drag state
 const dragState = computed(() => {
-  if (!draggedEvent.value && !draggedTemplate.value) return null;
+  if (!draggedEvent.value) return null;
 
-  const eventToCheck = draggedEvent.value || draggedTemplate.value!;
+  const eventToCheck = draggedEvent.value;
   const duration = draggedEvent.value
     ? getEventDuration(draggedEvent.value)
     : eventToCheck.duration || 1;
@@ -1209,7 +1223,6 @@ onMounted(async () => {
 
 function handleDragEnd() {
   draggedEvent.value = null
-  draggedTemplate.value = null
   draggedOverDay.value = null
   draggedOverTime.value = null
 }
@@ -1484,7 +1497,7 @@ function editEvent(event: CalendarEvent) {
 
       <ResizablePanel :default-size="25">
         <EventSelectionPanel :event-templates="filteredEventTemplates" :is-loading="timetableEventStore.isLoading"
-          @drag-start="(event, template) => handleDragStart(event, template, true)" @drag-end="handleDragEnd"
+          @drag-start="(event, template) => handleDragStart(event, template)" @drag-end="handleDragEnd"
           @menu-drag-over="handleMenuDragOver" @menu-drag-leave="isOverMenu = false" @menu-drop="handleMenuDrop" />
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -1493,7 +1506,7 @@ function editEvent(event: CalendarEvent) {
       position: 'fixed',
       left: mousePosition.x + 15 + 'px',
       top: mousePosition.y + 15 + 'px',
-      width: `${TIMETABLE_CONFIG.CELL_WIDTH * (draggedEvent ? getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) - 4}px`,
+      width: `${TIMETABLE_CONFIG.CELL_WIDTH * (getEventDuration(draggedEvent!)) - 4}px`,
       height: `${TIMETABLE_CONFIG.CELL_HEIGHT - 4}px`,
       border: hasRoomConflict ? '2px solid #e53935' : '2px solid #2196f3',
       pointerEvents: 'none'
@@ -1501,42 +1514,26 @@ function editEvent(event: CalendarEvent) {
       class="p-[4px] rounded-lg shadow-md z-50 border-2 border-solid border-gray-300">
       <div class="flex justify-between items-center">
         <div class="font-semibold text-gray-800 truncate">
-          {{ draggedEvent?.shortcut || draggedTemplate?.shortcut }}
+          {{ draggedEvent?.shortcut }}
         </div>
       </div>
 
       <div class="flex justify-between text-sm text-gray-600 mt-1">
         <div v-if="draggedOverTime">
           {{ draggedOverTime.from }} - {{ calculateEndTime(draggedOverTime.from,
-            draggedEvent ? getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) }}
+            getEventDuration(draggedEvent!) || 1) }}
         </div>
         <div v-if="draggedEvent?.room_name || preferredRoom"
           class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
           <Building class="w-4 h-4" />
-          {{draggedEvent?.room_name || buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
+          {{buildingStore.rooms.find(r => r.id === draggedEvent?.room_id)?.name}}
         </div>
       </div>
     </div>
-    <!-- <div v-if="isDragging && draggedOverDay && draggedOverTime" :style="getDragPreviewStyle()"
-  class="absolute rounded-lg shadow-md z-30 pointer-events-none">
-  <div class="flex justify-between items-center">
-    <div class="event-title font-semibold text-gray-800 truncate">
-      {{ draggedEvent?.shortcut || draggedTemplate?.shortcut }}
-    </div>
-  </div>
-  <div class="flex justify-between text-sm text-gray-600">
-    <div>{{ draggedOverTime?.from }} - {{ calculateEndTime(draggedOverTime?.from, draggedEvent ?
-      getEventDuration(draggedEvent) : (draggedTemplate?.duration || 1)) }}</div>
-    <div v-if="draggedEvent?.room_name || preferredRoom"
-      class="text-xs font-semibold bg-blue-100 rounded-sm px-1 border-primary inline-flex items-center">
-      <Building class="w-4 h-4" />
-      {{draggedEvent?.room_name || buildingStore.rooms.find(r => r.id === preferredRoom)?.name}}
-    </div>
-  </div>
-</div> -->
+
     <EventContextMenu v-if="selectedEvent" ref="contextMenuRef" :event="selectedEvent" :visible="contextMenuVisible"
       :position="contextMenuPosition" @update:visible="contextMenuVisible = $event" @delete-event="deleteEvent"
-      @edit-event="editEvent" @drag-start="handleDragStart"
-      @update-weeks-bitmask="updateEventWeeksBitmask" @drag-end="handleDragEnd" />
+      @edit-event="editEvent" @drag-start="handleDragStart" @update-weeks-bitmask="updateEventWeeksBitmask"
+      @drag-end="handleDragEnd" />
   </div>
 </template>
