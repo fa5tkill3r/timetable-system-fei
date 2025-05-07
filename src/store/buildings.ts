@@ -4,8 +4,8 @@ import { client } from '../lib/client'
 import { useSchemaStore } from './schemas'
 import { components, operations } from '@/types/schema'
 
-type RoomEquipment = components['schemas']['RoomEquipment'] 
-type RoomEquipmentRequest = components['schemas']['RoomEquipmentRequest'] 
+type RoomEquipment = components['schemas']['RoomEquipment']
+type RoomEquipmentRequest = components['schemas']['RoomEquipmentRequest']
 type Room = components['schemas']['Room']
 type RoomRequest = components['schemas']['RoomRequest']
 type Building = components['schemas']['Building']
@@ -24,15 +24,15 @@ export const useBuildingStore = defineStore('buildings', () => {
       buildings.value = []
       return []
     }
-    
+
     isLoading.value = true
     try {
       const response = await client.GET('/api/buildings/', {
         params: {
-          header: schemaStore.termHeader
-        }
+          header: schemaStore.termHeader,
+        },
       })
-      
+
       buildings.value = response.data?.results || []
       return buildings.value
     } catch (err) {
@@ -49,10 +49,10 @@ export const useBuildingStore = defineStore('buildings', () => {
       const response = await client.GET('/api/buildings/{id}/', {
         params: {
           path: { id },
-          header: schemaStore.termHeader
-        }
+          header: schemaStore.termHeader,
+        },
       })
-      
+
       selectedBuilding.value = response.data || null
       return selectedBuilding.value
     } catch (err) {
@@ -62,7 +62,9 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const createBuilding = async (building: BuildingRequest): Promise<Building | null> => {
+  const createBuilding = async (
+    building: BuildingRequest,
+  ): Promise<Building | null> => {
     isLoading.value = true
     try {
       const response = await client.POST('/api/buildings/', {
@@ -71,7 +73,7 @@ export const useBuildingStore = defineStore('buildings', () => {
         },
         body: building,
       })
-      
+
       await fetchBuildings()
       return response.data || null
     } catch (err) {
@@ -81,7 +83,10 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const updateBuilding = async (id: number, building: BuildingRequest): Promise<Building | null> => {
+  const updateBuilding = async (
+    id: number,
+    building: BuildingRequest,
+  ): Promise<Building | null> => {
     isLoading.value = true
     try {
       const response = await client.PUT('/api/buildings/{id}/', {
@@ -89,9 +94,9 @@ export const useBuildingStore = defineStore('buildings', () => {
           path: { id },
           header: schemaStore.termHeader,
         },
-        body: building
+        body: building,
       })
-      
+
       await fetchBuildings()
       return response.data || null
     } catch (err) {
@@ -108,10 +113,10 @@ export const useBuildingStore = defineStore('buildings', () => {
         params: {
           path: { id },
           header: schemaStore.termHeader,
-        }
+        },
       })
-      
-      buildings.value = buildings.value.filter(b => b.id !== id)
+
+      buildings.value = buildings.value.filter((b) => b.id !== id)
 
       return true
     } catch (err) {
@@ -126,21 +131,21 @@ export const useBuildingStore = defineStore('buildings', () => {
       rooms.value = []
       return []
     }
-    
+
     isLoading.value = true
     try {
-      const query: operations['rooms_list']['parameters']['query'] = {};
+      const query: operations['rooms_list']['parameters']['query'] = {}
       if (buildingId !== undefined) {
-        query.building = buildingId;
+        query.building = buildingId
       }
-      
+
       const response = await client.GET('/api/rooms/', {
         params: {
           header: schemaStore.termHeader,
-          query
-        }
+          query,
+        },
       })
-      
+
       rooms.value = response.data?.results || []
       return rooms.value
     } catch (err) {
@@ -156,10 +161,10 @@ export const useBuildingStore = defineStore('buildings', () => {
       const response = await client.GET('/api/rooms/{id}/', {
         params: {
           path: { id },
-          header: schemaStore.termHeader
-        }
+          header: schemaStore.termHeader,
+        },
       })
-      
+
       selectedRoom.value = response.data || null
       return selectedRoom.value
     } catch (err) {
@@ -176,9 +181,9 @@ export const useBuildingStore = defineStore('buildings', () => {
         params: {
           header: schemaStore.termHeader,
         },
-        body: room
+        body: room,
       })
-      
+
       if (rooms.value.length > 0) {
         await fetchRooms(room.building ?? undefined)
       }
@@ -190,7 +195,10 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const updateRoom = async (roomId: number, room: RoomRequest): Promise<Room | null> => {
+  const updateRoom = async (
+    roomId: number,
+    room: RoomRequest,
+  ): Promise<Room | null> => {
     isLoading.value = true
     try {
       const response = await client.PUT('/api/rooms/{id}/', {
@@ -198,9 +206,9 @@ export const useBuildingStore = defineStore('buildings', () => {
           path: { id: roomId },
           header: schemaStore.termHeader,
         },
-        body: room
+        body: room,
       })
-      
+
       if (rooms.value.length > 0) {
         await fetchRooms(room.building ?? undefined)
       }
@@ -212,16 +220,19 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const deleteRoom = async (roomId: number, buildingId: number): Promise<boolean> => {
+  const deleteRoom = async (
+    roomId: number,
+    buildingId: number,
+  ): Promise<boolean> => {
     isLoading.value = true
     try {
       const { response } = await client.DELETE('/api/rooms/{id}/', {
         params: {
           path: { id: roomId },
           header: schemaStore.termHeader,
-        }
+        },
       })
-      
+
       if (response.status === 204) {
         if (rooms.value.length > 0) {
           await fetchRooms(buildingId)
@@ -236,20 +247,22 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const fetchRoomEquipment = async (roomId: number): Promise<RoomEquipment[]> => {
+  const fetchRoomEquipment = async (
+    roomId: number,
+  ): Promise<RoomEquipment[]> => {
     if (!schemaStore.activeSchema?.id) {
       return []
     }
-    
+
     isLoading.value = true
     try {
       const response = await client.GET('/api/room-equipment/', {
         params: {
           header: schemaStore.termHeader,
-          query: { room: roomId }
-        }
+          query: { room: roomId },
+        },
       })
-      
+
       return response.data?.results || []
     } catch (err) {
       return []
@@ -258,20 +271,22 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const fetchRoomEquipmentByEquipment = async (equipmentId: number): Promise<RoomEquipment[]> => {
+  const fetchRoomEquipmentByEquipment = async (
+    equipmentId: number,
+  ): Promise<RoomEquipment[]> => {
     if (!schemaStore.activeSchema?.id) {
       return []
     }
-    
+
     isLoading.value = true
     try {
       const response = await client.GET('/api/room-equipment/', {
         params: {
           header: schemaStore.termHeader,
-          query: { equipment: equipmentId }
-        }
+          query: { equipment: equipmentId },
+        },
       })
-      
+
       return response.data?.results || []
     } catch (err) {
       return []
@@ -280,16 +295,19 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const createRoomEquipment = async (roomId: number, equipmentData: RoomEquipmentRequest): Promise<RoomEquipment | null> => {
+  const createRoomEquipment = async (
+    roomId: number,
+    equipmentData: RoomEquipmentRequest,
+  ): Promise<RoomEquipment | null> => {
     isLoading.value = true
     try {
       const response = await client.POST('/api/room-equipment/', {
         params: {
           header: schemaStore.termHeader,
         },
-        body: equipmentData
+        body: equipmentData,
       })
-      
+
       return response.data || null
     } catch (err) {
       return null
@@ -298,7 +316,10 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const updateRoomEquipment = async (equipmentId: number, equipmentData: RoomEquipmentRequest): Promise<RoomEquipment | null> => {
+  const updateRoomEquipment = async (
+    equipmentId: number,
+    equipmentData: RoomEquipmentRequest,
+  ): Promise<RoomEquipment | null> => {
     isLoading.value = true
     try {
       const response = await client.PUT('/api/room-equipment/{id}/', {
@@ -306,9 +327,9 @@ export const useBuildingStore = defineStore('buildings', () => {
           path: { id: equipmentId },
           header: schemaStore.termHeader,
         },
-        body: equipmentData
+        body: equipmentData,
       })
-      
+
       return response.data || null
     } catch (err) {
       return null
@@ -317,16 +338,19 @@ export const useBuildingStore = defineStore('buildings', () => {
     }
   }
 
-  const deleteRoomEquipment = async (equipmentId: number, roomId: number): Promise<boolean> => {
+  const deleteRoomEquipment = async (
+    equipmentId: number,
+    roomId: number,
+  ): Promise<boolean> => {
     isLoading.value = true
     try {
       const { response } = await client.DELETE('/api/room-equipment/{id}/', {
         params: {
           path: { id: equipmentId },
           header: schemaStore.termHeader,
-        }
+        },
       })
-      
+
       return response.status === 204
     } catch (err) {
       return false
@@ -343,6 +367,7 @@ export const useBuildingStore = defineStore('buildings', () => {
   watchEffect(() => {
     if (schemaStore.activeSchema?.id) {
       fetchBuildings()
+      fetchRooms()
     } else {
       buildings.value = []
       rooms.value = []
@@ -371,6 +396,6 @@ export const useBuildingStore = defineStore('buildings', () => {
     createRoomEquipment,
     updateRoomEquipment,
     deleteRoomEquipment,
-    clearSelections
+    clearSelections,
   }
 })
