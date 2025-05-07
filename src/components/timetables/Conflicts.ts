@@ -1,5 +1,6 @@
 import { CalendarEvent, TimeSlot } from '@/types/types'
 import { computed, Ref } from 'vue'
+import { DAYS } from '@/utils/timetable'
 
 export interface ConflictOptions {
   isDragging: Ref<boolean>
@@ -8,8 +9,6 @@ export interface ConflictOptions {
   draggedOverTime: Ref<TimeSlot | null>
   placedEvents: Ref<CalendarEvent[]>
   timeToIndex: (time: string) => number
-  getEventDuration: (event: CalendarEvent) => number
-  days: readonly string[]
 }
 
 export interface Conflicts {
@@ -39,8 +38,6 @@ export function useConflicts(options: ConflictOptions): Conflicts {
     draggedOverTime,
     placedEvents,
     timeToIndex,
-    getEventDuration,
-    days,
   } = options
 
   const hasRoomConflict = computed(() => currentDragConflicts.value.hasConflict)
@@ -69,14 +66,14 @@ export function useConflicts(options: ConflictOptions): Conflicts {
 
     try {
       const event = draggedEvent.value
-      const dayName = typeof day === 'number' ? days[day] : day
+      const dayName = typeof day === 'number' ? DAYS[day] : day
 
       // Exclude current event from check
       const eventsToCheck = event.id
         ? placedEvents.value.filter((e) => e.id !== event.id)
         : placedEvents.value
 
-      const endTimeIndex = timeIndex + event.duration! - 1
+      const endTimeIndex = timeIndex + event.duration - 1
       const conflictTypes = new Set<string>()
       const conflictingEvents: CalendarEvent[] = []
 
@@ -86,7 +83,7 @@ export function useConflicts(options: ConflictOptions): Conflicts {
         if (e.day !== dayName) continue
 
         const eventStartIndex = timeToIndex(e.start_time)
-        const eventEndIndex = eventStartIndex + getEventDuration(e) - 1
+        const eventEndIndex = eventStartIndex + e.duration - 1
 
         // Check time overlap
         if (timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) {

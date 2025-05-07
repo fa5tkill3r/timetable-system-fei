@@ -11,29 +11,24 @@ import {
   Ref,
   ComputedRef,
 } from 'vue'
-import _, { has } from 'lodash'
+import _ from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
 import { useTimetableStore } from '@/store/timetables'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { useSubjectStore } from '@/store/subjects'
 import { useBuildingStore } from '@/store/buildings'
 import { useTTEventTypeStore } from '@/store/ttEventTypes'
-import { getColorFromString } from '@/lib/utils'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import { MoreVertical, Building, Calendar } from 'lucide-vue-next'
-import { Input } from '@/components/ui/input'
+import { MoreVertical, Building } from 'lucide-vue-next'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
 import ComboBox from '@/components/common/ComboBox.vue'
 import {
   ResizableHandle,
@@ -43,23 +38,21 @@ import {
 import RoomSelectionPanel from '@/components/timetables/RoomSelectionPanel.vue'
 import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue'
 import { useSubjectGroupStore } from '@/store/subjectGroups'
-import { components } from '@/types/schema'
 import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
 import {
   DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
-  DEFAULT_TIME_CONFIG as TIME_CONFIG,
   DAYS
 } from '@/utils/timetable'
 import ConflictIcons from '@/components/timetables/ConflictIcons.vue'
 import EventContextMenu from '@/components/timetables/EventContextMenu.vue'
 import { templateRef } from '@vueuse/core'
 import { CalendarEvent, TimeSlot } from '@/types/types'
-import { Conflicts, useConflicts } from '@/components/timetables/Conflicts'
+import { useConflicts } from '@/components/timetables/Conflicts'
 import WeekFilter from '@/components/timetables/WeekFilter.vue'
 import { useTimeTableFilter } from '@/components/timetables/TimeTableFilter'
-import { TimeTableStyleOptions, useTimeTableStyle } from '@/components/timetables/TimeTableStyle'
+import { useTimeTableStyle } from '@/components/timetables/TimeTableStyle'
+import { useTimeTableBase } from '@/components/timetables/TimeTableBase'
 
-type Room = components['schemas']['Room']
 
 const semesterOptions = [
   { id: 'LS', name: 'Summer Semester (LS)' },
@@ -131,51 +124,6 @@ const placedEvents = computed<CalendarEvent[]>(() => {
 const isDragging = computed(() => draggedEvent.value !== null)
 
 
-const timeSlots: TimeSlot[] = (() => {
-  const slots: TimeSlot[] = []
-  let currentHour = TIME_CONFIG.START_HOUR
-  let currentMinute = TIME_CONFIG.START_MINUTE
-
-  for (let i = 0; i < TIME_CONFIG.SLOT_COUNT; i++) {
-    const fromHour = currentHour.toString().padStart(2, '0')
-    const fromMinute = currentMinute.toString().padStart(2, '0')
-    const from = `${fromHour}:${fromMinute}`
-
-    let endHour = currentHour
-    let endMinute = currentMinute + TIME_CONFIG.SLOT_DURATION
-
-    if (endMinute >= 60) {
-      endHour += Math.floor(endMinute / 60)
-      endMinute = endMinute % 60
-    }
-
-    const toHour = endHour.toString().padStart(2, '0')
-    const toMinute = endMinute.toString().padStart(2, '0')
-    const to = `${toHour}:${toMinute}`
-
-    slots.push({ from, to, index: i })
-
-    currentMinute += TIME_CONFIG.SLOT_DURATION + TIME_CONFIG.BREAK_DURATION
-    if (currentMinute >= 60) {
-      currentHour += Math.floor(currentMinute / 60)
-      currentMinute = currentMinute % 60
-    }
-  }
-
-  return slots
-})()
-
-function getSubjectCode(subjectId?: number | null): string | null {
-  if (!subjectId) return null
-
-  const subject = subjectStore.subjects.find((s) => s.id === subjectId)
-  return subject ? subject.code : null
-}
-
-
-
-
-
 async function loadTimetableData() {
   try {
     await timetableStore.fetchTimetables()
@@ -224,188 +172,12 @@ async function fetchTimetableEvents(timetableId: number) {
   }
 }
 
-function processTimetableEvents() {
-  events.value = []
-
-  timetableEventStore.events.forEach((event) => {
-    const ttaData = event.tta as any
-    const subjectId = ttaData?.subject
-    const eventType = ttaData?.event_type
-
-    const subjectName = getSubjectName(subjectId)
-    const subjectCode = getSubjectCode(subjectId)
-
-    const timeIndex = Math.min(event.start_time!, timeSlots.length - 1)
-    const startTime = timeSlots[timeIndex]!.from
-    const endTime = calculateEndTime(startTime, event.duration!)
-
-    const room = event.room as any as Room
-
-    const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
-
-    events.value.push({
-      id: event.id!,
-      day: DAYS[event.day_of_week! - 1] ?? null,
-      start_time: startTime,
-      end_time: endTime,
-      start_index: timeToIndex(startTime),
-      title: subjectName!,
-      shortcut: subjectCode!,
-      color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-      room_id: room?.id,
-      room_name: room?.name,
-      subject_id: subjectId,
-      event_type: eventType,
-      duration: event.duration || 1,
-      weeks_bitmask: event.weeks_bitmask || 4095,
-    })
-  })
-}
-
-function timeToIndex(time: string): number {
-  const index = timeSlots.findIndex((slot) => slot.from === time)
-  return index >= 0 ? index : 0
-}
-
-function calculateEndTime(startTime: string, duration: number): string {
-  const startIndex = timeToIndex(startTime)
-
-  if (startIndex === -1) {
-    console.warn(
-      `Could not find time slot for: "${startTime}". Available slots:`,
-      timeSlots.map((slot) => slot.from),
-    )
-    return startTime
-  }
-
-  const endIndex = startIndex + duration - 1
-  if (endIndex >= timeSlots.length) return timeSlots[timeSlots.length - 1]!.to
-
-  return timeSlots[endIndex]!.to
-}
-
-function getSubjectName(subjectId?: number | null): string | null {
-  if (!subjectId) return null
-
-  const subject = subjectStore.subjects.find((s) => s.id === subjectId)
-  return subject ? subject.name : null
-}
-
-
-
-const getEventDuration = (event: CalendarEvent): number => {
-  // For template events with no start/end time
-  if (event?.duration) {
-    return event.duration
-  }
-
-  if (!event.start_time || !event.end_time) {
-    return event.duration || 1
-  }
-
-  const startIndex = timeSlots.findIndex(
-    (slot) => slot.from === event.start_time,
-  )
-  const endIndex = timeSlots.findIndex((slot) => slot.to === event.end_time)
-  return endIndex - startIndex + 1
-}
-const getRowEventPositions = computed<
-  Map<number, { row: number; maxRows: number }>
->(() => {
-  const eventsByDay = _.groupBy(filteredEvents.value, 'day')
-  const eventPositions = new Map()
-
-  Object.entries(eventsByDay).forEach(([, dayEvents]) => {
-    const sortedEvents = [...dayEvents].sort(
-      (a, b) => timeToIndex(a.start_time!) - timeToIndex(b.start_time!),
-    )
-
-    const rows: { end_time: string; event: CalendarEvent }[][] = []
-
-    sortedEvents.forEach((event) => {
-      const startIndex = timeSlots.findIndex(
-        (slot) => slot.from === event.start_time,
-      )
-
-      let rowIndex = 0
-      let foundRow = false
-
-      while (!foundRow) {
-        if (!rows[rowIndex]) {
-          rows[rowIndex] = []
-          foundRow = true
-        } else {
-          const overlaps = rows[rowIndex]?.some((occupiedSlot) => {
-            const occupiedEndIndex = timeSlots.findIndex(
-              (slot) => slot.to === occupiedSlot.event.end_time,
-            )
-            return startIndex <= occupiedEndIndex
-          })
-
-          if (!overlaps) {
-            foundRow = true
-          } else {
-            rowIndex++
-          }
-        }
-      }
-
-      rows[rowIndex]?.push({ end_time: event.end_time!, event })
-      eventPositions.set(event.id, { row: rowIndex, maxRows: 0 })
-    })
-
-    const maxRows = rows.length
-    sortedEvents.forEach((event) => {
-      const position = eventPositions.get(event.id)
-      if (position) {
-        position.maxRows = maxRows
-      }
-    })
-  })
-
-  return eventPositions
-})
-
-
-
-const getDayRowPositions = computed<number[]>(() => {
-  const positions: number[] = Array(DAYS.length).fill(0)
-  const eventPositions = getRowEventPositions.value
-
-  let currentTop = TIMETABLE_CONFIG.HEADER_HEIGHT
-
-  DAYS.forEach((day, index) => {
-    positions[index] = currentTop
-
-    const dayEvents = filteredEvents.value.filter((e) => e.day === day)
-    let maxRows = 1
-
-    if (dayEvents.length > 0) {
-      const dayPositions = dayEvents
-        .map((e) => eventPositions.get(e.id))
-        .filter(Boolean) as { row: number; maxRows: number }[]
-
-      if (dayPositions.length > 0) {
-        maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
-      }
-    }
-
-    currentTop += TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
-  })
-
-  return positions
-})
-
-
-
-
 
 const handleDragStart = (event: DragEvent, itemData: CalendarEvent) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.setData('text/plain', itemData.id?.toString() || '')
 
-    // Create an empty, transparent element to use as the drag image
     const emptyImg = document.createElement('div')
     emptyImg.style.position = 'absolute'
     emptyImg.style.top = '-9999px'
@@ -461,11 +233,11 @@ const getMousePosition = (
     dayIndex >= 0 &&
     dayIndex < DAYS.length &&
     timeIndex >= 0 &&
-    timeIndex < timeSlots.length
+    timeIndex < timeSlots.value.length
   ) {
     return {
       day: DAYS[dayIndex]!,
-      time: timeSlots[timeIndex]!,
+      time: timeSlots.value[timeIndex]!,
     }
   }
   return null
@@ -514,12 +286,12 @@ const isValidEventPlacement = (
 ): boolean => {
   if (!position) return false
 
-  const timeIndex = timeSlots.findIndex(
+  const timeIndex = timeSlots.value.findIndex(
     (slot) => slot.from === position.time.from,
   )
   const newEndIndex = timeIndex + duration - 1
 
-  return timeIndex >= 0 && newEndIndex < timeSlots.length
+  return timeIndex >= 0 && newEndIndex < timeSlots.value.length
 }
 
 const handleDrop = async (event: DragEvent) => {
@@ -530,7 +302,7 @@ const handleDrop = async (event: DragEvent) => {
     if (!position) throw new Error('Invalid drop position')
     if (!draggedEvent.value) throw new Error('No event to drop')
 
-    if (!isValidEventPlacement(position, draggedEvent.value?.duration || 1)) {
+    if (!isValidEventPlacement(position, draggedEvent.value?.duration)) {
       toast({
         title: 'Invalid Placement',
         description: 'The event cannot be placed here.',
@@ -547,10 +319,10 @@ const handleDrop = async (event: DragEvent) => {
       ...draggedActivity,
       day: position.day,
       start_time: position.time.from,
-      duration: draggedActivity.duration || 1,
+      duration: draggedActivity.duration,
       end_time: calculateEndTime(
         position.time.from,
-        draggedActivity.duration || 1,
+        draggedActivity.duration,
       ),
       start_index: timeToIndex(position.time.from),
       room_id:
@@ -661,7 +433,7 @@ async function toggleEventPlacement(event: CalendarEvent) {
     const eventData = {
       day_of_week: null,
       start_time: null,
-      duration: getEventDuration(event),
+      duration: event.duration,
       room: null,
       weeks_bitmask: 0,
     }
@@ -732,16 +504,6 @@ function isOverTimetable(event: DragEvent): boolean {
   )
 }
 
-
-
-
-function setupGlobalDragHandlers() {
-  document.addEventListener('dragover', handleDocumentDragOver)
-
-  document.addEventListener('dragend', handleDragEnd)
-  window.addEventListener('dragend', handleDragEnd)
-}
-
 onMounted(async () => {
   await subjectStore.fetchSubjects()
   await buildingStore.fetchRooms()
@@ -762,7 +524,10 @@ onMounted(async () => {
   }
 
   loadTimetableData()
-  setupGlobalDragHandlers()
+
+  document.addEventListener('dragover', handleDocumentDragOver)
+  document.addEventListener('dragend', handleDragEnd)
+  window.addEventListener('dragend', handleDragEnd)
 })
 
 function handleDragEnd() {
@@ -771,7 +536,6 @@ function handleDragEnd() {
   draggedOverTime.value = null
 }
 
-// Make sure to clean up when component unmounts
 onUnmounted(() => {
   document.removeEventListener('dragover', handleDocumentDragOver)
   document.removeEventListener('dragend', handleDragEnd)
@@ -784,7 +548,6 @@ function handleEventContextMenu(
   event.preventDefault()
   event.stopPropagation()
 
-  // Position the context menu at the cursor position
   contextMenuPosition.value = { x: event.clientX, y: event.clientY }
   selectedEvent.value = calendarEvent
   contextMenuVisible.value = true
@@ -847,22 +610,6 @@ function editEvent(event: CalendarEvent) {
 }
 
 
-const conflicts = useConflicts({
-  draggedEvent,
-  isDragging,
-  placedEvents,
-  draggedOverDay,
-  draggedOverTime,
-  timeToIndex,
-  getEventDuration,
-  days: DAYS
-})
-
-const {
-  cellHasConflict,
-  hasRoomConflict,
-} = conflicts
-
 
 const {
   selectedSemester,
@@ -879,6 +626,33 @@ const {
   weekFilter,
 })
 
+const {
+  timeSlots,
+  timeToIndex,
+  calculateEndTime,
+  getRowEventPositions,
+  getDayRowPositions,
+  processTimetableEvents,
+  getSubjectName,
+  getSubjectCode
+} = useTimeTableBase({
+  events,
+  filteredEvents
+})
+
+const conflicts = useConflicts({
+  draggedEvent,
+  isDragging,
+  placedEvents,
+  draggedOverDay,
+  draggedOverTime,
+  timeToIndex,
+})
+
+const {
+  cellHasConflict,
+  hasRoomConflict,
+} = conflicts
 
 
 const {
@@ -895,7 +669,6 @@ const {
   getRowEventPositions,
   getDayRowPositions,
   timeToIndex,
-  getEventDuration,
   filteredEvents,
   conflicts,
   timeSlots
@@ -1052,7 +825,7 @@ watch(
                       <Badge :variant="timetableStore.selectedTimetable?.status ===
                         'PUBLISHED'
                         ? 'default'
-                        : timetableStore.selectedTimetable?.status === 'WIP'
+                        : timetableStore.selectedTimetable?.status === 'TEST'
                           ? 'secondary'
                           : 'destructive'
                         ">
@@ -1063,21 +836,15 @@ watch(
                         Owner: {{ timetableStore.selectedTimetable?.owner }}
                       </Badge>
                     </div>
-                    <!-- <div class="min-w-[150px]">
-                    <ComboBox :options="roomOptions" title="Preferred Room"
-                      search-placeholder="Select preferred room..." @update:selection="preferredRoom = $event" />
-                  </div> -->
                   </div>
                 </div>
               </div>
 
               <ScrollArea class="overflow-auto p-1">
-                <!-- Replace custom timetable with TimetableGrid component -->
                 <TimetableGrid ref="TimeTableGrid" :days="DAYS" :time-slots="timeSlots" :get-cell-style="getCellStyle"
                   :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
                   :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
                   @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd">
-                  <!-- Show placeholder message when no room is selected in rooms view -->
                   <div v-if="viewType === 'rooms' && !preferredRoom"
                     class="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 bg-opacity-80">
                     <div class="text-lg font-medium text-gray-500">
@@ -1085,8 +852,6 @@ watch(
                     </div>
                   </div>
 
-                  <!-- Replace the current conflict icons implementation with this -->
-                  <!-- Add conflict icons to cells -->
                   <div v-for="(day, dayIndex) in DAYS" :key="`conflict-icons-${day}`">
                     <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
                       <div v-if="
@@ -1099,14 +864,13 @@ watch(
                         zIndex: 30,
                         pointerEvents: 'none',
                       }">
-                        <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types
-                          " />
+                        <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
                       </div>
                     </template>
                   </div>
 
-                  <!-- Add events as slots in the TimetableGrid -->
-                  <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id" class="group relative">
+                  <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id || 'temp'"
+                    class="group relative">
                     <div :style="getEventStyle(event)" class="event rounded-lg shadow-md transition-all hover:shadow-lg"
                       draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd"
                       @contextmenu="handleEventContextMenu($event, event)">
@@ -1131,9 +895,6 @@ watch(
                   </div>
                 </TimetableGrid>
 
-                <!-- Add this right after your TimetableGrid component -->
-                <!-- Drag preview element -->
-
                 <ScrollBar orientation="horizontal" />
                 <ScrollBar orientation="vertical" />
               </ScrollArea>
@@ -1143,7 +904,6 @@ watch(
           <ResizableHandle @dragging="isResizing = $event" with-handle />
 
           <ResizablePanel :default-size="20">
-            <!-- Room selection panel -->
             <RoomSelectionPanel v-model:selected-room-id="preferredRoom" v-model:override-rooms="overrideRooms" />
           </ResizablePanel>
         </ResizablePanelGroup>
@@ -1162,7 +922,7 @@ watch(
       position: 'fixed',
       left: mousePosition.x + 15 + 'px',
       top: mousePosition.y + 15 + 'px',
-      width: `${TIMETABLE_CONFIG.CELL_WIDTH * getEventDuration(draggedEvent!) - 4}px`,
+      width: `${TIMETABLE_CONFIG.CELL_WIDTH * draggedEvent!.duration - 4}px`,
       height: `${TIMETABLE_CONFIG.CELL_HEIGHT - 4}px`,
       border: hasRoomConflict ? '2px solid #e53935' : '2px solid #2196f3',
       pointerEvents: 'none',
@@ -1182,7 +942,7 @@ watch(
           {{
             calculateEndTime(
               draggedOverTime.from,
-              getEventDuration(draggedEvent!) || 1,
+              draggedEvent!.duration,
             )
           }}
         </div>

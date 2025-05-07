@@ -17,7 +17,7 @@ export interface CalendarEvent {
   room_name?: string | null
   subject_id?: number | null
   event_type?: number | null
-  duration?: number
+  duration: number
   original_eventId?: number | null
   weeks_bitmask: number
 }

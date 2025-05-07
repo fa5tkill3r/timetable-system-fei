@@ -2,7 +2,7 @@ import { CalendarEvent, TimeSlot } from '@/types/types'
 import { DAYS } from '@/utils/timetable'
 import { computed, ComputedRef, CSSProperties, Ref } from 'vue'
 import { DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG } from '@/utils/timetable'
-import { ConflictOptions, Conflicts } from './Conflicts'
+import { Conflicts } from './Conflicts'
 
 export interface TimeTableStyleOptions {
   draggedEvent: Ref<CalendarEvent | null>
@@ -13,10 +13,9 @@ export interface TimeTableStyleOptions {
   >
   getDayRowPositions: ComputedRef<number[]>
   timeToIndex: (time: string) => number
-  getEventDuration: (event: CalendarEvent) => number
   filteredEvents: ComputedRef<CalendarEvent[]>
   conflicts: Conflicts
-  timeSlots: TimeSlot[]
+  timeSlots: ComputedRef<TimeSlot[]>
 }
 
 export function useTimeTableStyle(options: TimeTableStyleOptions) {
@@ -27,7 +26,6 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
     getRowEventPositions,
     getDayRowPositions,
     timeToIndex,
-    getEventDuration,
     filteredEvents,
     conflicts,
     timeSlots,
@@ -35,7 +33,6 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
   const { cellHasConflict, checkConflicts } = conflicts
 
-  // Update the getEventStyle function to ensure dragging works
   const getEventStyle = (event: CalendarEvent): CSSProperties => {
     if (!event.day || !event.start_time || !event.end_time) {
       return {}
@@ -43,17 +40,16 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
     const dayIndex = DAYS.indexOf(event.day)
     const startIndex = timeToIndex(event.start_time)
-    const duration = getEventDuration(event)
+    const duration = event.duration
     const dayPositions = getDayRowPositions.value
 
     const { row = 0, maxRows = 1 } =
-      getRowEventPositions.value.get(event.id) || {}
+      getRowEventPositions.value.get(event.id!) || {}
 
     const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
     const rowSpacing = (4 * maxRows) / (maxRows + 1)
     const topOffset = row * (eventHeight + rowSpacing)
 
-    // Adjust opacity - keep events more visible during drag
     const isDraggingNow = draggedEvent.value !== null
     const isBeingDragged = draggedEvent.value?.id === event.id
 
@@ -68,9 +64,9 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
       padding: '8px',
       boxSizing: 'border-box',
       overflow: 'hidden',
-      zIndex: 25, // Use consistent z-index
+      zIndex: 25,
       cursor: 'move',
-      opacity: isDraggingNow ? (isBeingDragged ? 0.4 : 0.85) : 1, // Make semi-transparent but not invisible
+      opacity: isDraggingNow ? (isBeingDragged ? 0.4 : 0.85) : 1,
     }
   }
 
@@ -92,8 +88,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
       draggedOverDay.value === DAYS[dayIndex] &&
         draggedOverTime.value &&
         timeIndex >= draggedOverTime.value.index &&
-        timeIndex <
-          draggedOverTime.value.index + getEventDuration(draggedEvent.value),
+        timeIndex < draggedOverTime.value.index + draggedEvent.value!.duration,
     )
 
     const wouldConflict = checkConflicts(dayIndex, timeIndex).hasConflict
@@ -126,15 +121,14 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
         // For regular hover during drag
         if (isDraggedOver) {
-          return timeIndex + getEventDuration(draggedEvent.value) <=
-            timeSlots.length
+          return timeIndex + draggedEvent.value.duration <=
+            timeSlots.value.length
             ? 'rgba(227, 242, 253, 0.7)' // Semi-transparent blue for valid placement
             : 'rgba(255, 205, 210, 0.7)' // Semi-transparent red for invalid placement
         }
 
         return 'transparent'
       })(),
-      // No longer using background image for icons
     }
   }
 
@@ -217,7 +211,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
     return {
       position: 'relative',
-      width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeSlots.length}px`,
+      width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeSlots.value.length}px`,
       height: `${totalHeight}px`,
       border: '1px solid #e0e0e0',
       borderBottom: 'none',
