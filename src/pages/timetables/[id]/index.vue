@@ -52,6 +52,7 @@ import EventContextMenu from '@/components/timetables/EventContextMenu.vue'
 import { templateRef } from '@vueuse/core'
 import { CalendarEvent, TimeSlot } from '@/types/types'
 import { useConflicts } from '@/components/timetables/Conflicts'
+import WeekFilter from '@/components/timetables/WeekFilter.vue'
 
 type Room = components['schemas']['Room']
 
@@ -97,6 +98,7 @@ const draggedOverDay = ref<string | null>(null)
 const draggedOverTime = ref<TimeSlot | null>(null)
 const mousePosition = ref({ x: 0, y: 0 })
 const TimeTableGrid = useTemplateRef('TimeTableGrid')
+const weekFilter = useTemplateRef('weekFilter')
 
 const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
@@ -345,13 +347,13 @@ const applyParallelsFilter = (item: CalendarEvent) => {
 const applyWeekPatternMatch = (event: CalendarEvent) => {
   const eventWeeksBitmask = event.weeks_bitmask || 0
 
-  if (exactWeekMatch.value) {
+  if (weekFilter.value?.exactWeekMatch) {
     // Exact match - patterns must be identical
-    return eventWeeksBitmask === filterWeeksBitmask.value
+    return eventWeeksBitmask === weekFilter.value.filterWeeksBitmask
   } else {
     // Partial match - any selected week in the filter must be present in the event
     // This is a bitwise AND to check if there's any overlap
-    return (eventWeeksBitmask & filterWeeksBitmask.value) > 0
+    return (eventWeeksBitmask & weekFilter.value?.filterWeeksBitmask!) > 0
   }
 }
 
@@ -1045,56 +1047,6 @@ function isOverTimetable(event: DragEvent): boolean {
   )
 }
 
-const filterWeeksBitmask = ref(parseInt('111111111111', 2)) // Default to all weeks selected
-const exactWeekMatch = ref(false) // Default to inexact matching
-
-const filterWeekBits = computed(() => {
-  const binaryString = (filterWeeksBitmask.value || 0)
-    .toString(2)
-    .padStart(12, '0')
-  return binaryString.split('').map((bit) => bit === '1')
-})
-
-const isFilterOddWeeksPattern = computed(() => {
-  const oddWeeksMask = parseInt('101010101010', 2)
-  return filterWeeksBitmask.value === oddWeeksMask
-})
-
-const isFilterEvenWeeksPattern = computed(() => {
-  const evenWeeksMask = parseInt('010101010101', 2)
-  return filterWeeksBitmask.value === evenWeeksMask
-})
-
-const isFilterAllWeeksPattern = computed(() => {
-  const allWeeksMask = parseInt('111111111111', 2)
-  return filterWeeksBitmask.value === allWeeksMask
-})
-
-function toggleFilterWeek(index: number) {
-  const bitArray = filterWeekBits.value.slice()
-  bitArray[index] = !bitArray[index]
-  filterWeeksBitmask.value = parseInt(
-    bitArray.map((bit) => (bit ? '1' : '0')).join(''),
-    2,
-  )
-}
-
-function selectOddWeeks() {
-  filterWeeksBitmask.value = parseInt('101010101010', 2)
-}
-
-function selectEvenWeeks() {
-  filterWeeksBitmask.value = parseInt('010101010101', 2)
-}
-
-function selectAllWeeks() {
-  if (!isFilterAllWeeksPattern.value) {
-    filterWeeksBitmask.value = parseInt('111111111111', 2)
-  } else {
-    filterWeeksBitmask.value = parseInt('000000000000', 2)
-  }
-}
-
 
 
 
@@ -1158,7 +1110,7 @@ async function updateEventWeeksBitmask(eventId: number, newBitmask: number) {
     const eventIndex = placedEvents.value.findIndex((e) => e.id === eventId)
     if (eventIndex !== -1) {
       // Update local state
-      placedEvents.value[eventIndex].weeks_bitmask = newBitmask
+      placedEvents.value[eventIndex]!.weeks_bitmask = newBitmask
 
       // Save to server
       await timetableEventStore.updateEvent(eventId, {
@@ -1233,46 +1185,7 @@ const {
         <ResizablePanelGroup direction="vertical">
           <ResizablePanel :default-size="80">
             <div class="flex h-full flex-col">
-              <div class="border-b bg-muted/20 px-2 py-1">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <h4 class="flex items-center text-sm font-medium">
-                      <Calendar class="mr-1 h-4 w-4" /> Week Filter
-                    </h4>
-                    <div class="flex gap-1">
-                      <Button size="sm" :variant="isFilterOddWeeksPattern ? 'default' : 'secondary'
-                        " class="h-7 text-xs" @click="selectOddWeeks">
-                        A
-                      </Button>
-                      <Button size="sm" :variant="isFilterEvenWeeksPattern ? 'default' : 'secondary'
-                        " class="h-7 text-xs" @click="selectEvenWeeks">
-                        B
-                      </Button>
-                      <Button size="sm" :variant="isFilterAllWeeksPattern ? 'default' : 'secondary'
-                        " class="h-7 text-xs" @click="selectAllWeeks">
-                        All Weeks
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div class="flex justify-center gap-1">
-                    <button v-for="(active, index) in filterWeekBits" :key="index" @click="toggleFilterWeek(index)"
-                      class="flex h-6 w-6 items-center justify-center rounded-full border text-xs" :class="active
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-background text-muted-foreground'
-                        ">
-                      {{ index + 1 }}
-                    </button>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <div class="ml-4 flex items-center gap-2">
-                      <label class="text-sm font-medium">Exact Match</label>
-                      <Switch v-model:checked="exactWeekMatch" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <WeekFilter ref="weekFilter" />
               <div class="flex items-center">
                 <div class="flex w-full flex-col">
                   <div class="flex justify-center">
