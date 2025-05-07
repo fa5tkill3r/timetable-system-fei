@@ -727,7 +727,6 @@ watch(
               <div class="flex items-center">
                 <div class="flex w-full flex-col">
                   <div class="flex justify-center">
-                    <!-- Replace separate buttons with proper tabs implementation -->
                     <Tabs v-model="viewType" default-value="parallels"
                       class="flex h-[100px] w-full flex-row items-start justify-between">
                       <TabsList class="h-fit">
@@ -737,10 +736,8 @@ watch(
                         <TabsTrigger value="student">Student</TabsTrigger>
                       </TabsList>
 
-                      <!-- Content specific to each tab view -->
                       <div class="mr-2">
                         <TabsContent value="parallels">
-                          <!-- Add filtering controls for parallels view -->
                           <div class="flex flex-wrap items-center justify-center gap-3">
                             <ComboBox :options="semesterOptions" title="Semester"
                               search-placeholder="Select semester..." v-model:selection="selectedSemester" />
@@ -822,6 +819,10 @@ watch(
                     timetableId && timetableStore.selectedTimetable?.status
                   " class="flex justify-between pb-2 pr-3">
                     <div class="flex items-end gap-2 pl-10">
+                      <Badge variant="outline">
+                        {{ selectedTimetableName }}
+                      </Badge>
+
                       <Badge :variant="timetableStore.selectedTimetable?.status ===
                         'PUBLISHED'
                         ? 'default'
@@ -841,59 +842,62 @@ watch(
               </div>
 
               <ScrollArea class="overflow-auto p-1">
-                <TimetableGrid ref="TimeTableGrid" :days="DAYS" :time-slots="timeSlots" :get-cell-style="getCellStyle"
-                  :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
-                  :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
-                  @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd">
-                  <div v-if="viewType === 'rooms' && !preferredRoom"
-                    class="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 bg-opacity-80">
-                    <div class="text-lg font-medium text-gray-500">
-                      Please select a room to view its schedule
-                    </div>
-                  </div>
-
-                  <div v-for="(day, dayIndex) in DAYS" :key="`conflict-icons-${day}`">
-                    <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
-                      <div v-if="
-                        isDragging &&
-                        cellHasConflict(dayIndex, slot.index).hasConflict
-                      " :style="{
-                        position: 'absolute',
-                        left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * slot.index + 4}px`,
-                        top: `${getDayRowPositions[dayIndex] ?? TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
-                        zIndex: 30,
-                        pointerEvents: 'none',
-                      }">
-                        <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
-                      </div>
-                    </template>
-                  </div>
-
-                  <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id || 'temp'"
-                    class="group relative">
-                    <div :style="getEventStyle(event)" class="event rounded-lg shadow-md transition-all hover:shadow-lg"
-                      draggable="true" @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd"
-                      @contextmenu="handleEventContextMenu($event, event)">
-                      <div class="flex items-center justify-between">
-                        <div class="event-title truncate font-semibold text-gray-800">
-                          {{ event.shortcut }}
-                          <span class="sr-only">{{ event.title }}</span>
-                        </div>
-                        <button @click.stop.prevent="() => { }" class="event-menu-button">
-                          <MoreVertical
-                            class="h-4 w-4 shrink-0 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100" />
-                        </button>
-                      </div>
-                      <div class="flex justify-between text-sm text-gray-600">
-                        <div>{{ event.start_time }} - {{ event.end_time }}</div>
-                        <div v-if="event.room_name"
-                          class="inline-flex items-center rounded-sm border-primary bg-blue-100 px-1 text-xs font-semibold">
-                          <Building class="h-4 w-4" /> {{ event.room_name }}
-                        </div>
+                <div class="flex justify-center">
+                  <TimetableGrid ref="TimeTableGrid" :days="DAYS" :time-slots="timeSlots" :get-cell-style="getCellStyle"
+                    :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
+                    :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
+                    @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd">
+                    <div v-if="viewType === 'rooms' && !preferredRoom"
+                      class="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 bg-opacity-80">
+                      <div class="text-lg font-medium text-gray-500">
+                        Please select a room to view its schedule
                       </div>
                     </div>
-                  </div>
-                </TimetableGrid>
+
+                    <div v-for="(day, dayIndex) in DAYS" :key="`conflict-icons-${day}`">
+                      <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
+                        <div v-if="
+                          isDragging &&
+                          cellHasConflict(dayIndex, slot.index).hasConflict
+                        " :style="{
+                          position: 'absolute',
+                          left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * slot.index + 4}px`,
+                          top: `${getDayRowPositions[dayIndex] ?? TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
+                          zIndex: 30,
+                          pointerEvents: 'none',
+                        }">
+                          <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
+                        </div>
+                      </template>
+                    </div>
+
+                    <div v-if="!isResizing" v-for="event in filteredEvents" :key="event.id || 'temp'"
+                      class="group relative">
+                      <div :style="getEventStyle(event)"
+                        class="event rounded-lg shadow-md transition-all hover:shadow-lg" draggable="true"
+                        @dragstart="handleDragStart($event, event)" @dragend="handleDragEnd"
+                        @contextmenu="handleEventContextMenu($event, event)">
+                        <div class="flex items-center justify-between">
+                          <div class="event-title truncate font-semibold text-gray-800">
+                            {{ event.shortcut }}
+                            <span class="sr-only">{{ event.title }}</span>
+                          </div>
+                          <button @click.stop.prevent="() => { }" class="event-menu-button">
+                            <MoreVertical
+                              class="h-4 w-4 shrink-0 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100" />
+                          </button>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                          <div>{{ event.start_time }} - {{ event.end_time }}</div>
+                          <div v-if="event.room_name"
+                            class="inline-flex items-center rounded-sm border-primary bg-blue-100 px-1 text-xs font-semibold">
+                            <Building class="h-4 w-4" /> {{ event.room_name }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TimetableGrid>
+                </div>
 
                 <ScrollBar orientation="horizontal" />
                 <ScrollBar orientation="vertical" />

@@ -862,6 +862,26 @@ export interface paths {
         patch: operations["subject_user_roles_partial_update"];
         trace?: never;
     };
+    "/api/subject-user-roles/list-roles/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all roles
+         * @description Get all roles
+         */
+        get: operations["subject_user_roles_list_roles_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/subjects/": {
         parameters: {
             query?: never;
@@ -1160,6 +1180,62 @@ export interface paths {
          * @description Partially updates an existing object. Only specified fields will be modified.
          */
         patch: operations["ttetype_partial_update"];
+        trace?: never;
+    };
+    "/api/ttetypemapper/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all objects
+         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+         */
+        get: operations["ttetypemapper_list"];
+        put?: never;
+        /**
+         * Create new object
+         * @description Creates a new object with the provided data. Returns the created object.
+         */
+        post: operations["ttetypemapper_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ttetypemapper/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get single object
+         * @description Retrieves a specific object by its unique identifier (ID).
+         */
+        get: operations["ttetypemapper_retrieve"];
+        /**
+         * Update object
+         * @description Fully updates an existing object. All fields must be provided.
+         */
+        put: operations["ttetypemapper_update"];
+        post?: never;
+        /**
+         * Delete object
+         * @description Permanently removes the specified object from the database.
+         */
+        delete: operations["ttetypemapper_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial update object
+         * @description Partially updates an existing object. Only specified fields will be modified.
+         */
+        patch: operations["ttetypemapper_partial_update"];
         trace?: never;
     };
     "/api/ttevent/": {
@@ -1698,6 +1774,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Equipment"][];
         };
+        PaginatedRoleList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["Role"][];
+        };
         PaginatedRoomEquipmentList: {
             /** @example 123 */
             count: number;
@@ -1862,6 +1953,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["TTEventType"][];
+        };
+        PaginatedTTEventTypeRoleMapList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["TTEventTypeRoleMap"][];
         };
         PaginatedTTGroupCountsList: {
             /** @example 123 */
@@ -2081,6 +2187,11 @@ export interface components {
             name?: string;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
+        PatchedTTEventTypeRoleMapRequest: {
+            event_type?: number;
+            role?: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedTTGroupRequest: {
             name?: string;
             tt?: number;
@@ -2089,6 +2200,7 @@ export interface components {
         PatchedTTRequest: {
             name?: string;
             description?: string | null;
+            owner?: number;
             /**
              * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
              *
@@ -2113,6 +2225,13 @@ export interface components {
             /** Format: date */
             end_date?: string | null;
             is_active?: boolean;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        Role: {
+            readonly id?: number;
+            name: string;
+            display_name: string;
+            description?: string;
         };
         Room: {
             readonly id?: number;
@@ -2259,6 +2378,7 @@ export interface components {
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         SubjectUserRole: {
+            readonly id?: number;
             user: number;
             subject: number;
             role: number;
@@ -2274,6 +2394,7 @@ export interface components {
             readonly id?: number;
             name: string;
             description?: string | null;
+            owner: number;
             /**
              * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
              *
@@ -2332,6 +2453,17 @@ export interface components {
             name: string;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
+        TTEventTypeRoleMap: {
+            readonly id?: number;
+            event_type: number;
+            role: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
+        TTEventTypeRoleMapRequest: {
+            event_type: number;
+            role: number;
+        };
+        /** @description Base serializer that automatically handles nested serialization with caching */
         TTGroup: {
             readonly id?: number;
             name: string;
@@ -2352,6 +2484,7 @@ export interface components {
         TTRequest: {
             name: string;
             description?: string | null;
+            owner: number;
             /**
              * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
              *
@@ -5876,7 +6009,7 @@ export interface operations {
                 /** @description Multiple values may be separated by commas. */
                 role_id__in?: number[];
                 subject?: number;
-                subject__name?: string;
+                subject__code?: string;
                 /** @description Multiple values may be separated by commas. */
                 subject_id__in?: number[];
                 user?: number;
@@ -6130,6 +6263,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubjectUserRole"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    subject_user_roles_list_roles_list: {
+        parameters: {
+            query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRoleList"];
                 };
             };
             /** @description Default Error Model */
@@ -7468,6 +7646,291 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TTEventType"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    ttetypemapper_list: {
+        parameters: {
+            query?: {
+                /** @description Filter by event type ID */
+                event_type?: number;
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description Filter by role ID */
+                role?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTTEventTypeRoleMapList"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    ttetypemapper_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTEventTypeRoleMapRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRoleMapRequest"];
+                "multipart/form-data": components["schemas"]["TTEventTypeRoleMapRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    ttetypemapper_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+                "max-level"?: number;
+            };
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type role map. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    ttetypemapper_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type role map. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TTEventTypeRoleMapRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRoleMapRequest"];
+                "multipart/form-data": components["schemas"]["TTEventTypeRoleMapRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
+                };
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    ttetypemapper_destroy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type role map. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Default Error Model */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+            /** @description Default Error Model */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Err_serializer"];
+                };
+            };
+        };
+    };
+    ttetypemapper_partial_update: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+                "X-Term": string;
+            };
+            path: {
+                /** @description A unique integer value identifying this tt event type role map. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTTEventTypeRoleMapRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTEventTypeRoleMapRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTTEventTypeRoleMapRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
                 };
             };
             /** @description Default Error Model */
