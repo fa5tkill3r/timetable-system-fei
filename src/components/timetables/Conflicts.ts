@@ -12,7 +12,26 @@ export interface ConflictOptions {
   days: readonly string[]
 }
 
-export function useConflicts(options: ConflictOptions) {
+export interface Conflicts {
+  hasRoomConflict: Ref<boolean>
+  cellHasConflict: (
+    dayIndex: number,
+    timeIndex: number | undefined,
+  ) => {
+    hasConflict: boolean
+    types: string[]
+  }
+  checkConflicts: (
+    day: string | number,
+    timeIndex: number | undefined,
+  ) => {
+    hasConflict: boolean
+    types: string[]
+    events: CalendarEvent[]
+  }
+}
+
+export function useConflicts(options: ConflictOptions): Conflicts {
   const {
     isDragging,
     draggedEvent,

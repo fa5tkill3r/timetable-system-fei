@@ -8,6 +8,8 @@ import {
   onUnmounted,
   useTemplateRef,
   nextTick,
+  Ref,
+  ComputedRef,
 } from 'vue'
 import _, { has } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
@@ -46,13 +48,16 @@ import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
 import {
   DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
   DEFAULT_TIME_CONFIG as TIME_CONFIG,
+  DAYS
 } from '@/utils/timetable'
 import ConflictIcons from '@/components/timetables/ConflictIcons.vue'
 import EventContextMenu from '@/components/timetables/EventContextMenu.vue'
 import { templateRef } from '@vueuse/core'
 import { CalendarEvent, TimeSlot } from '@/types/types'
-import { useConflicts } from '@/components/timetables/Conflicts'
+import { Conflicts, useConflicts } from '@/components/timetables/Conflicts'
 import WeekFilter from '@/components/timetables/WeekFilter.vue'
+import { useTimeTableFilter } from '@/components/timetables/TimeTableFilter'
+import { TimeTableStyleOptions, useTimeTableStyle } from '@/components/timetables/TimeTableStyle'
 
 type Room = components['schemas']['Room']
 
@@ -68,8 +73,6 @@ const yearOptions = [
   { id: '2i', name: '2. Master' },
 ]
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
 const timetableStore = useTimetableStore()
 const timetableEventStore = useTimetableEventStore()
 const subjectStore = useSubjectStore()
@@ -81,10 +84,7 @@ const { toast } = useToast()
 const route = useRoute('/timetables/[id]/')
 const router = useRouter()
 
-const selectedSemester = ref<string>('LS')
-const selectedYear = ref<string>('1bc')
-const selectedSubjectGroup = ref<string | null>(null)
-const viewType = ref<string>('parallels')
+
 const subjectId = ref<number | null>(null)
 const roomId = ref<number | null>(null)
 const selectedTimetableName = ref<string>('')
@@ -172,27 +172,9 @@ function getSubjectCode(subjectId?: number | null): string | null {
   return subject ? subject.code : null
 }
 
-const nominalSemester = computed(() => {
-  const isSummer = selectedSemester.value === 'LS'
 
-  if (selectedYear.value === '1bc') return isSummer ? 2 : 1
-  if (selectedYear.value === '2bc') return isSummer ? 4 : 3
-  if (selectedYear.value === '3bc') return isSummer ? 6 : 5
-  if (selectedYear.value === '1i') return isSummer ? 2 : 1
-  if (selectedYear.value === '2i') return isSummer ? 4 : 3
 
-  return null
-})
 
-const isBachelorSubject = (code: string | null) => {
-  if (!code) return true
-  return code.startsWith('B-') || !code.startsWith('I-')
-}
-
-const isMasterSubject = (code: string | null) => {
-  if (!code) return true
-  return code.startsWith('I-') || !code.startsWith('B-')
-}
 
 async function loadTimetableData() {
   try {
@@ -263,7 +245,7 @@ function processTimetableEvents() {
 
     events.value.push({
       id: event.id!,
-      day: days[event.day_of_week! - 1] ?? null,
+      day: DAYS[event.day_of_week! - 1] ?? null,
       start_time: startTime,
       end_time: endTime,
       start_index: timeToIndex(startTime),
@@ -309,83 +291,7 @@ function getSubjectName(subjectId?: number | null): string | null {
   return subject ? subject.name : null
 }
 
-const isSubjectInGroup = (
-  subjectId: number | null,
-  groupName: string | null,
-): boolean => {
-  if (!subjectId || !groupName) return true
 
-  const matchingGroups = subjectGroupStore.subjectGroups.filter(
-    (group) => group.subject === subjectId,
-  )
-
-  return matchingGroups.some((group) => group.name === groupName)
-}
-
-const applyParallelsFilter = (item: CalendarEvent) => {
-  if (!item.subject_id) return false
-
-  const subject = subjectStore.subjects.find((s) => s.id === item.subject_id)
-  if (!subject) return false
-
-  const subjectCode = subject.code || null
-
-  const isBachelor = selectedYear.value.includes('bc')
-  const isCorrectLevel = isBachelor
-    ? isBachelorSubject(subjectCode)
-    : isMasterSubject(subjectCode)
-
-  const isCorrectSemester = subject.nominal_semester === nominalSemester.value
-
-  const isInSelectedGroup =
-    !selectedSubjectGroup.value ||
-    isSubjectInGroup(item.subject_id, selectedSubjectGroup.value)
-
-  return isCorrectLevel && isCorrectSemester && isInSelectedGroup
-}
-
-const applyWeekPatternMatch = (event: CalendarEvent) => {
-  const eventWeeksBitmask = event.weeks_bitmask || 0
-
-  if (weekFilter.value?.exactWeekMatch) {
-    // Exact match - patterns must be identical
-    return eventWeeksBitmask === weekFilter.value.filterWeeksBitmask
-  } else {
-    // Partial match - any selected week in the filter must be present in the event
-    // This is a bitwise AND to check if there's any overlap
-    return (eventWeeksBitmask & weekFilter.value?.filterWeeksBitmask!) > 0
-  }
-}
-
-const filteredEvents = computed(() => {
-  let events = placedEvents.value
-
-  events = events.filter(applyWeekPatternMatch)
-
-  if (viewType.value === 'parallels') {
-    return events.filter(applyParallelsFilter)
-  } else if (viewType.value === 'rooms') {
-    if (!preferredRoom.value) {
-      return []
-    }
-    return events.filter((event) => event.room_id === preferredRoom.value)
-  }
-
-  return events
-})
-
-// Update filteredEventTemplates to use the same filter approach
-const filteredEventTemplates = computed(() => {
-  // Show only events with quantity > 0
-  const templates = unplacedEvents.value
-  // Only apply additional filtering in parallels view
-  if (viewType.value === 'parallels') {
-    return templates.filter(applyParallelsFilter)
-  }
-
-  // For rooms view and other views, show all unplaced events
-  return templates
-})
 
 const getEventDuration = (event: CalendarEvent): number => {
   // For template events with no start/end time
@@ -460,137 +366,15 @@ const getRowEventPositions = computed<
   return eventPositions
 })
 
-// Update the getEventStyle function to ensure dragging works
-const getEventStyle = (event: CalendarEvent): CSSProperties => {
-  if (!event.day || !event.start_time || !event.end_time) {
-    return {}
-  }
 
-  const dayIndex = days.indexOf(event.day)
-  const startIndex = timeToIndex(event.start_time)
-  const duration = getEventDuration(event)
-  const dayPositions = getDayRowPositions.value
-
-  const { row = 0, maxRows = 1 } =
-    getRowEventPositions.value.get(event.id) || {}
-
-  const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
-  const rowSpacing = (4 * maxRows) / (maxRows + 1)
-  const topOffset = row * (eventHeight + rowSpacing)
-
-  // Adjust opacity - keep events more visible during drag
-  const isDraggingNow = draggedEvent.value !== null
-  const isBeingDragged = draggedEvent.value?.id === event.id
-
-  return {
-    position: 'absolute',
-    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * startIndex}px`,
-    top: `${dayPositions[dayIndex]! + topOffset}px`,
-    width: `${TIMETABLE_CONFIG.CELL_WIDTH * duration - 4}px`,
-    height: `${eventHeight}px`,
-    backgroundColor: event.color,
-    borderRadius: '4px',
-    padding: '8px',
-    boxSizing: 'border-box',
-    overflow: 'hidden',
-    zIndex: 25, // Use consistent z-index
-    cursor: 'move',
-    opacity: isDraggingNow ? (isBeingDragged ? 0.4 : 0.85) : 1, // Make semi-transparent but not invisible
-  }
-}
-
-const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
-  const eventPositions = getRowEventPositions.value
-  const dayEvents = filteredEvents.value.filter(
-    (e) => e.day === days[dayIndex],
-  )
-  const dayPositions = getDayRowPositions.value
-
-  let maxRows = 1
-  if (dayEvents.length > 0) {
-    maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
-  }
-
-  const cellHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
-
-  const isDraggedOver = Boolean(
-    draggedOverDay.value === days[dayIndex] &&
-    draggedOverTime.value &&
-    timeIndex >= draggedOverTime.value.index &&
-    timeIndex <
-    draggedOverTime.value.index + getEventDuration(draggedEvent.value),
-  )
-
-  const wouldConflict = checkConflicts(
-    dayIndex,
-    timeIndex,
-  ).hasConflict
-
-  const conflictResult = cellHasConflict(dayIndex, timeIndex)
-  const hasConflict = isDraggedOver && conflictResult.hasConflict
-
-  return {
-    position: 'absolute',
-    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeIndex}px`,
-    top: `${dayPositions[dayIndex]}px`,
-    width: `${TIMETABLE_CONFIG.CELL_WIDTH}px`,
-    height: `${cellHeight}px`,
-    borderRight: '1px solid #e0e0e0',
-    borderBottom: '1px solid #e0e0e0',
-    boxSizing: 'border-box',
-    zIndex: 5,
-    backgroundColor: (() => {
-      if (!draggedEvent.value) return 'transparent'
-
-      // If conflict detected, use orange background
-      if (isDraggedOver && hasConflict) {
-        return 'rgba(255, 171, 145, 0.7)' // Semi-transparent orange for conflicts
-      }
-
-      // Show ALL conflicting cells in light orange when dragging
-      if (wouldConflict) {
-        return 'rgba(255, 224, 178, 0.7)' // Semi-transparent light orange for conflicts
-      }
-
-      // For regular hover during drag
-      if (isDraggedOver) {
-        return timeIndex + getEventDuration(draggedEvent.value) <=
-          timeSlots.length
-          ? 'rgba(227, 242, 253, 0.7)' // Semi-transparent blue for valid placement
-          : 'rgba(255, 205, 210, 0.7)' // Semi-transparent red for invalid placement
-      }
-
-      return 'transparent'
-    })(),
-    // No longer using background image for icons
-  }
-}
-
-const getHeaderStyle = (index: number): CSSProperties => {
-  return {
-    position: 'absolute',
-    left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * index}px`,
-    top: '0',
-    width: `${TIMETABLE_CONFIG.CELL_WIDTH}px`,
-    height: `${TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
-    borderRight: '1px solid #e0e0e0',
-    borderBottom: '1px solid #e0e0e0',
-    backgroundColor: '#f5f5f5',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    boxSizing: 'border-box',
-  }
-}
 
 const getDayRowPositions = computed<number[]>(() => {
-  const positions: number[] = Array(days.length).fill(0)
+  const positions: number[] = Array(DAYS.length).fill(0)
   const eventPositions = getRowEventPositions.value
 
   let currentTop = TIMETABLE_CONFIG.HEADER_HEIGHT
 
-  days.forEach((day, index) => {
+  DAYS.forEach((day, index) => {
     positions[index] = currentTop
 
     const dayEvents = filteredEvents.value.filter((e) => e.day === day)
@@ -612,75 +396,9 @@ const getDayRowPositions = computed<number[]>(() => {
   return positions
 })
 
-const getDayStyle = (index: number): CSSProperties => {
-  const eventPositions = getRowEventPositions.value
-  const dayEvents = filteredEvents.value.filter((e) => e.day === days[index])
-  const dayPositions = getDayRowPositions.value
 
-  let maxRows = 1
-  if (dayEvents.length > 0) {
-    maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
-  }
 
-  const rowHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
 
-  return {
-    position: 'absolute',
-    left: '0',
-    top: `${dayPositions[index]}px`,
-    width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH}px`,
-    height: `${rowHeight}px`,
-    borderRight: '1px solid #e0e0e0',
-    borderBottom: '1px solid #e0e0e0',
-    backgroundColor: '#f5f5f5',
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 10px',
-    boxSizing: 'border-box',
-    fontWeight: 'bold',
-  }
-}
-
-const cornerCellStyle: CSSProperties = {
-  position: 'absolute',
-  left: '0',
-  top: '0',
-  width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH}px`,
-  height: `${TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
-  borderRight: '1px solid #e0e0e0',
-  borderBottom: '1px solid #e0e0e0',
-  backgroundColor: '#f5f5f5',
-  boxSizing: 'border-box',
-}
-
-const containerStyle = computed<CSSProperties>(() => {
-  const dayPositions = getDayRowPositions.value
-  const eventPositions = getRowEventPositions.value
-
-  const lastDayIndex = days.length - 1
-  let lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT
-
-  const lastDayEvents = filteredEvents.value.filter(
-    (e) => e.day === days[lastDayIndex],
-  )
-
-  if (lastDayEvents.length > 0) {
-    const maxRows = eventPositions.get(lastDayEvents[0]!.id!)?.maxRows || 1
-    lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
-  }
-
-  const totalHeight = dayPositions[lastDayIndex]! + lastDayHeight
-
-  return {
-    position: 'relative',
-    width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeSlots.length}px`,
-    height: `${totalHeight}px`,
-    border: '1px solid #e0e0e0',
-    borderBottom: 'none',
-    borderRight: 'none',
-    fontFamily: 'Arial, sans-serif',
-  }
-})
 
 const handleDragStart = (event: DragEvent, itemData: CalendarEvent) => {
   if (event.dataTransfer) {
@@ -723,11 +441,11 @@ const getMousePosition = (
   let dayIndex = -1
 
   // Find which day row contains our current mouse position
-  for (let i = 0; i < days.length; i++) {
+  for (let i = 0; i < DAYS.length; i++) {
     const nextDayIndex = i + 1
     const currentDayTop = dayPositions[i]
     const nextDayTop =
-      nextDayIndex < days.length ? dayPositions[nextDayIndex] : Infinity
+      nextDayIndex < DAYS.length ? dayPositions[nextDayIndex] : Infinity
 
     if (y >= currentDayTop! && y < nextDayTop!) {
       dayIndex = i
@@ -741,12 +459,12 @@ const getMousePosition = (
 
   if (
     dayIndex >= 0 &&
-    dayIndex < days.length &&
+    dayIndex < DAYS.length &&
     timeIndex >= 0 &&
     timeIndex < timeSlots.length
   ) {
     return {
-      day: days[dayIndex]!,
+      day: DAYS[dayIndex]!,
       time: timeSlots[timeIndex]!,
     }
   }
@@ -887,7 +605,7 @@ async function saveEventPlacement(event: CalendarEvent) {
   }
 
   try {
-    const dayOfWeek = days.indexOf(event.day!) + 1
+    const dayOfWeek = DAYS.indexOf(event.day!) + 1
     const startTimeIndex = timeToIndex(event.start_time!)
 
     const commonEventData = {
@@ -965,30 +683,7 @@ async function toggleEventPlacement(event: CalendarEvent) {
   }
 }
 
-watch([subjectId, roomId, viewType], async () => {
-  if (timetableId.value) {
-    const query = { ...route.query }
 
-    if (subjectId.value) {
-      query.subject = subjectId.value.toString()
-    } else {
-      delete query.subject
-    }
-
-    if (roomId.value) {
-      query.room = roomId.value.toString()
-    } else {
-      delete query.room
-    }
-
-    router.replace({
-      path: route.path,
-      query,
-    })
-
-    await fetchTimetableEvents(timetableId.value)
-  }
-})
 
 const handleDocumentClick = (event: MouseEvent) => {
   if (!contextMenuVisible.value) return
@@ -1002,18 +697,8 @@ const handleDocumentClick = (event: MouseEvent) => {
 
 const contextMenuRef = templateRef('contextMenuRef')
 
-watch(
-  () => contextMenuVisible.value,
-  (isVisible) => {
-    if (isVisible) {
-      setTimeout(() => {
-        document.addEventListener('mousedown', handleDocumentClick)
-      }, 10)
-    } else {
-      document.removeEventListener('mousedown', handleDocumentClick)
-    }
-  },
-)
+
+
 
 function handleDocumentDragOver(e: DragEvent) {
   e.preventDefault()
@@ -1162,11 +847,7 @@ function editEvent(event: CalendarEvent) {
 }
 
 
-const {
-  cellHasConflict,
-  hasRoomConflict,
-  checkConflicts,
-} = useConflicts({
+const conflicts = useConflicts({
   draggedEvent,
   isDragging,
   placedEvents,
@@ -1174,8 +855,92 @@ const {
   draggedOverTime,
   timeToIndex,
   getEventDuration,
-  days
+  days: DAYS
 })
+
+const {
+  cellHasConflict,
+  hasRoomConflict,
+} = conflicts
+
+
+const {
+  selectedSemester,
+  selectedYear,
+  selectedSubjectGroup,
+  viewType,
+  filteredEvents,
+  filteredEventTemplates,
+  nominalSemester,
+} = useTimeTableFilter({
+  placedEvents,
+  unplacedEvents,
+  preferredRoom,
+  weekFilter,
+})
+
+
+
+const {
+  getCellStyle,
+  getEventStyle,
+  getHeaderStyle,
+  containerStyle,
+  cornerCellStyle,
+  getDayStyle
+} = useTimeTableStyle({
+  draggedEvent,
+  draggedOverDay,
+  draggedOverTime,
+  getRowEventPositions,
+  getDayRowPositions,
+  timeToIndex,
+  getEventDuration,
+  filteredEvents,
+  conflicts,
+  timeSlots
+})
+
+
+watch([subjectId, roomId, viewType], async () => {
+  if (timetableId.value) {
+    const query = { ...route.query }
+
+    if (subjectId.value) {
+      query.subject = subjectId.value.toString()
+    } else {
+      delete query.subject
+    }
+
+    if (roomId.value) {
+      query.room = roomId.value.toString()
+    } else {
+      delete query.room
+    }
+
+    router.replace({
+      path: route.path,
+      query,
+    })
+
+    await fetchTimetableEvents(timetableId.value)
+  }
+})
+
+
+watch(
+  () => contextMenuVisible.value,
+  (isVisible) => {
+    if (isVisible) {
+      setTimeout(() => {
+        document.addEventListener('mousedown', handleDocumentClick)
+      }, 10)
+    } else {
+      document.removeEventListener('mousedown', handleDocumentClick)
+    }
+  },
+)
+
 </script>
 
 <template>
@@ -1308,7 +1073,7 @@ const {
 
               <ScrollArea class="overflow-auto p-1">
                 <!-- Replace custom timetable with TimetableGrid component -->
-                <TimetableGrid ref="TimeTableGrid" :days="days" :time-slots="timeSlots" :get-cell-style="getCellStyle"
+                <TimetableGrid ref="TimeTableGrid" :days="DAYS" :time-slots="timeSlots" :get-cell-style="getCellStyle"
                   :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
                   :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
                   @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd">
@@ -1322,7 +1087,7 @@ const {
 
                   <!-- Replace the current conflict icons implementation with this -->
                   <!-- Add conflict icons to cells -->
-                  <div v-for="(day, dayIndex) in days" :key="`conflict-icons-${day}`">
+                  <div v-for="(day, dayIndex) in DAYS" :key="`conflict-icons-${day}`">
                     <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
                       <div v-if="
                         isDragging &&
