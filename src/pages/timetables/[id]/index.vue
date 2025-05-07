@@ -40,7 +40,6 @@ import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue
 import { useSubjectGroupStore } from '@/store/subjectGroups'
 import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
 import {
-  DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
   DAYS
 } from '@/utils/timetable'
 import ConflictIcons from '@/components/timetables/ConflictIcons.vue'
@@ -52,6 +51,8 @@ import WeekFilter from '@/components/timetables/WeekFilter.vue'
 import { useTimeTableFilter } from '@/components/timetables/TimeTableFilter'
 import { useTimeTableStyle } from '@/components/timetables/TimeTableStyle'
 import { useTimeTableBase } from '@/components/timetables/TimeTableBase'
+import TimetableSettings from '@/components/timetables/TimetableSettings.vue'
+import { useTimetableSettingsStore } from '@/store/timetableSettings'
 
 
 const semesterOptions = [
@@ -96,6 +97,9 @@ const weekFilter = useTemplateRef('weekFilter')
 const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
 const selectedEvent = ref<CalendarEvent | null>(null)
+
+const timetableSettings = useTimetableSettingsStore()
+
 
 
 
@@ -226,7 +230,7 @@ const getMousePosition = (
   }
 
   const timeIndex = Math.floor(
-    (x - TIMETABLE_CONFIG.DAY_COLUMN_WIDTH) / TIMETABLE_CONFIG.CELL_WIDTH,
+    (x - timetableSettings.config.DAY_COLUMN_WIDTH) / timetableSettings.config.CELL_WIDTH,
   )
 
   if (
@@ -505,12 +509,6 @@ function isOverTimetable(event: DragEvent): boolean {
 }
 
 onMounted(async () => {
-  await subjectStore.fetchSubjects()
-  await buildingStore.fetchRooms()
-  await ttEventTypeStore.fetchEventTypes()
-  await subjectGroupStore.fetchSubjectGroups()
-  await subjectGroupStore.fetchSubjectGroupGroups()
-
   if (subjectGroupStore.subjectGroupGroups.length > 0) {
     selectedSubjectGroup.value =
       subjectGroupStore.subjectGroupGroups[0]?.name ?? null
@@ -837,6 +835,9 @@ watch(
                         Owner: {{ timetableStore.selectedTimetable?.owner }}
                       </Badge>
                     </div>
+                    <div>
+                      <TimetableSettings />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -846,7 +847,8 @@ watch(
                   <TimetableGrid ref="TimeTableGrid" :days="DAYS" :time-slots="timeSlots" :get-cell-style="getCellStyle"
                     :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
                     :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
-                    @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd">
+                    @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd"
+                    :compact="timetableSettings.compactView">
                     <div v-if="viewType === 'rooms' && !preferredRoom"
                       class="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 bg-opacity-80">
                       <div class="text-lg font-medium text-gray-500">
@@ -861,8 +863,8 @@ watch(
                           cellHasConflict(dayIndex, slot.index).hasConflict
                         " :style="{
                           position: 'absolute',
-                          left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * slot.index + 4}px`,
-                          top: `${getDayRowPositions[dayIndex] ?? TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
+                          left: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * slot.index + 4}px`,
+                          top: `${getDayRowPositions[dayIndex] ?? timetableSettings.config.HEADER_HEIGHT}px`,
                           zIndex: 30,
                           pointerEvents: 'none',
                         }">
@@ -888,7 +890,7 @@ watch(
                           </button>
                         </div>
                         <div class="flex justify-between text-sm text-gray-600">
-                          <div>{{ event.start_time }} - {{ event.end_time }}</div>
+                          <div v-if="!timetableSettings.compactView">{{ event.start_time }} - {{ event.end_time }}</div>
                           <div v-if="event.room_name"
                             class="inline-flex items-center rounded-sm border-primary bg-blue-100 px-1 text-xs font-semibold">
                             <Building class="h-4 w-4" /> {{ event.room_name }}
@@ -926,8 +928,8 @@ watch(
       position: 'fixed',
       left: mousePosition.x + 15 + 'px',
       top: mousePosition.y + 15 + 'px',
-      width: `${TIMETABLE_CONFIG.CELL_WIDTH * draggedEvent!.duration - 4}px`,
-      height: `${TIMETABLE_CONFIG.CELL_HEIGHT - 4}px`,
+      width: `${timetableSettings.config.CELL_WIDTH * draggedEvent!.duration - 4}px`,
+      height: `${timetableSettings.config.CELL_HEIGHT - 4}px`,
       border: hasRoomConflict ? '2px solid #e53935' : '2px solid #2196f3',
       pointerEvents: 'none',
     }" :class="{

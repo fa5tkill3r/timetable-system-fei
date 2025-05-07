@@ -6,10 +6,8 @@ import { CalendarEvent } from '@/types/types'
 import { DAYS, TimeSlot } from '@/utils/timetable'
 import _ from 'lodash'
 import { computed, ComputedRef, Ref } from 'vue'
-import {
-  DEFAULT_TIME_CONFIG as TIME_CONFIG,
-  DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG,
-} from '@/utils/timetable'
+import { DEFAULT_TIME_CONFIG as TIME_CONFIG } from '@/utils/timetable'
+import { useTimetableSettingsStore } from '@/store/timetableSettings'
 
 export interface TimeTableBaseOptions {
   events: Ref<CalendarEvent[]>
@@ -21,6 +19,8 @@ type Room = components['schemas']['Room']
 export function useTimeTableBase(options: TimeTableBaseOptions) {
   const subjectStore = useSubjectStore()
   const timetableEventStore = useTimetableEventStore()
+
+  const timetableSettings = useTimetableSettingsStore()
 
   const { events, filteredEvents } = options
 
@@ -164,7 +164,7 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
     const positions: number[] = Array(DAYS.length).fill(0)
     const eventPositions = getRowEventPositions.value
 
-    let currentTop = TIMETABLE_CONFIG.HEADER_HEIGHT
+    let currentTop = timetableSettings.config.HEADER_HEIGHT
 
     DAYS.forEach((day, index) => {
       positions[index] = currentTop
@@ -182,7 +182,7 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
         }
       }
 
-      currentTop += TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
+      currentTop += timetableSettings.config.CELL_HEIGHT * maxRows
     })
 
     return positions

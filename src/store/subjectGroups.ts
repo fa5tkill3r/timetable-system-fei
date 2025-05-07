@@ -15,7 +15,6 @@ export const useSubjectGroupStore = defineStore('subjectGroups', () => {
   const isLoading = ref(false)
   const isLoadingGroups = ref(false)
 
-  // Get all subject groups
   const fetchSubjectGroups = async () => {
     if (!schemaStore.activeSchema?.id) {
       subjectGroups.value = []
@@ -159,6 +158,7 @@ export const useSubjectGroupStore = defineStore('subjectGroups', () => {
   watchEffect(() => {
     if (schemaStore.activeSchema?.id) {
       fetchSubjectGroups()
+      fetchSubjectGroupGroups()
     } else {
       subjectGroups.value = []
     }

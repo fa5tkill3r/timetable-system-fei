@@ -1,8 +1,8 @@
 import { CalendarEvent, TimeSlot } from '@/types/types'
 import { DAYS } from '@/utils/timetable'
 import { computed, ComputedRef, CSSProperties, Ref } from 'vue'
-import { DEFAULT_TIMETABLE_CONFIG as TIMETABLE_CONFIG } from '@/utils/timetable'
 import { Conflicts } from './Conflicts'
+import { useTimetableSettingsStore } from '@/store/timetableSettings'
 
 export interface TimeTableStyleOptions {
   draggedEvent: Ref<CalendarEvent | null>
@@ -32,6 +32,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
   } = options
 
   const { cellHasConflict, checkConflicts } = conflicts
+  const timetableSettings = useTimetableSettingsStore()
 
   const getEventStyle = (event: CalendarEvent): CSSProperties => {
     if (!event.day || !event.start_time || !event.end_time) {
@@ -46,7 +47,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
     const { row = 0, maxRows = 1 } =
       getRowEventPositions.value.get(event.id!) || {}
 
-    const eventHeight = TIMETABLE_CONFIG.CELL_HEIGHT - 4
+    const eventHeight = timetableSettings.config.CELL_HEIGHT - 4
     const rowSpacing = (4 * maxRows) / (maxRows + 1)
     const topOffset = row * (eventHeight + rowSpacing)
 
@@ -55,9 +56,9 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
     return {
       position: 'absolute',
-      left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * startIndex}px`,
+      left: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * startIndex}px`,
       top: `${dayPositions[dayIndex]! + topOffset}px`,
-      width: `${TIMETABLE_CONFIG.CELL_WIDTH * duration - 4}px`,
+      width: `${timetableSettings.config.CELL_WIDTH * duration - 4}px`,
       height: `${eventHeight}px`,
       backgroundColor: event.color,
       borderRadius: '4px',
@@ -82,7 +83,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
       maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
     }
 
-    const cellHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
+    const cellHeight = timetableSettings.config.CELL_HEIGHT * maxRows
 
     const isDraggedOver = Boolean(
       draggedOverDay.value === DAYS[dayIndex] &&
@@ -98,9 +99,9 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
     return {
       position: 'absolute',
-      left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeIndex}px`,
+      left: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * timeIndex}px`,
       top: `${dayPositions[dayIndex]}px`,
-      width: `${TIMETABLE_CONFIG.CELL_WIDTH}px`,
+      width: `${timetableSettings.config.CELL_WIDTH}px`,
       height: `${cellHeight}px`,
       borderRight: '1px solid #e0e0e0',
       borderBottom: '1px solid #e0e0e0',
@@ -135,10 +136,10 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
   const getHeaderStyle = (index: number): CSSProperties => {
     return {
       position: 'absolute',
-      left: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * index}px`,
+      left: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * index}px`,
       top: '0',
-      width: `${TIMETABLE_CONFIG.CELL_WIDTH}px`,
-      height: `${TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
+      width: `${timetableSettings.config.CELL_WIDTH}px`,
+      height: `${timetableSettings.config.HEADER_HEIGHT}px`,
       borderRight: '1px solid #e0e0e0',
       borderBottom: '1px solid #e0e0e0',
       backgroundColor: '#f5f5f5',
@@ -160,13 +161,13 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
       maxRows = eventPositions.get(dayEvents[0]!.id!)?.maxRows || 1
     }
 
-    const rowHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
+    const rowHeight = timetableSettings.config.CELL_HEIGHT * maxRows
 
     return {
       position: 'absolute',
       left: '0',
       top: `${dayPositions[index]}px`,
-      width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH}px`,
+      width: `${timetableSettings.config.DAY_COLUMN_WIDTH}px`,
       height: `${rowHeight}px`,
       borderRight: '1px solid #e0e0e0',
       borderBottom: '1px solid #e0e0e0',
@@ -183,8 +184,8 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
     position: 'absolute',
     left: '0',
     top: '0',
-    width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH}px`,
-    height: `${TIMETABLE_CONFIG.HEADER_HEIGHT}px`,
+    width: `${timetableSettings.config.DAY_COLUMN_WIDTH}px`,
+    height: `${timetableSettings.config.HEADER_HEIGHT}px`,
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
     backgroundColor: '#f5f5f5',
@@ -196,7 +197,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
     const eventPositions = getRowEventPositions.value
 
     const lastDayIndex = DAYS.length - 1
-    let lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT
+    let lastDayHeight = timetableSettings.config.CELL_HEIGHT
 
     const lastDayEvents = filteredEvents.value.filter(
       (e) => e.day === DAYS[lastDayIndex],
@@ -204,14 +205,14 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
     if (lastDayEvents.length > 0) {
       const maxRows = eventPositions.get(lastDayEvents[0]!.id!)?.maxRows || 1
-      lastDayHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
+      lastDayHeight = timetableSettings.config.CELL_HEIGHT * maxRows
     }
 
     const totalHeight = dayPositions[lastDayIndex]! + lastDayHeight
 
     return {
       position: 'relative',
-      width: `${TIMETABLE_CONFIG.DAY_COLUMN_WIDTH + TIMETABLE_CONFIG.CELL_WIDTH * timeSlots.value.length}px`,
+      width: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * timeSlots.value.length}px`,
       height: `${totalHeight}px`,
       border: '1px solid #e0e0e0',
       borderBottom: 'none',
