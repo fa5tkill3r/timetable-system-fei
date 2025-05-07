@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/tabs'
 import { client } from '@/lib/client'
 import { useConstraintStore } from '@/store/constraints'
+import { components } from '@/types/schema'
 import { Building, Infinity, CalendarDays } from 'lucide-vue-next'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
@@ -23,6 +24,19 @@ interface Constraint {
   icon: any,
   constraintType: string
 }
+
+type BackendConstraintType = components['schemas']['Constraint']
+
+
+export interface ConstraintData {
+  id: number | null
+  type: 'ROOT' | 'OPERATION' | 'TIMERANGE' | 'DAILYLIMIT' | 'ROOM'
+  strength: 'STRONG' | 'MEDIUM' | 'WEAK' | 'NONCONFLICT'
+  data: any
+  nested_children?: ConstraintData[]
+  parent: ConstraintData | null
+}
+
 const constraintComponentCache = new Map<string, ReturnType<typeof defineAsyncComponent>>()
 
 function loadConstraintComponent(name: string) {
@@ -56,9 +70,10 @@ const constraints = [
 ] as Constraint[]
 const selectedConstraint = ref<Constraint | null>(null)
 
-const backendResponse = ref<any>(null)
+const backendResponse = ref<ConstraintData | null>(null)
 const isNewConstraint = ref(false)
 const isUpdating = ref(false)
+
 
 watch(backendResponse, async (newValue, oldValue) => {
   // Ignore initial setting of the value or if we're in the middle of an update
@@ -125,57 +140,129 @@ const selectedConstraintData = computed({
     // Return the constraints of this type from the operation node
     return operationNode?.nested_children?.filter(child => child.type === type) || []
   },
-  set: (newConstraints) => {
+  set: async (newConstraints) => {
     if (!selectedConstraint.value || !backendResponse.value?.nested_children?.[0]) return
 
+    // Don't trigger updates while we're already processing changes
+    if (isUpdating.value) return
+
+    isUpdating.value = true
     const type = selectedConstraint.value.id.toUpperCase()
 
-    // Find the operation node for this constraint type
-    let operationNode = backendResponse.value.nested_children[0].nested_children.find(
-      node => node.type === 'OPERATION' &&
-        node.nested_children?.some(child => child.type === type)
-    )
+    try {
+      // Find the operation node for this constraint type
+      let operationNode = backendResponse.value.nested_children[0].nested_children.find(
+        node => node.type === 'OPERATION' &&
+          node.nested_children?.some(child => child.type === type)
+      )
 
-    if (operationNode) {
-      // Filter out constraints of other types (keep them)
-      const otherConstraints = operationNode.nested_children.filter(child => child.type !== type)
+      if (operationNode) {
+        // Get existing constraints of this type
+        const existingConstraints = operationNode.nested_children.filter(child => child.type === type)
 
-      // Update nested_children with other constraints and new constraints
-      operationNode.nested_children = [...otherConstraints, ...newConstraints]
-    } else {
-      // Create a new operation node for this constraint type
-      const newOperationNode = {
-        type: "OPERATION",
-        strength: "STRONG",
-        data: {
-          operator: "AND"
-        },
-        children: [],
-        owner: null,
-        parent: backendResponse.value.nested_children[0].id,
-        nested_children: newConstraints
+        // Map of existing constraints by ID
+        const existingMap = new Map(
+          existingConstraints.filter(c => c.id).map(c => [c.id, c])
+        )
+
+        // Map of new constraints by ID
+        const newMap = new Map(
+          newConstraints.filter(c => c.id).map(c => [c.id, c])
+        )
+
+        // 1. Identify constraints to delete (in existing but not in new)
+        const toDelete = existingConstraints.filter(c =>
+          c.id && !newMap.has(c.id)
+        )
+
+        // 2. Identify constraints to update (in both existing and new)
+        const toUpdate = newConstraints.filter(c =>
+          c.id && existingMap.has(c.id)
+        )
+
+        // 3. Identify constraints to create (in new but without IDs)
+        const toCreate = newConstraints.filter(c => !c.id)
+
+        // Process deletions
+        for (const constraint of toDelete) {
+          if (constraint.id) {
+            await constraintStore.deleteConstraint(constraint.id)
+          }
+        }
+
+        // Process updates
+        for (const constraint of toUpdate) {
+          if (constraint.id) {
+            await constraintStore.updateConstraint(constraint.id, {
+              type: constraint.type,
+              strength: constraint.strength,
+              data: constraint.data
+            })
+          }
+        }
+
+        // Process creations
+        for (const constraint of toCreate) {
+          await constraintStore.createConstraint({
+            type: constraint.type,
+            strength: constraint.strength,
+            data: constraint.data,
+            parent: operationNode.id
+          })
+        }
+      } else if (newConstraints.length > 0) {
+        // We need to create a new operation node and then add constraints to it
+        const newOperationNode = await constraintStore.createConstraint({
+          type: "OPERATION",
+          strength: "STRONG",
+          data: { operator: "AND" },
+          parent: backendResponse.value.nested_children[0].id
+        })
+
+        if (newOperationNode?.id) {
+          // Now create all the new constraints under this operation node
+          for (const constraint of newConstraints) {
+            await constraintStore.createConstraint({
+              type: constraint.type,
+              strength: constraint.strength,
+              data: constraint.data,
+              parent: newOperationNode.id
+            })
+          }
+        }
       }
 
-      // Add the new operation node
-      backendResponse.value.nested_children[0].nested_children.push(newOperationNode)
+      // After all operations, refresh the data
+      await constraintStore.fetchConstraints()
+      backendResponse.value = await constraintStore.getPersonConstraints(person)
+
+    } catch (error) {
+      console.error("Error processing constraint changes:", error)
+    } finally {
+      isUpdating.value = false
     }
   }
 })
 
+watch(selectedConstraintData, (newValue) => {
+  console.log("Selected constraint data changed:", newValue)
+
+}, { deep: true })
+
+
 
 onMounted(async () => {
-  // Get nested constraints for this person
   const personConstraints = await constraintStore.getPersonConstraints(person)
 
-  if (personConstraints.id) {
-    // We found existing constraints
+  if (personConstraints) {
+    console.log("Fetched person constraints successfully")
     backendResponse.value = personConstraints
   } else {
-    // No constraints found, this is a default structure
-    backendResponse.value = personConstraints
-    isNewConstraint.value = true
+    console.error("Failed to fetch person constraints")
+    return
   }
 })
+
 
 </script>
 

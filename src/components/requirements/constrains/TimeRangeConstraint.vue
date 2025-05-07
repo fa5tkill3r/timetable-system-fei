@@ -22,10 +22,12 @@ interface AvailabilityCell {
     day: string
     timeSlot: number
     level: number
+    constraintId?: number // Add ID to track which constraint this cell belongs to
 }
 
 // Interface for constraint model
 interface TimeRangeConstraint {
+    id?: number, // Make ID optional since new constraints won't have one
     type: 'TIMERANGE',
     strength: 'WEAK' | 'NORMAL' | 'STRONG',
     data: {
@@ -156,25 +158,37 @@ function clearAllAvailability() {
 }
 
 function updateConstraintsFromCells() {
+    // Group cells by day, strength, and constraintId (to preserve existing IDs)
     const groupedCells = availabilityCells.value.reduce((acc, cell) => {
         const strength = availabilityLevels.find(level => level.value === cell.level)?.strength;
         if (!strength) return acc;
 
         const dayIndex = dayToIndex(cell.day);
-        const key = `${dayIndex}-${strength}`;
+        // Group by constraint ID if it exists, otherwise create a new group
+        const keyParts = [dayIndex, strength];
+        if (cell.constraintId) keyParts.push(cell.constraintId.toString());
+        const key = keyParts.join('-');
 
         if (!acc[key]) {
             acc[key] = {
                 dayIndex,
                 strength,
-                timeSlots: [cell.timeSlot]
+                timeSlots: [cell.timeSlot],
+                constraintId: cell.constraintId // Keep track of original ID
             };
         } else {
             acc[key].timeSlots.push(cell.timeSlot);
         }
 
         return acc;
-    }, {} as Record<string, { dayIndex: number, strength: string, timeSlots: number[] }>);
+    }, {} as Record<string, { dayIndex: number, strength: string, timeSlots: number[], constraintId?: number }>);
+
+    // Create a map of existing constraints by ID for quick reference
+    const existingConstraintsMap = new Map(
+        constraints.value
+            .filter(c => c.id !== undefined)
+            .map(c => [c.id, c])
+    );
 
     const newConstraints: TimeRangeConstraint[] = [];
 
@@ -188,7 +202,9 @@ function updateConstraintsFromCells() {
             if (sortedSlots[i] === end + 1) {
                 end = sortedSlots[i];
             } else {
+                // Create constraint with original ID if it exists
                 newConstraints.push({
+                    ...(group.constraintId ? { id: group.constraintId } : {}),
                     type: 'TIMERANGE',
                     strength: group.strength as 'WEAK' | 'NORMAL' | 'STRONG',
                     data: {
@@ -203,7 +219,9 @@ function updateConstraintsFromCells() {
             }
         }
 
+        // Create constraint for the final segment
         newConstraints.push({
+            ...(group.constraintId ? { id: group.constraintId } : {}),
             type: 'TIMERANGE',
             strength: group.strength as 'WEAK' | 'NORMAL' | 'STRONG',
             data: {
@@ -235,7 +253,8 @@ function initializeCellsFromConstraints() {
             cells.push({
                 day,
                 timeSlot,
-                level
+                level,
+                constraintId: constraint.id // Store the constraint ID with the cell
             });
         }
     });
