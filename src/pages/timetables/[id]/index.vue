@@ -23,7 +23,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import { MoreVertical, Building } from 'lucide-vue-next'
+import { MoreVertical, Building, Calendar } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
@@ -51,6 +51,7 @@ import ConflictIcons from '@/components/timetables/ConflictIcons.vue'
 import EventContextMenu from '@/components/timetables/EventContextMenu.vue'
 import { templateRef } from '@vueuse/core'
 import { CalendarEvent, TimeSlot } from '@/types/types'
+import { useConflicts } from '@/components/timetables/Conflicts'
 
 type Room = components['schemas']['Room']
 
@@ -101,6 +102,8 @@ const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
 const selectedEvent = ref<CalendarEvent | null>(null)
 
+
+
 const timetableId = computed(() => {
   return route.params.id ? parseInt(route.params.id as string) : null
 })
@@ -122,6 +125,9 @@ const placedEvents = computed<CalendarEvent[]>(() => {
       event.day !== null,
   )
 })
+
+const isDragging = computed(() => draggedEvent.value !== null)
+
 
 const timeSlots: TimeSlot[] = (() => {
   const slots: TimeSlot[] = []
@@ -269,56 +275,6 @@ function processTimetableEvents() {
       duration: event.duration || 1,
       weeks_bitmask: event.weeks_bitmask || 4095,
     })
-
-    // if (event.start_time !== null &&
-    //   event.day_of_week !== null &&
-    //   event.room !== null &&
-    //   event.weeks_bitmask !== null &&
-    //   event.weeks_bitmask !== 0) {
-
-    //   // Convert numeric time index to display time
-    //   const timeIndex = Math.min(event.start_time!, timeSlots.length - 1)
-    //   const startTime = timeSlots[timeIndex]!.from
-    //   const endTime = calculateEndTime(startTime, event.duration!)
-
-    //   const room = event.room as any as Room
-
-    //   const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
-
-    //   events.value.push({
-    //     id: event.id!,
-    //     day: days[event.day_of_week! - 1]!,
-    //     start_time: startTime,
-    //     end_time: endTime,
-    //     start_index: timeToIndex(startTime),
-    //     title: subjectName!,
-    //     shortcut: subjectCode!,
-    //     color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-    //     room_id: room.id,
-    //     room_name: room.name,
-    //     subject_id: subjectId,
-    //     event_type: eventType,
-    //     duration: event.duration || 1,
-    //     weeks_bitmask: event.weeks_bitmask || 4095,
-    //   })
-    // } else {
-    //   const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
-
-    //   eventTemplates.value.push({
-    //     id: event.id!,
-    //     day: null,
-    //     start_time: null,
-    //     end_time: null,
-    //     title: subjectName!,
-    //     shortcut: subjectCode || '',
-    //     color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
-    //     duration: event.duration || 1,
-    //     subject_id: subjectId,
-    //     original_eventId: event.id,
-    //     event_type: eventType,
-    //     weeks_bitmask: event.weeks_bitmask || 4095,
-    //   })
-    // }
   })
 }
 
@@ -555,7 +511,6 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
 
   const cellHeight = TIMETABLE_CONFIG.CELL_HEIGHT * maxRows
 
-  // Calculate if this cell is within the dragged area
   const isDraggedOver = Boolean(
     draggedOverDay.value === days[dayIndex] &&
     draggedOverTime.value &&
@@ -564,54 +519,11 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     draggedOverTime.value.index + getEventDuration(draggedEvent.value),
   )
 
-  // Check if cell would cause a conflict if the dragged event was placed here
-  const wouldConflict = Boolean(
-    isDragging.value &&
-    (() => {
-      if (!draggedEvent.value) return false
+  const wouldConflict = checkConflicts(
+    dayIndex,
+    timeIndex,
+  ).hasConflict
 
-      // Create a temporary event at this position to check for conflicts
-      const eventToCheck = draggedEvent.value
-      const duration = draggedEvent.value
-        ? getEventDuration(draggedEvent.value)
-        : eventToCheck.duration || 1
-
-      // If we're dragging an existing event, we need to exclude it from conflicts
-      const eventsToCheck = draggedEvent.value?.id
-        ? placedEvents.value.filter((e) => e.id !== draggedEvent.value!.id)
-        : placedEvents.value
-
-      const endTimeIndex = timeIndex + duration - 1
-
-      // Find events that would overlap with this position
-      const conflictingEvents = eventsToCheck.filter((e) => {
-        if (!e.day || !e.start_time || !e.end_time) return false
-
-        // Check if same day
-        if (e.day !== days[dayIndex]) return false
-
-        // Get event time range
-        const eventStartIndex = timeToIndex(e.start_time)
-        const eventEndIndex = eventStartIndex + getEventDuration(e) - 1
-
-        // Check for overlap
-        return (
-          timeIndex <= eventEndIndex &&
-          endTimeIndex >= eventStartIndex &&
-          // Room conflict check - if same room is used
-          (eventToCheck.room_id === e.room_id ||
-            preferredRoom.value === e.room_id)
-        )
-      })
-
-      return conflictingEvents.length > 0
-    })(),
-  )
-
-  // Get current conflicts based on mouse position
-  const conflicts = getConflictingEvents.value
-
-  // Calculate if this cell has a conflict
   const conflictResult = cellHasConflict(dayIndex, timeIndex)
   const hasConflict = isDraggedOver && conflictResult.hasConflict
 
@@ -624,7 +536,7 @@ const getCellStyle = (dayIndex: number, timeIndex: number): CSSProperties => {
     borderRight: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
     boxSizing: 'border-box',
-    zIndex: 5, // Lower z-index for backgrounds to be below events
+    zIndex: 5,
     backgroundColor: (() => {
       if (!draggedEvent.value) return 'transparent'
 
@@ -1182,132 +1094,9 @@ function selectAllWeeks() {
     filterWeeksBitmask.value = parseInt('000000000000', 2)
   }
 }
-const getConflictingEvents = computed(() => {
-  if (!draggedEvent.value) return []
-  if (!draggedOverDay.value || !draggedOverTime.value) return []
 
-  const eventToCheck = draggedEvent.value
-  const duration = draggedEvent.value
-    ? getEventDuration(draggedEvent.value)
-    : eventToCheck.duration || 1
 
-  // If we're dragging an existing event, we need to exclude it from conflicts
-  const eventsToCheck = draggedEvent.value
-    ? placedEvents.value.filter((e) => e.id !== draggedEvent.value!.id)
-    : placedEvents.value
 
-  const startTimeIndex = timeToIndex(draggedOverTime.value.from)
-  const endTimeIndex = startTimeIndex + duration - 1
-
-  // Find events that overlap with the dragged position
-  return eventsToCheck.filter((e) => {
-    if (!e.day || !e.start_time || !e.end_time) return false
-
-    // Check if same day
-    if (e.day !== draggedOverDay.value) return false
-
-    // Get event time range
-    const eventStartIndex = timeToIndex(e.start_time)
-    const eventEndIndex = eventStartIndex + getEventDuration(e) - 1
-
-    // Check for overlap
-    return (
-      startTimeIndex <= eventEndIndex &&
-      endTimeIndex >= eventStartIndex &&
-      // Room conflict check - if same room is used
-      (eventToCheck.room_id === e.room_id ||
-        preferredRoom.value === e.room_id)
-    )
-  })
-})
-
-// Single source of truth for drag state
-const dragState = computed(() => {
-  if (!draggedEvent.value) return null
-
-  const eventToCheck = draggedEvent.value
-  const duration = draggedEvent.value
-    ? getEventDuration(draggedEvent.value)
-    : eventToCheck.duration || 1
-
-  return { eventToCheck, duration }
-})
-
-// Single computed property for isDragging
-const isDragging = computed(() => dragState.value !== null)
-
-// Centralized conflict checking function
-const checkConflicts = (
-  day: string | number,
-  timeIndex: number | undefined,
-) => {
-  // Early returns for invalid inputs
-  if (!dragState.value || timeIndex === undefined)
-    return { hasConflict: false, types: [], events: [] }
-
-  try {
-    const { eventToCheck, duration } = dragState.value
-    const dayName = typeof day === 'number' ? days[day] : day
-
-    // Exclude current event from check
-    const eventsToCheck = eventToCheck.id
-      ? placedEvents.value.filter((e) => e.id !== eventToCheck.id)
-      : placedEvents.value
-
-    const endTimeIndex = timeIndex + duration - 1
-    const conflictTypes = new Set<string>()
-    const conflictingEvents: CalendarEvent[] = []
-
-    // Find conflicts
-    for (const e of eventsToCheck) {
-      if (!e.day || !e.start_time || !e.end_time) continue
-      if (e.day !== dayName) continue
-
-      const eventStartIndex = timeToIndex(e.start_time)
-      const eventEndIndex = eventStartIndex + getEventDuration(e) - 1
-
-      // Check time overlap
-      if (timeIndex <= eventEndIndex && endTimeIndex >= eventStartIndex) {
-        // Room conflict check
-        const roomConflict =
-          eventToCheck.room_id === e.room_id ||
-          (preferredRoom.value === e.room_id && !eventToCheck.room_id)
-
-        if (roomConflict) {
-          conflictTypes.add('room')
-          conflictingEvents.push(e)
-        }
-      }
-    }
-
-    return {
-      hasConflict: conflictingEvents.length > 0,
-      types: Array.from(conflictTypes),
-      events: conflictingEvents,
-    }
-  } catch (error) {
-    console.error('Error checking conflicts:', error)
-    return { hasConflict: false, types: [], events: [] }
-  }
-}
-
-// Current drag conflicts
-const currentDragConflicts = computed(() => {
-  if (!isDragging.value || !draggedOverDay.value || !draggedOverTime.value)
-    return { hasConflict: false, types: [], events: [] }
-
-  const timeIndex = timeToIndex(draggedOverTime.value.from)
-  return checkConflicts(draggedOverDay.value, timeIndex)
-})
-
-// Room conflict indicator
-const hasRoomConflict = computed(() => currentDragConflicts.value.hasConflict)
-
-// Simplified cell conflict check
-const cellHasConflict = (dayIndex: number, timeIndex: number | undefined) => {
-  const result = checkConflicts(dayIndex, timeIndex)
-  return { hasConflict: result.hasConflict, types: result.types }
-}
 
 function setupGlobalDragHandlers() {
   document.addEventListener('dragover', handleDocumentDragOver)
@@ -1419,6 +1208,22 @@ function editEvent(event: CalendarEvent) {
   })
   contextMenuVisible.value = false
 }
+
+
+const {
+  cellHasConflict,
+  hasRoomConflict,
+  checkConflicts,
+} = useConflicts({
+  draggedEvent,
+  isDragging,
+  placedEvents,
+  draggedOverDay,
+  draggedOverTime,
+  timeToIndex,
+  getEventDuration,
+  days
+})
 </script>
 
 <template>
@@ -1593,8 +1398,7 @@ function editEvent(event: CalendarEvent) {
                 <TimetableGrid ref="TimeTableGrid" :days="days" :time-slots="timeSlots" :get-cell-style="getCellStyle"
                   :get-header-style="getHeaderStyle" :get-day-style="getDayStyle" :corner-cell-style="cornerCellStyle"
                   :container-style="containerStyle" :is-resizing="isResizing" :is-dragging="isDragging"
-                  @cell-click="handleCellClick" @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd"
-                  @cell-context-menu="handleContextMenu">
+                  @drag-over="handleDragOver" @drop="handleDrop" @drag-end="handleDragEnd">
                   <!-- Show placeholder message when no room is selected in rooms view -->
                   <div v-if="viewType === 'rooms' && !preferredRoom"
                     class="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 bg-opacity-80">
