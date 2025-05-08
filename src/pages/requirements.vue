@@ -102,6 +102,17 @@ watch(backendResponse, async (newValue, oldValue) => {
         console.log("Created new constraint successfully")
       }
     } else if (newValue.id) {
+      // Skip ROOT updates unless there are actual changes
+      if (newValue.type === 'ROOT') {
+        // For ROOT, only update if there are actual data changes
+        const hasChanged = JSON.stringify(oldValue.data) !== JSON.stringify(newValue.data) ||
+          oldValue.strength !== newValue.strength
+        if (!hasChanged) {
+          console.log("Skipping unnecessary ROOT update")
+          return
+        }
+      }
+
       // Use the store's updateConstraint function instead of direct PUT
       const updated = await constraintStore.updateConstraint(newValue.id, {
         type: newValue.type,
@@ -128,7 +139,7 @@ const selectedConstraintData = computed({
     const type = selectedConstraint.value.id.toUpperCase()
 
     // Find the operation node for this constraint type
-    const operationNode = backendResponse.value.nested_children[0].nested_children.find(
+    const operationNode = backendResponse.value.nested_children[0].nested_children!.find(
       node => node.type === 'OPERATION' &&
         node.nested_children?.some(child => child.type === type)
     )
@@ -147,14 +158,14 @@ const selectedConstraintData = computed({
 
     try {
       // Find the operation node for this constraint type
-      let operationNode = backendResponse.value.nested_children[0].nested_children.find(
+      let operationNode = backendResponse.value.nested_children[0].nested_children!.find(
         node => node.type === 'OPERATION' &&
           node.nested_children?.some(child => child.type === type)
       )
 
       if (operationNode) {
         // Get existing constraints of this type
-        const existingConstraints = operationNode.nested_children.filter(child => child.type === type)
+        const existingConstraints = operationNode.nested_children!.filter(child => child.type === type)
 
         // Map of existing constraints by ID
         const existingMap = new Map(
@@ -181,8 +192,8 @@ const selectedConstraintData = computed({
           const existingConstraint = existingMap.get(constraint.id);
 
           // Compare the constraint data to see if it's actually changed
-          const hasChanged = JSON.stringify(existingConstraint.data) !== JSON.stringify(constraint.data) ||
-            existingConstraint.strength !== constraint.strength;
+          const hasChanged = JSON.stringify(existingConstraint!.data) !== JSON.stringify(constraint.data) ||
+            existingConstraint!.strength !== constraint.strength;
 
           // Only add to toUpdate if the constraint has actually changed
           if (hasChanged) {
@@ -221,6 +232,7 @@ const selectedConstraintData = computed({
             strength: constraint.strength,
             data: constraint.data,
             parent: operationNode.id,
+            nested_children: undefined
             // nested_children: []
           })
         }
@@ -231,6 +243,7 @@ const selectedConstraintData = computed({
           strength: "STRONG",
           data: { operator: "AND" },
           parent: backendResponse.value.nested_children[0].id,
+          nested_children: undefined
           // nested_children: []
         })
 
@@ -242,6 +255,7 @@ const selectedConstraintData = computed({
               strength: constraint.strength,
               data: constraint.data,
               parent: newOperationNode.id,
+              nested_children: undefined
               // nested_children: []
             })
           }

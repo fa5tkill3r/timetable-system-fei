@@ -34,7 +34,9 @@ interface TimeRangeConstraint {
         day_of_week: number,
         start_time: number,
         duration: number
-    }
+    },
+    parent: number | null | undefined
+    nested_children: number[] | null | undefined
 }
 
 const constraints = defineModel<TimeRangeConstraint[]>({
@@ -236,24 +238,24 @@ function updateConstraintsFromCells() {
         // Find continuous segments - this correctly identifies gaps when middle slots are removed
         let segments: { start: number; end: number; cells: number[] }[] = [];
         let start = sortedSlots[0];
-        let end = start;
+        let end = start!;
         let currentCells = [start];
 
         for (let i = 1; i < sortedSlots.length; i++) {
             if (sortedSlots[i] === end + 1) {
                 // Continuous - extend segment
-                end = sortedSlots[i];
+                end = sortedSlots[i]!;
                 currentCells.push(sortedSlots[i]);  // Push the actual value not 'end'
             } else {
                 // Gap - finish segment and start a new one
-                segments.push({ start, end, cells: [...currentCells] });
+                segments.push({ start: start!, end, cells: [...currentCells] as number[] });
                 start = sortedSlots[i];
-                end = start;
+                end = start!;
                 currentCells = [start];
             }
         }
         // Add final segment
-        segments.push({ start, end, cells: [...currentCells] });
+        segments.push({ start: start!, end, cells: [...currentCells] as number[] });
 
         // Track if we've already used the original constraint ID for patching
         let originalIdUsed = false;
@@ -446,7 +448,9 @@ function updateConstraintsFromCells() {
                         day_of_week: group.dayIndex,
                         start_time: segment.start,
                         duration
-                    }
+                    },
+                    parent: undefined,
+                    nested_children: undefined,
                 });
             }
         });

@@ -127,7 +127,7 @@ export const useConstraintStore = defineStore('constraints', () => {
 
   const updateConstraint = async (
     id: number,
-    constraintData: PatchedConstraintRequest,
+    constraintData: Partial<PatchedConstraintRequest>,
   ) => {
     isLoading.value = true
     try {
@@ -136,7 +136,7 @@ export const useConstraintStore = defineStore('constraints', () => {
           path: { id },
           header: schemaStore.termHeader,
         },
-        body: constraintData,
+        body: constraintData as PatchedConstraintRequest,
       })
       if (response.data) {
         const index = constraints.value.findIndex((c) => c.id === id)
