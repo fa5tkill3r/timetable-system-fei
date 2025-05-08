@@ -7,22 +7,19 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  console.log('authenticated', authStore.isAuthenticated)
 
-  if (to.path === '/login') {
-    if (authStore.isAuthenticated) {
-      next('/')
-    } else {
-      next()
+  if (to.meta.public) {
+    if (to.meta.notAuthOnly && authStore.isAuthenticated) {
+      return next('/')
     }
+    return next()
   } else {
     if (!authStore.isAuthenticated) {
-      next('/login')
-    } else {
-      next()
+      return next('/login')
     }
+    return next()
   }
 })
 

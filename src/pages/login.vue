@@ -9,6 +9,13 @@ import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
+definePage({
+  meta: {
+    public: true,
+    notAuthOnly: true
+  }
+})
+
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
@@ -24,6 +31,12 @@ async function onSubmit(event: Event) {
     isLoading.value = false
     router.push('/')
   }, 2000)
+}
+
+function initiateGoogleLogin() {
+  isLoading.value = true
+
+  authStore.initiateGoogleLogin()
 }
 </script>
 
@@ -102,7 +115,7 @@ async function onSubmit(event: Event) {
               </span>
             </div>
           </div>
-          <Button variant="outline" type="button" :disabled="isLoading">
+          <Button variant="outline" type="button" :disabled="isLoading" @click="initiateGoogleLogin">
             <LoaderCircle v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
             <img src="/img/stu-fei.svg" alt="Google Logo" class="pr-1 mr-2 h-7 w-auto bg-red-600" />
             {{ $t('login.aisLogin') }}

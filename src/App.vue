@@ -1,33 +1,40 @@
 <script setup lang="ts">
-import Navigation from '@/components/Navigation.vue'
-import SchemaSwitcher from './components/SchemaSwitcher.vue'
 import Toaster from '@/components/ui/toast/Toaster.vue'
-import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import { LoaderCircle } from 'lucide-vue-next'
 
 const route = useRoute()
+const router = useRouter()
+const isInitialized = ref(false)
 
-// Define which routes use the auth layout
-const authRoutes = ['/login', '/register', '/forgot-password']
-
-// Determine which layout to use based on the current route
-const isAuthRoute = computed(() => {
-  return authRoutes.includes(route.path)
+onMounted(async () => {
+  await router.isReady()
+  isInitialized.value = true
 })
+
 </script>
 
 <template>
   <Toaster />
 
-  <!-- Switch between layouts based on route -->
-  <AuthLayout v-if="isAuthRoute">
-    <RouterView />
-  </AuthLayout>
+  <div v-if="!isInitialized" class="flex h-screen w-screen items-center justify-center">
+    <div class="text-center">
+      <LoaderCircle class="h-12 w-12 animate-spin mx-auto" />
+    </div>
+  </div>
 
-  <DefaultLayout v-else />
+  <template v-else>
+    <AuthLayout v-if="route.meta.public">
+      <RouterView />
+    </AuthLayout>
+
+    <DefaultLayout v-else>
+      <RouterView />
+    </DefaultLayout>
+  </template>
 </template>
 
 <style scoped></style>
