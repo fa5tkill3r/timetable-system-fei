@@ -176,12 +176,28 @@ const selectedConstraintData = computed({
         )
 
         // 2. Identify constraints to update (in both existing and new)
-        const toUpdate = newConstraints.filter(c =>
-          c.id && existingMap.has(c.id)
-        )
+        const toUpdate = []
+
+        for (const constraint of newConstraints) {
+          if (!constraint.id || !existingMap.has(constraint.id)) continue;
+
+          // Get the existing constraint with the same ID
+          const existingConstraint = existingMap.get(constraint.id);
+
+          // Compare the constraint data to see if it's actually changed
+          const hasChanged = JSON.stringify(existingConstraint.data) !== JSON.stringify(constraint.data) ||
+            existingConstraint.strength !== constraint.strength;
+
+          // Only add to toUpdate if the constraint has actually changed
+          if (hasChanged) {
+            toUpdate.push(constraint);
+          }
+        }
 
         // 3. Identify constraints to create (in new but without IDs)
         const toCreate = newConstraints.filter(c => !c.id)
+
+        console.log(`Processing: ${toDelete.length} deletes, ${toUpdate.length} updates, ${toCreate.length} creates`);
 
         // Process deletions
         for (const constraint of toDelete) {
@@ -190,14 +206,14 @@ const selectedConstraintData = computed({
           }
         }
 
-        // Process updates
+        // Process updates (only the ones that actually changed)
         for (const constraint of toUpdate) {
           if (constraint.id) {
             await constraintStore.updateConstraint(constraint.id, {
               type: constraint.type,
               strength: constraint.strength,
               data: constraint.data,
-              nested_children: []
+              // nested_children: []
             })
           }
         }
@@ -209,7 +225,7 @@ const selectedConstraintData = computed({
             strength: constraint.strength,
             data: constraint.data,
             parent: operationNode.id,
-            nested_children: []
+            // nested_children: []
           })
         }
       } else if (newConstraints.length > 0) {
@@ -219,7 +235,7 @@ const selectedConstraintData = computed({
           strength: "STRONG",
           data: { operator: "AND" },
           parent: backendResponse.value.nested_children[0].id,
-          nested_children: []
+          // nested_children: []
         })
 
         if (newOperationNode?.id) {
@@ -230,7 +246,7 @@ const selectedConstraintData = computed({
               strength: constraint.strength,
               data: constraint.data,
               parent: newOperationNode.id,
-              nested_children: []
+              // nested_children: []
             })
           }
         }
