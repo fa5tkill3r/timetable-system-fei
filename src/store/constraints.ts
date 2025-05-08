@@ -211,22 +211,17 @@ export const useConstraintStore = defineStore('constraints', () => {
     return response as Constraint
   }
 
-  // Get constraints for a specific person, converted to nested format
-  const getPersonConstraints = async (
-    personId: number,
+  const getTargetConstraints = async (
+    targetId: number,
   ): Promise<ConstraintData | null> => {
     await fetchConstraints()
 
-    // Find the root constraint for this person
     let rootConstraint = constraints.value.find(
-      (c) =>
-        c.type === 'ROOT' &&
-        c.data?.target_type === 'USER' &&
-        c.data?.target_id === personId,
+      (c) => c.type === 'ROOT' && c.data?.target_id === targetId,
     )
 
     if (!rootConstraint) {
-      rootConstraint = await createDefaultConstraint(personId)
+      rootConstraint = await createDefaultConstraint(targetId)
     }
 
     // Transform to nested format
@@ -289,7 +284,7 @@ export const useConstraintStore = defineStore('constraints', () => {
     updateConstraint,
     deleteConstraint,
     clearSelection,
-    getPersonConstraints,
+    getTargetConstraints,
     transformToFlat,
     createDefaultConstraint,
   }

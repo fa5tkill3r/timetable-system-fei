@@ -10,14 +10,20 @@ import {
 } from '@/components/ui/tabs'
 import { client } from '@/lib/client'
 import { useConstraintStore } from '@/store/constraints'
+import { useSubjectStore } from '@/store/subjects'
+import { useAuthStore } from '@/store/auth'
+import ComboBox from '@/components/common/ComboBox.vue'
 import { components } from '@/types/schema'
 import { set } from 'lodash'
 import { Building, Infinity, CalendarDays } from 'lucide-vue-next'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
-const person = 98116
+const target = ref<number | null>(null)
+const activeTab = ref('user')
 
 const constraintStore = useConstraintStore()
+const subjectStore = useSubjectStore()
+const authStore = useAuthStore()
 
 interface Constraint {
   id: any
@@ -25,9 +31,6 @@ interface Constraint {
   icon: any,
   constraintType: string
 }
-
-type BackendConstraintType = components['schemas']['Constraint']
-
 
 export interface ConstraintData {
   id: number | null
@@ -96,13 +99,11 @@ watch(backendResponse, async (newValue, oldValue) => {
       })
 
       if (result) {
-        // Direct assignment without additional API call
-        backendResponse.value = await constraintStore.getPersonConstraints(person)
+        backendResponse.value = await constraintStore.getTargetConstraints(target.value!)
         isNewConstraint.value = false
         console.log("Created new constraint successfully")
       }
     } else if (newValue.id) {
-      // Skip ROOT updates unless there are actual changes
       if (newValue.type === 'ROOT') {
         // For ROOT, only update if there are actual data changes
         const hasChanged = JSON.stringify(oldValue.data) !== JSON.stringify(newValue.data) ||
@@ -220,7 +221,6 @@ const selectedConstraintData = computed({
               type: constraint.type,
               strength: constraint.strength,
               data: constraint.data,
-              // nested_children: []
             })
           }
         }
@@ -233,7 +233,6 @@ const selectedConstraintData = computed({
             data: constraint.data,
             parent: operationNode.id,
             nested_children: undefined
-            // nested_children: []
           })
         }
       } else if (newConstraints.length > 0) {
@@ -244,7 +243,6 @@ const selectedConstraintData = computed({
           data: { operator: "AND" },
           parent: backendResponse.value.nested_children[0].id,
           nested_children: undefined
-          // nested_children: []
         })
 
         if (newOperationNode?.id) {
@@ -256,16 +254,12 @@ const selectedConstraintData = computed({
               data: constraint.data,
               parent: newOperationNode.id,
               nested_children: undefined
-              // nested_children: []
             })
           }
         }
       }
 
-      // After all operations, refresh the data - REMOVING REDUNDANT FETCH
-      // await constraintStore.fetchConstraints() <- Remove this line
-      backendResponse.value = await constraintStore.getPersonConstraints(person)
-
+      backendResponse.value = await constraintStore.getTargetConstraints(target.value!)
     } catch (error) {
       console.error("Error processing constraint changes:", error)
     } finally {
@@ -279,17 +273,47 @@ watch(selectedConstraintData, (newValue) => {
 
 }, { deep: true })
 
+watch(activeTab, async (newTab) => {
+  if (newTab === 'user') {
+    if (authStore.isAuthenticated) {
+      target.value = Number(authStore.userId)
 
+      try {
+        const targetConstraints = await constraintStore.getTargetConstraints(target.value)
+        if (targetConstraints) {
+          backendResponse.value = targetConstraints
+        } else {
+          console.error("Failed to fetch user constraints")
+          backendResponse.value = null
+        }
+      } catch (error) {
+        console.error("Error fetching user constraints:", error)
+      }
+    } else {
+      target.value = null
+      backendResponse.value = null
+    }
+  } else {
+    target.value = null
+    backendResponse.value = null
+  }
+
+  selectedConstraint.value = null
+}, { immediate: true })
 
 onMounted(async () => {
-  const personConstraints = await constraintStore.getPersonConstraints(person)
+  if (activeTab.value === 'user' && authStore.isAuthenticated) {
+    target.value = Number(authStore.userId)
+  }
 
-  if (personConstraints) {
-    console.log("Fetched person constraints successfully")
-    backendResponse.value = personConstraints
-  } else {
-    console.error("Failed to fetch person constraints")
-    return
+  if (target.value) {
+    const targetConstraints = await constraintStore.getTargetConstraints(target.value)
+    if (targetConstraints) {
+      console.log("Fetched target constraints successfully")
+      backendResponse.value = targetConstraints
+    } else {
+      console.error("Failed to fetch target constraints")
+    }
   }
 })
 
@@ -300,26 +324,39 @@ onMounted(async () => {
   <div class="flex gap-4">
     <div class="flex flex-col gap-4 p-4">
       <h1 class="text-2xl font-semibold">Requirements</h1>
-      <Tabs default-value="account" class="w-[400px]">
+      <Tabs v-model="activeTab" default-value="user" class="w-[400px]">
         <TabsList class="grid w-full grid-cols-2">
-          <TabsTrigger value="account">
-            Myself
+          <TabsTrigger value="user">
+            My requirements
           </TabsTrigger>
-          <TabsTrigger value="password">
+          <TabsTrigger value="subject">
             Subject
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="account">
-
+        <TabsContent value="user">
+          <div class="py-4">
+            <p class="text-sm text-muted-foreground">Setting requirements for your personal schedule.</p>
+            <div v-if="authStore.isAuthenticated" class="mt-2 p-2 bg-muted rounded-md">
+              <p class="font-medium">{{ authStore.user?.name || 'Current User' }}</p>
+              <p class="text-xs text-muted-foreground">{{ authStore.user?.email }}</p>
+            </div>
+            <p v-else class="text-sm text-destructive">Please log in to set personal requirements.</p>
+          </div>
         </TabsContent>
-        <TabsContent value="password">
-
+        <TabsContent value="subject">
+          <div class="py-4">
+            <ComboBox v-model:selection="target" :options="subjectStore.subjects.map(subject => ({
+              id: subject.id,
+              name: subject.code + ' - ' + subject.name
+            }))" :loading="subjectStore.isLoading" title="Select Subject"
+              description="Choose a subject to set requirements for" search-placeholder="Search subjects..." />
+          </div>
         </TabsContent>
       </Tabs>
 
       <Button v-for="constraint in constraints" :key="constraint.name"
         :variant="selectedConstraint?.name === constraint.name ? 'default' : 'outline'"
-        @click="selectedConstraint = constraint" class="py-3 px-4 text-base w-full h-12">
+        @click="selectedConstraint = constraint" class="py-3 px-4 text-base w-full h-12" :disabled="target === null">
         <component :is="constraint.icon" class="h-5 w-5 mr-3" />
         {{ constraint.name }}
       </Button>
