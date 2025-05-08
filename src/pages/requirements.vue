@@ -248,8 +248,8 @@ const selectedConstraintData = computed({
         }
       }
 
-      // After all operations, refresh the data
-      await constraintStore.fetchConstraints()
+      // After all operations, refresh the data - REMOVING REDUNDANT FETCH
+      // await constraintStore.fetchConstraints() <- Remove this line
       backendResponse.value = await constraintStore.getPersonConstraints(person)
 
     } catch (error) {
