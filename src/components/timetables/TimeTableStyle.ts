@@ -14,7 +14,7 @@ export interface TimeTableStyleOptions {
   getDayRowPositions: ComputedRef<number[]>
   timeToIndex: (time: string) => number
   filteredEvents: ComputedRef<CalendarEvent[]>
-  conflicts: Conflicts
+  conflicts: Conflicts | null
   timeSlots: ComputedRef<TimeSlot[]>
 }
 
@@ -31,7 +31,10 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
     timeSlots,
   } = options
 
-  const { cellHasConflict, checkConflicts } = conflicts
+  const cellHasConflict = conflicts?.cellHasConflict
+  const checkConflicts = conflicts?.checkConflicts
+  const readonly = conflicts === null
+
   const timetableSettings = useTimetableSettingsStore()
 
   const getEventStyle = (event: CalendarEvent): CSSProperties => {
@@ -66,7 +69,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
       boxSizing: 'border-box',
       overflow: 'hidden',
       zIndex: 25,
-      cursor: 'move',
+      cursor: readonly ? 'auto' : 'move',
       opacity: isDraggingNow ? (isBeingDragged ? 0.4 : 0.85) : 1,
     }
   }
@@ -92,10 +95,11 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
         timeIndex < draggedOverTime.value.index + draggedEvent.value!.duration,
     )
 
-    const wouldConflict = checkConflicts(dayIndex, timeIndex).hasConflict
+    const wouldConflict =
+      checkConflicts?.(dayIndex, timeIndex)?.hasConflict || false
 
-    const conflictResult = cellHasConflict(dayIndex, timeIndex)
-    const hasConflict = isDraggedOver && conflictResult.hasConflict
+    const conflictResult = cellHasConflict?.(dayIndex, timeIndex)
+    const hasConflict = (isDraggedOver && conflictResult?.hasConflict) || false
 
     return {
       position: 'absolute',
@@ -107,6 +111,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
       borderBottom: '1px solid #e0e0e0',
       boxSizing: 'border-box',
       zIndex: 5,
+      cursor: 'auto',
       backgroundColor: (() => {
         if (!draggedEvent.value) return 'transparent'
 
