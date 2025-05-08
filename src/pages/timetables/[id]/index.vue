@@ -53,6 +53,7 @@ import { useTimeTableStyle } from '@/components/timetables/TimeTableStyle'
 import { useTimeTableBase } from '@/components/timetables/TimeTableBase'
 import TimetableSettings from '@/components/timetables/TimetableSettings.vue'
 import { useTimetableSettingsStore } from '@/store/timetableSettings'
+import { useSubjectUserRoleStore } from '@/store/subjectUserRoles'
 
 
 const semesterOptions = [
@@ -73,6 +74,8 @@ const subjectStore = useSubjectStore()
 const buildingStore = useBuildingStore()
 const ttEventTypeStore = useTTEventTypeStore()
 const subjectGroupStore = useSubjectGroupStore()
+const subjectUserRoleStore = useSubjectUserRoleStore()
+
 
 const { toast } = useToast()
 const route = useRoute('/timetables/[id]/')
@@ -93,6 +96,8 @@ const draggedOverTime = ref<TimeSlot | null>(null)
 const mousePosition = ref({ x: 0, y: 0 })
 const TimeTableGrid = useTemplateRef('TimeTableGrid')
 const weekFilter = useTemplateRef('weekFilter')
+const selectedTeacher = ref<string | null>(null)
+
 
 const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
@@ -127,6 +132,30 @@ const placedEvents = computed<CalendarEvent[]>(() => {
 
 const isDragging = computed(() => draggedEvent.value !== null)
 
+
+const staffMembers = computed(() => {
+  // Get unique lecturers across all events
+  const uniqueStaffMembers = new Set<string>()
+
+  // Go through all events with subject IDs
+  events.value
+    .filter(event => event.subject_id)
+    .forEach(event => {
+      // Get lecturer roles for this subject
+      subjectUserRoleStore.getLecturersForSubject(event.subject_id!)
+        .forEach(role => {
+          const user = role.user as any
+          const name = user.full_name || 'Unknown'
+          uniqueStaffMembers.add(name)
+        })
+    })
+
+  // Convert to array of objects for ComboBox
+  return Array.from(uniqueStaffMembers).map(name => ({
+    id: name,
+    name: name
+  }))
+})
 
 async function loadTimetableData() {
   try {
@@ -622,6 +651,7 @@ const {
   unplacedEvents,
   preferredRoom,
   weekFilter,
+  selectedTeacher
 })
 
 const {
@@ -778,9 +808,17 @@ watch(
                         </TabsContent>
 
                         <TabsContent value="teacher">
-                          <div class="px-4 text-center text-muted-foreground">
-                            Teacher view shows schedules organized by teaching
-                            staff
+                          <div class="flex flex-col items-center gap-4 px-4">
+                            <div class="flex flex-wrap items-center justify-center gap-3">
+                              <ComboBox :options="staffMembers" title="Lecturer" search-placeholder="Select lecturer..."
+                                v-model:selection="selectedTeacher" />
+                              <div v-if="!selectedTeacher" class="text-center text-muted-foreground">
+                                Please select a lecturer to view their teaching schedule
+                              </div>
+                              <div v-else>
+                                Showing schedule for: <Badge variant="default">{{ selectedTeacher }}</Badge>
+                              </div>
+                            </div>
                           </div>
                         </TabsContent>
 

@@ -2,12 +2,14 @@ import { useSubjectGroupStore } from '@/store/subjectGroups'
 import { useSubjectStore } from '@/store/subjects'
 import { CalendarEvent } from '@/types/types'
 import { computed, ref, Ref } from 'vue'
+import { useSubjectUserRoleStore } from '@/store/subjectUserRoles'
 
 export interface TimeTableFilterOptions {
   placedEvents: Ref<CalendarEvent[]>
   unplacedEvents: Ref<CalendarEvent[]>
   preferredRoom: Ref<number | undefined>
   weekFilter: Ref<any>
+  selectedTeacher: Ref<string | null>
 }
 
 export function useTimeTableFilter(options: TimeTableFilterOptions) {
@@ -18,8 +20,15 @@ export function useTimeTableFilter(options: TimeTableFilterOptions) {
 
   const subjectStore = useSubjectStore()
   const subjectGroupStore = useSubjectGroupStore()
+  const subjectUserRoleStore = useSubjectUserRoleStore()
 
-  const { placedEvents, unplacedEvents, preferredRoom, weekFilter } = options
+  const {
+    placedEvents,
+    unplacedEvents,
+    preferredRoom,
+    weekFilter,
+    selectedTeacher,
+  } = options
 
   const isSubjectInGroup = (
     subjectId: number | null,
@@ -79,6 +88,20 @@ export function useTimeTableFilter(options: TimeTableFilterOptions) {
     }
   }
 
+  const isTeacherForSubject = (
+    subjectId: number | null,
+    teacherName: string | null,
+  ): boolean => {
+    if (!subjectId || !teacherName) return true
+
+    const lecturers = subjectUserRoleStore.getLecturersForSubject(subjectId)
+    return lecturers.some((role) => {
+      const user = role.user as any
+      const name = user.full_name || user.username || 'Unknown'
+      return name === teacherName
+    })
+  }
+
   const nominalSemester = computed(() => {
     const isSummer = selectedSemester.value === 'LS'
 
@@ -103,6 +126,13 @@ export function useTimeTableFilter(options: TimeTableFilterOptions) {
         return []
       }
       return events.filter((event) => event.room_id === preferredRoom.value)
+    } else if (viewType.value === 'teacher') {
+      if (!selectedTeacher?.value) {
+        return []
+      }
+      return events.filter((event) =>
+        isTeacherForSubject(event.subject_id!, selectedTeacher.value),
+      )
     }
 
     return events
@@ -115,6 +145,10 @@ export function useTimeTableFilter(options: TimeTableFilterOptions) {
     // Only apply additional filtering in parallels view
     if (viewType.value === 'parallels') {
       return templates.filter(applyParallelsFilter)
+    } else if (viewType.value === 'teacher' && selectedTeacher?.value) {
+      return templates.filter((event) =>
+        isTeacherForSubject(event.subject_id!, selectedTeacher.value),
+      )
     }
 
     // For rooms view and other views, show all unplaced events
