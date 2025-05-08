@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar/'
-import { Languages, LogOut, User, Settings } from 'lucide-vue-next'
-import { watch } from 'vue'
+import { LogOut, User, Settings } from 'lucide-vue-next'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
@@ -31,6 +31,11 @@ function logout() {
 watch(() => i18n.locale.value, (newLocale) => {
   localStorage.setItem('locale', newLocale)
 })
+
+const profilePicture = computed(() => {
+  return authStore.user?.picture || 'https://avatar.iran.liara.run/public'
+})
+
 </script>
 
 <template>
@@ -43,12 +48,11 @@ watch(() => i18n.locale.value, (newLocale) => {
           <div class="flex items-center gap-4">
             <LanguageSwitcher />
 
-            <!-- Avatar Dropdown Menu -->
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
                 <Button variant="ghost" class="relative h-8 w-8 rounded-full">
                   <Avatar class="h-8 w-8">
-                    <AvatarImage src="https://avatar.iran.liara.run/public" :alt="authStore.user?.name || 'User'" />
+                    <AvatarImage :src="profilePicture" :alt="authStore.user?.name || 'User'" />
                     <AvatarFallback>{{ authStore.user?.name?.charAt(0) || 'U' }}</AvatarFallback>
                   </Avatar>
                 </Button>
