@@ -85,7 +85,7 @@ const toggleWeek = (index: number) => {
 
   weeksBitmask.value = newBitmask
 
-  emit('update-weeks-bitmask', props.event.id, newBitmask)
+  emit('update-weeks-bitmask', props.event.id!, newBitmask)
 }
 
 const handleDragStart = (event: DragEvent) => {
@@ -117,23 +117,23 @@ const handleDragStart = (event: DragEvent) => {
 const selectOddWeeks = () => {
   const oddWeeksMask = parseInt('101010101010', 2)
   weeksBitmask.value = oddWeeksMask
-  emit('update-weeks-bitmask', props.event.id, oddWeeksMask)
+  emit('update-weeks-bitmask', props.event.id!, oddWeeksMask)
 }
 
 const selectEvenWeeks = () => {
   const evenWeeksMask = parseInt('010101010101', 2)
   weeksBitmask.value = evenWeeksMask
-  emit('update-weeks-bitmask', props.event.id, evenWeeksMask)
+  emit('update-weeks-bitmask', props.event.id!, evenWeeksMask)
 }
 
 const selectAllWeeks = () => {
   if (isAllWeeksPattern.value) {
     weeksBitmask.value = 0
-    emit('update-weeks-bitmask', props.event.id, 0)
+    emit('update-weeks-bitmask', props.event.id!, 0)
     return
   } else {
     weeksBitmask.value = parseInt('111111111111', 2)
-    emit('update-weeks-bitmask', props.event.id, parseInt('111111111111', 2))
+    emit('update-weeks-bitmask', props.event.id!, parseInt('111111111111', 2))
     return
   }
 }
@@ -162,7 +162,7 @@ const selectAllWeeks = () => {
           <span>{{ $t(`days.${event.day}`) }} {{ event.start_time }} - {{ event.end_time }}</span>
           <span v-if="event.room_name" class="font-medium">{{ $t('timetable.editor.eventMenu.room') }} {{
             event.room_name
-            }}</span>
+          }}</span>
         </div>
       </CardHeader>
 
