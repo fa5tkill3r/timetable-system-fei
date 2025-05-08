@@ -11,6 +11,7 @@ import {
 import { client } from '@/lib/client'
 import { useConstraintStore } from '@/store/constraints'
 import { components } from '@/types/schema'
+import { set } from 'lodash'
 import { Building, Infinity, CalendarDays } from 'lucide-vue-next'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
@@ -77,11 +78,14 @@ const isUpdating = ref(false)
 
 watch(backendResponse, async (newValue, oldValue) => {
   // Ignore initial setting of the value or if we're in the middle of an update
-  if (!oldValue || !newValue || isUpdating.value) return
+  if (!oldValue || !newValue || isUpdating.value || newValue === oldValue) return
 
   console.log("Backend response changed:", newValue)
 
   try {
+    // Set flag at the beginning of operations
+    isUpdating.value = true
+
     if (isNewConstraint.value) {
       // Create a new constraint with the nested structure
       const result = await constraintStore.createConstraint({
@@ -92,35 +96,27 @@ watch(backendResponse, async (newValue, oldValue) => {
       })
 
       if (result) {
-        isUpdating.value = true
-        // Refresh constraints and get the updated nested version
+        // Direct assignment without additional API call
         backendResponse.value = await constraintStore.getPersonConstraints(person)
         isNewConstraint.value = false
-        isUpdating.value = false
         console.log("Created new constraint successfully")
       }
     } else if (newValue.id) {
-      isUpdating.value = true
-
       // Use the store's updateConstraint function instead of direct PUT
       const updated = await constraintStore.updateConstraint(newValue.id, {
         type: newValue.type,
         strength: newValue.strength,
-        data: newValue.data,
-        nested_children: newValue.nested_children
+        data: newValue.data
       })
 
       if (updated) {
         console.log("Updated constraint successfully")
-        // Refresh to get the latest data
-        await constraintStore.fetchConstraints()
-        backendResponse.value = await constraintStore.getPersonConstraints(person)
       }
-
-      isUpdating.value = false
     }
   } catch (error) {
     console.error("Error saving constraint:", error)
+  } finally {
+    // Ensure flag is always reset
     isUpdating.value = false
   }
 }, { deep: true })
