@@ -30,8 +30,8 @@ type BackendConstraintType = components['schemas']['Constraint']
 
 export interface ConstraintData {
   id: number | null
-  type: 'ROOT' | 'OPERATION' | 'TIMERANGE' | 'DAILYLIMIT' | 'ROOM'
-  strength: 'STRONG' | 'MEDIUM' | 'WEAK' | 'NONCONFLICT'
+  type: 'ROOT' | 'OPERATION' | 'TIMERANGE'// | 'DAILYLIMIT' | 'ROOM'
+  strength: 'STRONG' | 'MEDIUM' | 'WEAK'
   data: any
   nested_children?: ConstraintData[]
   parent: ConstraintData | null
@@ -196,7 +196,8 @@ const selectedConstraintData = computed({
             await constraintStore.updateConstraint(constraint.id, {
               type: constraint.type,
               strength: constraint.strength,
-              data: constraint.data
+              data: constraint.data,
+              nested_children: []
             })
           }
         }
@@ -207,7 +208,8 @@ const selectedConstraintData = computed({
             type: constraint.type,
             strength: constraint.strength,
             data: constraint.data,
-            parent: operationNode.id
+            parent: operationNode.id,
+            nested_children: []
           })
         }
       } else if (newConstraints.length > 0) {
@@ -216,7 +218,8 @@ const selectedConstraintData = computed({
           type: "OPERATION",
           strength: "STRONG",
           data: { operator: "AND" },
-          parent: backendResponse.value.nested_children[0].id
+          parent: backendResponse.value.nested_children[0].id,
+          nested_children: []
         })
 
         if (newOperationNode?.id) {
@@ -226,7 +229,8 @@ const selectedConstraintData = computed({
               type: constraint.type,
               strength: constraint.strength,
               data: constraint.data,
-              parent: newOperationNode.id
+              parent: newOperationNode.id,
+              nested_children: []
             })
           }
         }
