@@ -12,12 +12,14 @@ import { client } from '@/lib/client'
 import { useConstraintStore } from '@/store/constraints'
 import { useSubjectStore } from '@/store/subjects'
 import { useAuthStore } from '@/store/auth'
+import { useI18n } from 'vue-i18n'
 import ComboBox from '@/components/common/ComboBox.vue'
 import { components } from '@/types/schema'
 import { set } from 'lodash'
 import { Building, Infinity, CalendarDays } from 'lucide-vue-next'
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 
+const { t } = useI18n()
 const target = ref<number | null>(null)
 const activeTab = ref('user')
 
@@ -58,17 +60,17 @@ function loadConstraintComponent(name: string) {
 const constraints = [
   {
     id: "TimeRange",
-    name: "Time range",
+    name: "timeRange",
     icon: CalendarDays,
   },
   {
     id: "DailyLimit",
-    name: "Daily limit",
+    name: "dailyLimit",
     icon: Infinity
   },
   {
     id: "Room",
-    name: "Room",
+    name: "room",
     icon: Building
   }
 ] as Constraint[]
@@ -323,24 +325,24 @@ onMounted(async () => {
 <template>
   <div class="flex gap-4">
     <div class="flex flex-col gap-4 p-4">
-      <h1 class="text-2xl font-semibold">Requirements</h1>
+      <h1 class="text-2xl font-semibold">{{ $t('navigation.requirements') }}</h1>
       <Tabs v-model="activeTab" default-value="user" class="w-[400px]">
         <TabsList class="grid w-full grid-cols-2">
           <TabsTrigger value="user">
-            My requirements
+            {{ $t('requirements.myRequirements') }}
           </TabsTrigger>
           <TabsTrigger value="subject">
-            Subject
+            {{ $t('requirements.subject') }}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="user">
           <div class="py-4">
-            <p class="text-sm text-muted-foreground">Setting requirements for your personal schedule.</p>
+            <p class="text-sm text-muted-foreground">{{ $t('requirements.personalScheduleInfo') }}</p>
             <div v-if="authStore.isAuthenticated" class="mt-2 p-2 bg-muted rounded-md">
-              <p class="font-medium">{{ authStore.user?.name || 'Current User' }}</p>
+              <p class="font-medium">{{ authStore.user?.name || $t('user.defaultName') }}</p>
               <p class="text-xs text-muted-foreground">{{ authStore.user?.email }}</p>
             </div>
-            <p v-else class="text-sm text-destructive">Please log in to set personal requirements.</p>
+            <p v-else class="text-sm text-destructive">{{ $t('requirements.loginPrompt') }}</p>
           </div>
         </TabsContent>
         <TabsContent value="subject">
@@ -348,8 +350,9 @@ onMounted(async () => {
             <ComboBox v-model:selection="target" :options="subjectStore.subjects.map(subject => ({
               id: subject.id,
               name: subject.code + ' - ' + subject.name
-            }))" :loading="subjectStore.isLoading" title="Select Subject"
-              description="Choose a subject to set requirements for" search-placeholder="Search subjects..." />
+            }))" :loading="subjectStore.isLoading" :title="$t('requirements.selectSubject')"
+              :description="$t('requirements.selectSubjectDescription')"
+              :search-placeholder="$t('requirements.searchSubjects')" />
           </div>
         </TabsContent>
       </Tabs>
@@ -358,16 +361,22 @@ onMounted(async () => {
         :variant="selectedConstraint?.name === constraint.name ? 'default' : 'outline'"
         @click="selectedConstraint = constraint" class="py-3 px-4 text-base w-full h-12" :disabled="target === null">
         <component :is="constraint.icon" class="h-5 w-5 mr-3" />
-        {{ constraint.name }}
+        {{ $t(`requirements.constraints.${constraint.name}`) }}
       </Button>
     </div>
     <div class="flex-1 p-4 border-l border-gray-200">
       <div class="flex flex-col gap-4">
-        <!-- <h2 class="text-xl font-semibold">Constraints</h2> -->
-
         <div class="p-4">
           <component v-if="selectedConstraint" v-model="selectedConstraintData"
             :is="loadConstraintComponent(selectedConstraint?.id)" />
+          <div v-else class="flex flex-col justify-center items-center h-full min-h-[400px]">
+            <h1 class="text-2xl font-medium text-center text-muted-foreground">
+              {{ $t('requirements.selectConstraintPrompt') }}
+            </h1>
+            <p class="mt-2 text-center text-muted-foreground">
+              {{ $t('requirements.selectConstraintDescription') }}
+            </p>
+          </div>
         </div>
       </div>
     </div>

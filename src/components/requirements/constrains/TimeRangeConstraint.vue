@@ -2,6 +2,7 @@
 import { ref, CSSProperties, onMounted, onUnmounted, watch } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
+import { useI18n } from 'vue-i18n'
 import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
 import {
     DAYS,
@@ -11,11 +12,13 @@ import {
     getBaseTimetableStyles
 } from '@/utils/timetable'
 
+const { t } = useI18n()
+
 const availabilityLevels = [
-    { id: 'clear', name: 'Clear', color: '#FFFFFF', value: 0, strength: null },
-    { id: 'weak', name: 'Weak', color: '#FFCCCC', value: 1, strength: 'WEAK' },
-    { id: 'normal', name: 'Normal', color: '#FF8080', value: 2, strength: 'NORMAL' },
-    { id: 'strong', name: 'Strong', color: '#FF0000', value: 3, strength: 'STRONG' }
+    { id: 'clear', name: 'clear', color: '#FFFFFF', value: 0, strength: null },
+    { id: 'weak', name: 'weak', color: '#FFCCCC', value: 1, strength: 'WEAK' },
+    { id: 'normal', name: 'normal', color: '#FF8080', value: 2, strength: 'NORMAL' },
+    { id: 'strong', name: 'strong', color: '#FF0000', value: 3, strength: 'STRONG' }
 ]
 
 interface AvailabilityCell {
@@ -149,12 +152,12 @@ function handleCellRightClick(dayIndex: number, timeIndex: number, updateConstra
 }
 
 function clearAllAvailability() {
-    if (confirm("Are you sure you want to clear all availability markings?")) {
+    if (confirm(t('constraints.timeRange.confirmClear'))) {
         availabilityCells.value = []
         constraints.value = []
         toast({
-            title: "Cleared",
-            description: "All availability markings have been cleared."
+            title: t('constraints.timeRange.cleared'),
+            description: t('constraints.timeRange.clearedMessage')
         })
     }
 }
@@ -507,10 +510,10 @@ onMounted(() => {
 
 <template>
     <div class="flex flex-col mx-auto p-6" @mouseup="handleMouseUp" @mouseleave="handleMouseUp">
-        <h1 class="text-2xl font-bold mb-6">Time Range Select</h1>
+        <h1 class="text-2xl font-bold mb-6">{{ $t('constraints.timeRange.title') }}</h1>
 
         <div class="mb-6">
-            <h2 class="text-lg font-semibold mb-2">Select Unavailability Level:</h2>
+            <h2 class="text-lg font-semibold mb-2">{{ $t('constraints.timeRange.selectLevel') }}</h2>
             <div class="flex gap-4 mb-4">
                 <Button v-for="level in availabilityLevels" :key="level.id"
                     :variant="selectedLevel?.id === level.id ? 'default' : 'outline'" class="flex items-center gap-2"
@@ -524,19 +527,19 @@ onMounted(() => {
                         backgroundColor: level.color,
                         borderColor: level.id === 'clear' ? '#e0e0e0' : 'rgba(0,0,0,0.2)'
                     }"></div>
-                    {{ level.name }}
+                    {{ $t(`constraints.timeRange.levels.${level.name}`) }}
                 </Button>
             </div>
 
             <div class="flex justify-between mb-4">
                 <div>
                     <p class="text-sm text-gray-500">
-                        Click and drag to mark your unavailability. Use different colors to indicate the level of
-                        unavailability.
+                        {{ $t('constraints.timeRange.instructions') }}
                     </p>
                 </div>
                 <div class="space-x-2">
-                    <Button variant="outline" @click="clearAllAvailability">Clear All</Button>
+                    <Button variant="outline" @click="clearAllAvailability">{{ $t('constraints.timeRange.clearAll')
+                        }}</Button>
                 </div>
             </div>
         </div>
