@@ -758,19 +758,21 @@ watch(
                     <Tabs v-model="viewType" default-value="parallels"
                       class="flex h-[100px] w-full flex-row items-start justify-between">
                       <TabsList class="h-fit">
-                        <TabsTrigger value="parallels">Parallels</TabsTrigger>
-                        <TabsTrigger value="rooms">Rooms</TabsTrigger>
-                        <TabsTrigger value="teacher">Teacher</TabsTrigger>
-                        <TabsTrigger value="student">Student</TabsTrigger>
+                        <TabsTrigger value="parallels">{{ $t('timetable.editor.views.parallels') }}</TabsTrigger>
+                        <TabsTrigger value="rooms">{{ $t('timetable.editor.views.rooms') }}</TabsTrigger>
+                        <TabsTrigger value="teacher">{{ $t('timetable.editor.views.teacher') }}</TabsTrigger>
+                        <TabsTrigger value="student">{{ $t('timetable.editor.views.student') }}</TabsTrigger>
                       </TabsList>
 
                       <div class="mr-2">
                         <TabsContent value="parallels">
                           <div class="flex flex-wrap items-center justify-center gap-3">
-                            <ComboBox :options="semesterOptions" title="Semester"
-                              search-placeholder="Select semester..." v-model:selection="selectedSemester" />
+                            <ComboBox :options="semesterOptions" :title="$t('timetable.editor.semester')"
+                              :search-placeholder="$t('timetable.editor.searchSemester')"
+                              v-model:selection="selectedSemester" />
 
-                            <ComboBox :options="yearOptions" title="Year" search-placeholder="Select year..."
+                            <ComboBox :options="yearOptions" :title="$t('timetable.editor.year')"
+                              :search-placeholder="$t('timetable.editor.searchYear')"
                               v-model:selection="selectedYear" />
 
                             <ComboBox :options="subjectGroupStore.subjectGroupGroups.map(
@@ -779,11 +781,12 @@ watch(
                                 name: g.name,
                               }),
                             )
-                              " title="Subject Group" search-placeholder="Select subject group..."
+                              " :title="$t('timetable.editor.subjectGroup')"
+                              :search-placeholder="$t('timetable.editor.searchSubjectGroup')"
                               v-model:selection="selectedSubjectGroup" />
 
                             <Badge class="h-fit" variant="outline">
-                              Nominal Semester: {{ nominalSemester }}
+                              {{ $t('timetable.editor.nominalSemester') }}: {{ nominalSemester }}
                             </Badge>
                           </div>
                         </TabsContent>
@@ -791,11 +794,10 @@ watch(
                         <TabsContent value="rooms">
                           <div class="flex flex-col items-center gap-4 px-4">
                             <div v-if="!preferredRoom" class="text-center text-muted-foreground">
-                              Please select a room from bottom panel to view its
-                              timetable.
+                              {{ $t('timetable.editor.roomNotSelected') }}
                             </div>
                             <div v-else>
-                              Now showing timetable for room:
+                              {{ $t('timetable.editor.showingTimetableFor') }}:
                               <Badge variant="default">
                                 {{
                                   buildingStore.rooms.find(
@@ -810,13 +812,15 @@ watch(
                         <TabsContent value="teacher">
                           <div class="flex flex-col items-center gap-4 px-4">
                             <div class="flex flex-wrap items-center justify-center gap-3">
-                              <ComboBox :options="staffMembers" title="Lecturer" search-placeholder="Select lecturer..."
+                              <ComboBox :options="staffMembers" :title="$t('timetable.editor.teacher')"
+                                :search-placeholder="$t('timetable.editor.searchTeacher')"
                                 v-model:selection="selectedTeacher" />
                               <div v-if="!selectedTeacher" class="text-center text-muted-foreground">
-                                Please select a lecturer to view their teaching schedule
+                                {{ $t('timetable.editor.teacherNotSelected') }}
                               </div>
                               <div v-else>
-                                Showing schedule for: <Badge variant="default">{{ selectedTeacher }}</Badge>
+                                {{ $t('timetable.editor.showingTimetableFor') }}: <Badge variant="default">{{
+                                  selectedTeacher }}</Badge>
                               </div>
                             </div>
                           </div>
@@ -830,25 +834,6 @@ watch(
                         </TabsContent>
                       </div>
                     </Tabs>
-                  </div>
-
-                  <div class="flex flex-wrap items-center justify-center gap-3">
-                    <div v-if="subjectId || roomId" class="flex items-center gap-2">
-                      <Badge variant="outline" v-if="subjectId">
-                        Subject: {{ getSubjectName(subjectId) || subjectId }}
-                        <Button variant="ghost" size="icon" class="ml-1 h-4 w-4" @click="subjectId = null">
-                          <span class="sr-only">Remove</span>
-                          &times;
-                        </Button>
-                      </Badge>
-                      <Badge variant="outline" v-if="roomId">
-                        Room ID: {{ roomId }}
-                        <Button variant="ghost" size="icon" class="ml-1 h-4 w-4" @click="roomId = null">
-                          <span class="sr-only">Remove</span>
-                          &times;
-                        </Button>
-                      </Badge>
-                    </div>
                   </div>
 
                   <div v-if="
@@ -890,7 +875,7 @@ watch(
                     <div v-if="viewType === 'rooms' && !preferredRoom"
                       class="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 bg-opacity-80">
                       <div class="text-lg font-medium text-gray-500">
-                        Please select a room to view its schedule
+                        {{ $t('timetable.editor.roomNotSelectedTimetable') }}
                       </div>
                     </div>
 

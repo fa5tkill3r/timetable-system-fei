@@ -8,18 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu'
 import { Button } from '@/components/ui/button'
 import { GripVertical, Trash2, Edit, Calendar, Copy } from 'lucide-vue-next'
 import { useSubjectUserRoleStore } from '@/store/subjectUserRoles'
-import { components } from '@/types/schema'
 import { CalendarEvent } from '@/types/types'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 
 interface Props {
@@ -52,9 +47,12 @@ const staffMembers = computed(() => {
   return subjectUserRoleStore.getLecturersForSubject(props.event.subject_id)
     .map(role => {
       const user = role.user as any
+      const customRole = role.role as any
+      console.log("ROle", customRole);
+
       return {
-        name: user.full_name || user.username || 'Unknown',
-        role: role.role_id === 1 ? 'Lecturer' : 'Teaching Assistant'
+        name: user.full_name || user.username || t('timetable.editor.eventMenu.unknown'),
+        role: customRole.id === 1 ? t('timetable.editor.eventMenu.lecturer') : t('timetable.editor.eventMenu.teachingAssistant')
       }
     })
 })
@@ -94,14 +92,12 @@ const handleDragStart = (event: DragEvent) => {
   if (event.dataTransfer) {
     const eventData = {
       ...props.event,
-      isCopy: true, // Flag to indicate this should create a new event
-      sourceEventId: props.event.id // Keep reference to source event
+      isCopy: true,
+      sourceEventId: props.event.id
     }
 
-    // Store as JSON string so all data is transferred
     event.dataTransfer.setData('application/json', JSON.stringify(eventData))
 
-    // Change to copy operation instead of move
     event.dataTransfer.effectAllowed = 'copy'
 
     const calendarEvent = {
@@ -109,8 +105,6 @@ const handleDragStart = (event: DragEvent) => {
       id: null,
       original_eventId: props.event.id,
     }
-    // props.event.original_eventId = props.event.id
-    // props.event.id = null
 
     emit('drag-start', event, calendarEvent)
 
@@ -165,14 +159,16 @@ const selectAllWeeks = () => {
         </CardTitle>
         <CardDescription class="font-medium">{{ event.title }}</CardDescription>
         <div class="text-xs flex justify-between">
-          <span>{{ event.day }} {{ event.start_time }} - {{ event.end_time }}</span>
-          <span v-if="event.room_name" class="font-medium">Room: {{ event.room_name }}</span>
+          <span>{{ $t(`days.${event.day}`) }} {{ event.start_time }} - {{ event.end_time }}</span>
+          <span v-if="event.room_name" class="font-medium">{{ $t('timetable.editor.eventMenu.room') }} {{
+            event.room_name
+            }}</span>
         </div>
       </CardHeader>
 
       <CardContent class="pt-4">
         <div v-if="staffMembers.length > 0" class="mb-4">
-          <h4 class="font-semibold mb-1 text-sm">Staff</h4>
+          <h4 class="font-semibold mb-1 text-sm">{{ $t('timetable.editor.eventMenu.staff') }}</h4>
           <div v-for="(member, idx) in staffMembers" :key="idx" class="text-sm flex justify-between">
             <span>{{ member.name }}</span>
             <span class="text-xs text-muted-foreground">{{ member.role }}</span>
@@ -182,20 +178,20 @@ const selectAllWeeks = () => {
         <div class="mb-2">
           <h4 class="font-semibold mb-1 text-sm flex items-center justify-between">
             <div class="flex items-center gap-1">
-              <Calendar class="h-3.5 w-3.5 mr-1" /> Weeks
+              <Calendar class="h-3.5 w-3.5 mr-1" /> {{ $t('timetable.editor.eventMenu.weeks') }}
             </div>
             <div class="h-3 flex items-center justify-center gap-1">
               <Button size="sm" :variant="isOddWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit"
                 @click="selectOddWeeks">
-                A
+                {{ $t('timetable.editor.eventMenu.weekPatternA') }}
               </Button>
               <Button size="sm" :variant="isEvenWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit"
                 @click="selectEvenWeeks">
-                B
+                {{ $t('timetable.editor.eventMenu.weekPatternB') }}
               </Button>
               <Button size="sm" :variant="isAllWeeksPattern ? 'default' : 'secondary'" class="text-xs h-fit"
                 @click="selectAllWeeks">
-                FULL
+                {{ $t('timetable.editor.eventMenu.weekPatternFull') }}
               </Button>
             </div>
 
@@ -214,7 +210,7 @@ const selectAllWeeks = () => {
         <Button size="sm" variant="outline"
           class="text-destructive hover:bg-destructive hover:text-destructive-foreground w-full"
           @click="emit('delete-event', event)">
-          <Trash2 class="h-3.5 w-3.5 mr-1" /> Delete
+          <Trash2 class="h-3.5 w-3.5 mr-1" /> {{ $t('timetable.editor.eventMenu.delete') }}
         </Button>
       </CardFooter>
     </Card>

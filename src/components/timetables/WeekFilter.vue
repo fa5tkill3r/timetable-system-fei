@@ -1,21 +1,14 @@
 <script setup lang="ts">
-import { MoreVertical, Building, Calendar } from 'lucide-vue-next'
-import { Input } from '@/components/ui/input'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Badge } from '@/components/ui/badge'
+import { Calendar } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/toast'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import ComboBox from '@/components/common/ComboBox.vue'
 import { ref, computed } from 'vue'
 
 
 
 
-const filterWeeksBitmask = ref(parseInt('111111111111', 2)) // Default to all weeks selected
-const exactWeekMatch = ref(false) // Default to inexact matching
+const filterWeeksBitmask = ref(parseInt('111111111111', 2))
+const exactWeekMatch = ref(false)
 
 const filterWeekBits = computed(() => {
   const binaryString = (filterWeeksBitmask.value || 0)
@@ -77,7 +70,7 @@ defineExpose({
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <h4 class="flex items-center text-sm font-medium">
-          <Calendar class="mr-1 h-4 w-4" /> Week Filter
+          <Calendar class="mr-1 h-4 w-4" /> {{ $t('timetable.editor.weekFilter') }}
         </h4>
         <div class="flex gap-1">
           <Button size="sm" :variant="isFilterOddWeeksPattern ? 'default' : 'secondary'
@@ -90,7 +83,7 @@ defineExpose({
           </Button>
           <Button size="sm" :variant="isFilterAllWeeksPattern ? 'default' : 'secondary'
             " class="h-7 text-xs" @click="selectAllWeeks">
-            All Weeks
+            {{ $t('timetable.editor.allWeeks') }}
           </Button>
         </div>
       </div>
@@ -107,7 +100,7 @@ defineExpose({
 
       <div class="flex items-center gap-2">
         <div class="ml-4 flex items-center gap-2">
-          <label class="text-sm font-medium">Exact Match</label>
+          <label class="text-sm font-medium">{{ $t('timetable.editor.exactMatch') }}</label>
           <Switch v-model:checked="exactWeekMatch" />
         </div>
       </div>

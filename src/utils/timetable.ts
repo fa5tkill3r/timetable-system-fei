@@ -26,26 +26,28 @@ export const DEFAULT_TIME_CONFIG: TimeConfig = {
   SLOT_DURATION: 50,
   BREAK_DURATION: 10,
   START_HOUR: 8,
-  START_MINUTE: 0
+  START_MINUTE: 0,
 }
 
 export const DEFAULT_TIMETABLE_CONFIG: TimetableConfig = {
   CELL_WIDTH: 120,
   CELL_HEIGHT: 60,
   HEADER_HEIGHT: 40,
-  DAY_COLUMN_WIDTH: 100
+  DAY_COLUMN_WIDTH: 100,
 }
 
 export const COMPACT_TIMETABLE_CONFIG: TimetableConfig = {
   CELL_WIDTH: 80,
   CELL_HEIGHT: 50,
   HEADER_HEIGHT: 40,
-  DAY_COLUMN_WIDTH: 100
+  DAY_COLUMN_WIDTH: 100,
 }
 
-export const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+export const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 
-export function generateTimeSlots(config: TimeConfig = DEFAULT_TIME_CONFIG): TimeSlot[] {
+export function generateTimeSlots(
+  config: TimeConfig = DEFAULT_TIME_CONFIG,
+): TimeSlot[] {
   const slots: TimeSlot[] = []
   let currentHour = config.START_HOUR
   let currentMinute = config.START_MINUTE
@@ -79,7 +81,11 @@ export function generateTimeSlots(config: TimeConfig = DEFAULT_TIME_CONFIG): Tim
   return slots
 }
 
-export function getBaseTimetableStyles(days: string[], timeSlots: TimeSlot[], config: TimetableConfig) {
+export function getBaseTimetableStyles(
+  days: string[],
+  timeSlots: TimeSlot[],
+  config: TimetableConfig,
+) {
   const getHeaderStyle = (index: number): CSSProperties => {
     return {
       position: 'absolute',

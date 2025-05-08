@@ -109,24 +109,13 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
 
 <template>
   <ScrollArea class="h-full">
-    <div 
-      :style="containerStyle" 
-      class="bg-white rounded-lg shadow-md overflow-hidden mb-2"
-      @mouseleave="handleMouseLeave"
-      @dragover="handleDragOver"
-      @dragenter="handleDragEnter"
-      @dragleave="handleDragLeave"
-      @drop="handleDrop"
-      @dragend="handleDragEnd"
-    >
+    <div :style="containerStyle" class="bg-white rounded-lg shadow-md overflow-hidden mb-2"
+      @mouseleave="handleMouseLeave" @dragover="handleDragOver" @dragenter="handleDragEnter"
+      @dragleave="handleDragLeave" @drop="handleDrop" @dragend="handleDragEnd">
       <div :style="cornerCellStyle"></div>
-      
-      <div 
-        v-for="(time, index) in timeSlots" 
-        :key="index" 
-        :style="getHeaderStyle(index)"
-        class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-      >
+
+      <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
+        class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
         <template v-if="compact">
           {{ time.from }}
         </template>
@@ -135,12 +124,8 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
         </template>
       </div>
 
-      <div 
-        v-for="(day, index) in days" 
-        :key="day" 
-        :style="getDayStyle(index)"
-      >
-        {{ day }}
+      <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
+        {{ $t(`days.${day}`) }}
       </div>
 
       <template v-if="isResizing">
@@ -153,29 +138,22 @@ function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: numbe
       </template>
 
       <template v-else>
-        <div 
-          v-for="(day, dayIndex) in days" 
-          :key="`day-${day}`"
-        >
-          <div 
-            v-for="(time, timeIndex) in timeSlots" 
-            :key="`${day}-${time.index}`"
-            :style="getCellStyle(dayIndex, timeIndex)"
-            @click="handleCellClick(dayIndex, timeIndex)"
+        <div v-for="(day, dayIndex) in days" :key="`day-${day}`">
+          <div v-for="(time, timeIndex) in timeSlots" :key="`${day}-${time.index}`"
+            :style="getCellStyle(dayIndex, timeIndex)" @click="handleCellClick(dayIndex, timeIndex)"
             @mousedown="(event) => handleMouseDown(event, dayIndex, timeIndex)"
             @mouseover="(event) => handleMouseOver(event, dayIndex, timeIndex)"
             @contextmenu="handleContextMenu($event, dayIndex, timeIndex)"
-            class="cursor-pointer hover:opacity-80 transition-opacity"
-          />
+            class="cursor-pointer hover:opacity-80 transition-opacity" />
         </div>
       </template>
-      
+
       <!-- Apply moderate opacity to events during drag -->
       <div :class="{ 'opacity-85': isDragging }" style="z-index: 20">
         <slot></slot>
       </div>
     </div>
-    
+
     <ScrollBar orientation="horizontal" />
     <ScrollBar orientation="vertical" />
   </ScrollArea>

@@ -17,7 +17,6 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/hover-card'
-import { components } from '@/types/schema'
 
 const overrideRooms = defineModel('overrideRooms', {
   required: true,
@@ -62,7 +61,6 @@ const equipmentOptions = computed(() => {
   }) as RoomFilterOption)
 })
 
-// Replace hardcoded room group options with data from the API
 const roomGroupOptions = computed(() => roomGroupStore.groupOptions)
 
 const isFiltered = computed(() =>
@@ -119,7 +117,6 @@ const filteredRooms = computed(() => {
     rooms = rooms.filter(room => {
       if (!room.id) return false
 
-      // Check if room belongs to any of the selected room groups
       return selectedRoomGroups.value.some(groupName =>
         roomGroupStore.isRoomInGroup(room.id!, String(groupName))
       )
@@ -228,21 +225,18 @@ onUnmounted(() => {
 
 <template>
   <div class="h-full flex">
-    <!-- Main panel -->
     <div ref="containerRef" class="h-full flex-1 flex flex-col">
-      <!-- Hide the entire top bar when in compact mode -->
       <div v-if="!isCompactMode" class="p-3 border-b">
         <div class="w-full flex flex-col mb-3">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center">
-              <h3 class="text-lg font-semibold mr-4">Room Selection</h3>
+              <h3 class="text-lg font-semibold mr-4">{{ $t('timetable.editor.roomSelection.title') }}</h3>
               <div v-if="selectedRoomId">
                 <Badge variant="outline" class="flex items-center gap-2 h-7">
                   <Building class="w-4 h-4" />
                   <span>{{filteredRooms.find(room => room.id === selectedRoomId)?.name || `Room
                     ${selectedRoomId}`}}</span>
                   <Button variant="ghost" size="icon" class="h-4 w-4" @click="selectedRoomId = undefined">
-                    <span class="sr-only">Remove</span>
                     &times;
                   </Button>
                 </Badge>
@@ -250,27 +244,31 @@ onUnmounted(() => {
             </div>
 
             <div class="flex items-center gap-2">
-              <Label for="override-rooms" class="text-sm text-muted-foreground">Override rooms</Label>
+              <Label for="override-rooms" class="text-sm text-muted-foreground">{{
+                $t('timetable.editor.roomSelection.overrideRooms') }}</Label>
               <Switch id="override-rooms" v-model:checked="overrideRooms" />
             </div>
           </div>
 
           <div class="flex flex-wrap gap-2">
-            <Input placeholder="Search rooms..." v-model="searchQuery" class="h-8 w-[150px] lg:w-[200px]" />
-            <RoomFilter title="Buildings" :options="buildingOptions" v-model="selectedBuildingIds" />
-            <RoomFilter title="Room Types" :options="roomGroupOptions" v-model="selectedRoomGroups" />
-            <RoomFilter title="Equipment" :options="equipmentOptions" v-model="selectedEquipmentIds" />
-            <CapacitySliderFilter v-model="capacityRange" />
+            <Input :placeholder="$t('timetable.editor.roomSelection.searchRooms')" v-model="searchQuery"
+              class="h-8 w-[150px] lg:w-[200px]" />
+            <RoomFilter :title="$t('timetable.editor.roomSelection.buildings')" :options="buildingOptions"
+              v-model="selectedBuildingIds" />
+            <RoomFilter :title="$t('timetable.editor.roomSelection.roomTypes')" :options="roomGroupOptions"
+              v-model="selectedRoomGroups" />
+            <RoomFilter :title="$t('timetable.editor.roomSelection.equipment')" :options="equipmentOptions"
+              v-model="selectedEquipmentIds" />
+            <CapacitySliderFilter :title="$t('timetable.editor.roomSelection.capacity')" v-model="capacityRange" />
 
             <Button v-if="isFiltered" variant="ghost" class="h-8 px-2 lg:px-3" @click="resetAll">
-              Reset
+              {{ $t('reset') }}
               <XIcon class="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
 
-      <!-- Show selected room badge at the top in compact mode -->
       <div v-if="isCompactMode && selectedRoomId" class="px-2 pt-2">
         <Badge variant="outline" class="flex items-center gap-2 h-7">
           <Building class="w-4 h-4" />
@@ -305,7 +303,7 @@ onUnmounted(() => {
                 <div class="grid grid-cols-2 gap-2 text-sm">
                   <div class="flex items-center">
                     <Users class="h-4 w-4 mr-2 opacity-70" />
-                    <span>Capacity: {{ room.capacity || 'Unknown' }}</span>
+                    <span>{{ $t('timetable.editor.roomSelection.capacity') }}: {{ room.capacity || 'Unknown' }}</span>
                   </div>
                   <div class="flex items-center">
                     <Building class="h-4 w-4 mr-2 opacity-70" />
@@ -313,9 +311,8 @@ onUnmounted(() => {
                   </div>
                 </div>
 
-                <!-- Add room groups display -->
                 <div v-if="room.id && roomGroupStore.getRoomGroups(room.id).length > 0" class="text-sm">
-                  <div class="font-medium mb-1">Room Groups:</div>
+                  <div class="font-medium mb-1">{{ $t('timetable.editor.roomSelection.roomGroup') }}:</div>
                   <div class="flex flex-wrap gap-1">
                     <Badge v-for="group in roomGroupStore.getRoomGroups(room.id)" :key="group.id" variant="outline"
                       class="text-xs">
@@ -325,7 +322,7 @@ onUnmounted(() => {
                 </div>
 
                 <div v-if="room.id" class="text-sm">
-                  <div class="font-medium mb-1">Equipment:</div>
+                  <div class="font-medium mb-1">{{ $t('timetable.editor.roomSelection.equipment') }}:</div>
                   <div class="flex flex-wrap gap-1">
                     <div v-if="roomEquipments" class="flex flex-wrap gap-1">
                       <template v-if="roomEquipments.length > 0">
@@ -335,14 +332,14 @@ onUnmounted(() => {
                         </Badge>
                       </template>
                       <div v-else class="text-xs text-muted-foreground">
-                        No equipment available
+                        {{ $t('timetable.editor.roomSelection.noEquipment') }}
                       </div>
                     </div>
                     <div v-else class="text-xs text-muted-foreground">
                       <div class="flex items-center gap-1">
                         <div class="h-3 w-3 rounded-full border-2 border-r-transparent border-primary animate-spin">
                         </div>
-                        Loading equipment...
+                        {{ $t('timetable.editor.roomSelection.loadingEquipment') }}
                       </div>
                     </div>
                   </div>
@@ -352,7 +349,7 @@ onUnmounted(() => {
           </HoverCard>
 
           <div v-if="filteredRooms.length === 0" class="text-center py-8 text-muted-foreground">
-            No rooms found.
+            {{ $t('timetable.editor.roomSelection.noRoomsFound') }}
           </div>
         </div>
         <ScrollBar />
@@ -367,13 +364,15 @@ onUnmounted(() => {
       <div class="flex items-center gap-2" :class="{ 'flex-col': !isVeryCompactMode }">
         <Input id="compact-search" v-model="searchQuery" class="h-8 w-40 text-sm px-2" :class="{
           'w-24': isVeryCompactMode
-        }" :placeholder="isVeryCompactMode ? 'Search' : 'Search rooms...'" />
+        }"
+          :placeholder="isVeryCompactMode ? $t('timetable.editor.roomSelection.search') : $t('timetable.editor.roomSelection.searchRooms')" />
 
         <div class="flex flex-col items-center" :class="{
           'gap-2': !isVeryCompactMode,
         }">
           <Label for="compact-override-rooms" class="text-xs text-muted-foreground">
-            {{ isVeryCompactMode ? 'Override' : 'Override rooms' }}
+            {{ isVeryCompactMode ? $t('timetable.editor.roomSelection.override') :
+              $t('timetable.editor.roomSelection.overrideRooms') }}
           </Label>
           <Switch id="compact-override-rooms" v-model:checked="overrideRooms"
             :class="{ 'scale-75': isVeryCompactMode }" />
