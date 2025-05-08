@@ -1517,7 +1517,7 @@ export interface components {
              */
             readonly children: number[];
             readonly owner?: number | null;
-            readonly parent?: number | null;
+            parent?: number | null;
         };
         ConstraintRequest: {
             /**
@@ -1575,6 +1575,7 @@ export interface components {
              *     ]
              */
             nested_children: unknown;
+            parent?: number | null;
         };
         CrossSubjectCollision: {
             subject_a: number | null;
@@ -1654,6 +1655,7 @@ export interface components {
              *     ]
              */
             nested_children: unknown;
+            parent?: number | null;
         };
         OperationData: {
             /**
@@ -2126,6 +2128,7 @@ export interface components {
              *     ]
              */
             nested_children: unknown;
+            parent?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         PatchedEquipmentRequest: {
@@ -2342,6 +2345,7 @@ export interface components {
              *     ]
              */
             nested_children: unknown;
+            parent?: number | null;
         };
         /** @description Base serializer that automatically handles nested serialization with caching */
         Subject: {
@@ -2545,6 +2549,7 @@ export interface components {
              *     ]
              */
             nested_children: unknown;
+            parent?: number | null;
         };
         TimeRangeData: {
             /** @default 0 */
