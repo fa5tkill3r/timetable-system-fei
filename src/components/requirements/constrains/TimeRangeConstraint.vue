@@ -17,7 +17,7 @@ const { t } = useI18n()
 const availabilityLevels = [
     { id: 'clear', name: 'clear', color: '#FFFFFF', value: 0, strength: null },
     { id: 'weak', name: 'weak', color: '#FFCCCC', value: 1, strength: 'WEAK' },
-    { id: 'normal', name: 'normal', color: '#FF8080', value: 2, strength: 'NORMAL' },
+    { id: 'medium', name: 'medium', color: '#FF8080', value: 2, strength: 'MEDIUM' },
     { id: 'strong', name: 'strong', color: '#FF0000', value: 3, strength: 'STRONG' }
 ]
 
@@ -32,7 +32,7 @@ interface AvailabilityCell {
 interface TimeRangeConstraint {
     id?: number, // Make ID optional since new constraints won't have one
     type: 'TIMERANGE',
-    strength: 'WEAK' | 'NORMAL' | 'STRONG',
+    strength: 'WEAK' | 'MEDIUM' | 'STRONG',
     data: {
         day_of_week: number,
         start_time: number,
@@ -163,24 +163,15 @@ function clearAllAvailability() {
 }
 
 function updateConstraintsFromCells() {
-    // Track constraints by their IDs to preserve them when possible
-    const constraintsById = new Map(
-        constraints.value.filter(c => c.id !== undefined).map(c => [c.id!, c])
-    );
-
-    // Map constraints by day, strength, and position to efficiently find them
-    const existingConstraintMap = new Map<string, TimeRangeConstraint>();
-
-    // Map to track constraint ranges by day and strength
+    // Map to track constraint ranges by day and strength for efficient lookup
     const constraintRanges = new Map<string, { constraint: TimeRangeConstraint, start: number, end: number }[]>();
 
-    // First, build a map of existing constraints for easy lookup
+    // Build constraintRanges from existing constraints
     constraints.value.forEach(constraint => {
         if (constraint.type !== 'TIMERANGE') return;
 
         const key = `${constraint.data.day_of_week}-${constraint.strength}`;
 
-        // Initialize the ranges map for this key if needed
         if (!constraintRanges.has(key)) {
             constraintRanges.set(key, []);
         }
@@ -188,21 +179,14 @@ function updateConstraintsFromCells() {
         const start = constraint.data.start_time;
         const end = start + constraint.data.duration - 1;
 
-        // Add this constraint's range
         constraintRanges.get(key)!.push({
-            constraint,
+            constraint, // Reference to the original constraint object
             start,
             end
         });
-
-        // Map each position to the constraint
-        for (let i = 0; i < constraint.data.duration; i++) {
-            const position = start + i;
-            existingConstraintMap.set(`${key}-${position}`, constraint);
-        }
     });
 
-    // Group cells by day and strength
+    // Group availabilityCells by day and strength
     const groupedByDayAndStrength = availabilityCells.value.reduce((acc, cell) => {
         const strength = availabilityLevels.find(level => level.value === cell.level)?.strength;
         if (!strength) return acc;
@@ -215,13 +199,12 @@ function updateConstraintsFromCells() {
                 dayIndex,
                 strength,
                 timeSlots: new Set([cell.timeSlot]),
-                cells: [cell]
+                cells: [cell] // Storing original cells, though only timeSlots used for segments here
             };
         } else {
             acc[key].timeSlots.add(cell.timeSlot);
             acc[key].cells.push(cell);
         }
-
         return acc;
     }, {} as Record<string, {
         dayIndex: number,
@@ -231,227 +214,185 @@ function updateConstraintsFromCells() {
     }>);
 
     const newConstraints: TimeRangeConstraint[] = [];
-    const processedRanges = new Set<string>();
+    // Tracks original constraint ranges that have been used as a 'bestMatch' for a segment
+    const processedOriginalRanges = new Set<string>();
 
-    // Process each group to find segments and handle gaps
     Object.values(groupedByDayAndStrength).forEach(group => {
         const sortedSlots = Array.from(group.timeSlots).sort((a, b) => a - b);
+
+        if (sortedSlots.length === 0) {
+            return; // Skip this group if there are no availability cells
+        }
+
         const lookupKey = `${group.dayIndex}-${group.strength}`;
 
-        // Find continuous segments - this correctly identifies gaps when middle slots are removed
-        let segments: { start: number; end: number; cells: number[] }[] = [];
-        let start = sortedSlots[0];
-        let end = start!;
-        let currentCells = [start];
+        // Find continuous segments from sorted time slots
+        let segments: { start: number; end: number }[] = [];
+        let currentSegmentStart = sortedSlots[0]!;
+        let currentSegmentEnd = sortedSlots[0]!;
 
         for (let i = 1; i < sortedSlots.length; i++) {
-            if (sortedSlots[i] === end + 1) {
-                // Continuous - extend segment
-                end = sortedSlots[i]!;
-                currentCells.push(sortedSlots[i]);  // Push the actual value not 'end'
+            if (sortedSlots[i] === currentSegmentEnd + 1) {
+                currentSegmentEnd = sortedSlots[i]!;
             } else {
-                // Gap - finish segment and start a new one
-                segments.push({ start: start!, end, cells: [...currentCells] as number[] });
-                start = sortedSlots[i];
-                end = start!;
-                currentCells = [start];
+                segments.push({ start: currentSegmentStart, end: currentSegmentEnd });
+                currentSegmentStart = sortedSlots[i]!;
+                currentSegmentEnd = sortedSlots[i]!;
             }
         }
-        // Add final segment
-        segments.push({ start: start!, end, cells: [...currentCells] as number[] });
+        segments.push({ start: currentSegmentStart, end: currentSegmentEnd });
 
-        // Track if we've already used the original constraint ID for patching
-        let originalIdUsed = false;
+        // Flag to track if the original ID has been used for a segment in this group (day/strength)
+        // Critical for 'shrink' logic to assign original ID correctly
+        let originalIdUsedForThisGroup = false;
 
-        // Sort segments by start time to ensure the first segment gets the original ID
+        // Sort segments by start time to ensure consistent ID assignment (e.g., first segment gets priority)
         segments.sort((a, b) => a.start - b.start);
 
-        // Find optimal operations for each segment
         segments.forEach(segment => {
             const duration = segment.end - segment.start + 1;
+            if (duration <= 0) return; // Should not happen with correct segment logic, but a safeguard
 
-            // Try to match with an existing constraint
             let bestMatch: {
                 constraint: TimeRangeConstraint,
                 overlap: number,
                 action: 'keep' | 'extend' | 'shrink' | 'split'
             } | undefined;
 
-            // Get existing ranges for this day and strength
-            const existingRanges = constraintRanges.get(lookupKey) || [];
+            const existingRangesForGroup = constraintRanges.get(lookupKey) || [];
 
-            for (const range of existingRanges) {
-                // Skip already processed ranges
-                const rangeId = `${lookupKey}-${range.constraint.id}-${range.start}-${range.end}`;
-                if (processedRanges.has(rangeId)) continue;
+            for (const range of existingRangesForGroup) {
+                const originalRangeKey = `${lookupKey}-${range.constraint.id}-${range.start}-${range.end}`;
+                if (processedOriginalRanges.has(originalRangeKey)) {
+                    continue; // This original constraint range has already been matched
+                }
 
-                // Calculate overlap
                 const overlapStart = Math.max(segment.start, range.start);
                 const overlapEnd = Math.min(segment.end, range.end);
                 const overlap = overlapEnd >= overlapStart ? overlapEnd - overlapStart + 1 : 0;
 
-                let action: 'keep' | 'extend' | 'shrink' | 'split' = 'keep';
+                if (overlap === 0) continue;
 
+                let action: 'keep' | 'extend' | 'shrink' | 'split';
                 if (segment.start === range.start && segment.end === range.end) {
-                    action = 'keep'; // Perfect match
+                    action = 'keep';
                 } else if (segment.start <= range.start && segment.end >= range.end) {
-                    action = 'extend'; // Segment fully contains range
+                    action = 'extend';
                 } else if (segment.start >= range.start && segment.end <= range.end) {
-                    action = 'shrink'; // Range fully contains segment
-                } else if (overlap > 0) {
-                    action = 'split'; // Partial overlap
+                    action = 'shrink';
+                } else {
+                    action = 'split';
                 }
 
-                // Choose the best match based on overlap
-                if (overlap > 0 && (!bestMatch || overlap > bestMatch.overlap)) {
+                if (!bestMatch || overlap > bestMatch.overlap) {
                     bestMatch = { constraint: range.constraint, overlap, action };
                 }
             }
 
             if (bestMatch) {
-                const constraint = bestMatch.constraint;
-                const rangeId = `${lookupKey}-${constraint.id}-${constraint.data.start_time}-${constraint.data.start_time + constraint.data.duration - 1}`;
-                processedRanges.add(rangeId);
+                const matchedOriginalConstraint = bestMatch.constraint;
+                const originalConstraintData = matchedOriginalConstraint.data;
 
-                // Handle different match types
+                const originalRangeKey = `${lookupKey}-${matchedOriginalConstraint.id}-${originalConstraintData.start_time}-${originalConstraintData.start_time + originalConstraintData.duration - 1}`;
+                processedOriginalRanges.add(originalRangeKey);
+
+
+                // The following 'keep', 'extend', 'shrink', 'split' logic is based on your original code's structure
+                // to preserve specific ID management rules.
                 if (bestMatch.action === 'keep') {
-                    // Keep existing constraint unchanged
-                    // Remove parent to prevent circular references
-                    const cleanConstraint = { ...constraint };
-                    if ('parent' in cleanConstraint) delete cleanConstraint.parent;
-                    if ('nested_children' in cleanConstraint) delete cleanConstraint.nested_children;
-
-                    newConstraints.push(cleanConstraint);
-                } else if (bestMatch.action === 'extend') {
-                    // Create extended constraint
                     newConstraints.push({
-                        ...constraint,
+                        ...matchedOriginalConstraint,
+                        parent: undefined,
+                        nested_children: undefined
+                    });
+                } else if (bestMatch.action === 'extend') {
+                    newConstraints.push({
+                        ...matchedOriginalConstraint,
                         data: {
-                            ...constraint.data,
+                            ...originalConstraintData,
                             start_time: segment.start,
                             duration: duration
                         },
-                        // Remove parent/children references
                         parent: undefined,
                         nested_children: undefined
                     });
                 } else if (bestMatch.action === 'shrink') {
-                    const constraint = bestMatch.constraint;
-                    const constraintStart = constraint.data.start_time;
-                    const constraintEnd = constraintStart + constraint.data.duration - 1;
+                    const constraintStart = originalConstraintData.start_time;
+                    // Note: originalIdUsedForThisGroup is crucial here for ID assignment
+                    if (!originalIdUsedForThisGroup && segment.start === constraintStart) {
+                        newConstraints.push({
+                            ...matchedOriginalConstraint,
+                            id: matchedOriginalConstraint.id,
+                            parent: undefined, nested_children: undefined,
+                            data: { ...originalConstraintData, duration: duration }
+                        });
+                        if (matchedOriginalConstraint.id != null) originalIdUsedForThisGroup = true;
+                    } else if (!originalIdUsedForThisGroup && segment.start > constraintStart) {
+                        newConstraints.push({ // Part before segment
+                            ...matchedOriginalConstraint,
+                            id: matchedOriginalConstraint.id,
+                            parent: undefined, nested_children: undefined,
+                            data: { ...originalConstraintData, duration: segment.start - constraintStart }
+                        });
+                        if (matchedOriginalConstraint.id != null) originalIdUsedForThisGroup = true;
 
-                    if (!originalIdUsed && segment.start === constraintStart) {
-                        // This is the first segment, keep original ID
-                        newConstraints.push({
-                            ...constraint,
-                            id: constraint.id, // Explicitly preserve ID
-                            parent: undefined,
-                            nested_children: undefined,
-                            data: {
-                                ...constraint.data,
-                                duration: duration
-                            }
+                        newConstraints.push({ // Segment itself as new
+                            ...matchedOriginalConstraint,
+                            id: undefined,
+                            parent: undefined, nested_children: undefined,
+                            data: { ...originalConstraintData, start_time: segment.start, duration: duration }
                         });
-                        originalIdUsed = true;
-                    } else if (!originalIdUsed && segment.start > constraintStart) {
-                        // First part gets the original constraint ID
+                    } else { // Original ID already used or segment is a later part
                         newConstraints.push({
-                            ...constraint,
-                            id: constraint.id, // Keep original ID
-                            parent: undefined,
-                            nested_children: undefined,
-                            data: {
-                                ...constraint.data,
-                                duration: segment.start - constraintStart
-                            }
-                        });
-                        originalIdUsed = true;
-
-                        // Now add the current segment as a new constraint
-                        newConstraints.push({
-                            ...constraint,
-                            id: undefined, // New constraint needs new ID
-                            parent: undefined,
-                            nested_children: undefined,
-                            data: {
-                                ...constraint.data,
-                                start_time: segment.start,
-                                duration: duration
-                            }
-                        });
-                    } else {
-                        // This is a later segment or ID already used, create new constraint
-                        newConstraints.push({
-                            ...constraint,
-                            id: undefined, // New constraint for POST
-                            parent: undefined,
-                            nested_children: undefined,
-                            data: {
-                                ...constraint.data,
-                                start_time: segment.start,
-                                duration: duration
-                            }
+                            ...matchedOriginalConstraint,
+                            id: undefined,
+                            parent: undefined, nested_children: undefined,
+                            data: { ...originalConstraintData, start_time: segment.start, duration: duration }
                         });
                     }
-                    // We've handled this segment completely
-                    return;
                 } else if (bestMatch.action === 'split') {
-                    // Handle partial overlap more efficiently
-                    const constraintStart = constraint.data.start_time;
-                    const constraintEnd = constraintStart + constraint.data.duration - 1;
+                    const constraintStart = originalConstraintData.start_time;
+                    const constraintEnd = constraintStart + originalConstraintData.duration - 1;
 
-                    // Keep original constraint for the first part (PATCH)
-                    if (segment.start > constraintStart) {
+                    if (segment.start > constraintStart) { // Part before segment
                         newConstraints.push({
-                            ...constraint, // Keep original ID
-                            parent: undefined,
-                            nested_children: undefined,
-                            data: {
-                                ...constraint.data,
-                                duration: segment.start - constraintStart
-                            }
+                            ...matchedOriginalConstraint,
+                            id: !originalIdUsedForThisGroup && matchedOriginalConstraint.id != null ? matchedOriginalConstraint.id : undefined, // Try to assign original ID if not used
+                            parent: undefined, nested_children: undefined,
+                            data: { ...originalConstraintData, start_time: constraintStart, duration: segment.start - constraintStart }
                         });
+                        if (!originalIdUsedForThisGroup && matchedOriginalConstraint.id != null) originalIdUsedForThisGroup = true;
                     }
 
-                    // For the segment itself (if needed)
-                    newConstraints.push({
-                        ...constraint,
-                        // Keep original ID if this is at the beginning of the original constraint
-                        id: segment.start <= constraintStart ? constraint.id : undefined,
-                        parent: undefined,
-                        nested_children: undefined,
-                        data: {
-                            ...constraint.data,
-                            start_time: segment.start,
-                            duration: duration
-                        }
+                    newConstraints.push({ // The segment itself
+                        ...matchedOriginalConstraint,
+                        // Original ID if segment aligns with original start & ID not yet taken by a "part before"
+                        id: (segment.start === constraintStart && !originalIdUsedForThisGroup && matchedOriginalConstraint.id != null) ? matchedOriginalConstraint.id : undefined,
+                        parent: undefined, nested_children: undefined,
+                        data: { ...originalConstraintData, start_time: segment.start, duration: duration }
                     });
+                    if (segment.start === constraintStart && !originalIdUsedForThisGroup && matchedOriginalConstraint.id != null) originalIdUsedForThisGroup = true;
 
-                    // For the part after the segment (if needed)
-                    if (segment.end < constraintEnd) {
+
+                    if (segment.end < constraintEnd) { // Part after segment
                         newConstraints.push({
-                            ...constraint,
-                            id: undefined, // New constraint (POST)
-                            parent: undefined,
-                            nested_children: undefined,
-                            data: {
-                                ...constraint.data,
-                                start_time: segment.end + 1,
-                                duration: constraintEnd - segment.end
-                            }
+                            ...matchedOriginalConstraint,
+                            id: undefined, // Trailing part is always new
+                            parent: undefined, nested_children: undefined,
+                            data: { ...originalConstraintData, start_time: segment.end + 1, duration: constraintEnd - segment.end }
                         });
                     }
                 }
-            } else {
-                // Create brand new constraint for this segment
+            } else { // No bestMatch found, create a brand new constraint for this segment
                 newConstraints.push({
                     type: 'TIMERANGE',
-                    strength: group.strength as 'WEAK' | 'NORMAL' | 'STRONG',
+                    strength: group.strength as 'WEAK' | 'MEDIUM' | 'STRONG',
                     data: {
                         day_of_week: group.dayIndex,
                         start_time: segment.start,
                         duration
                     },
+                    id: undefined, // New constraint, no ID yet
                     parent: undefined,
                     nested_children: undefined,
                 });
@@ -459,16 +400,18 @@ function updateConstraintsFromCells() {
         });
     });
 
-    // Add this before updating constraints.value
-    const sanitizedConstraints = newConstraints.map(constraint => {
-        // Create a clean copy without circular references
+    // Filter out any constraints that might have ended up with zero or negative duration
+    const validConstraints = newConstraints.filter(c => c.data.duration > 0);
+
+    // Sanitize constraints by removing temporary or circular properties before updating the model
+    const sanitizedConstraints = validConstraints.map(constraint => {
         const clean = { ...constraint };
-        if ('parent' in clean) delete clean.parent;
-        if ('nested_children' in clean) delete clean.nested_children;
+        // Ensure parent/nested_children are not present in the final constraint objects
+        delete clean.parent;
+        delete clean.nested_children;
         return clean;
     });
 
-    // Update the constraints model with our sanitized list
     constraints.value = sanitizedConstraints;
 }
 
@@ -539,7 +482,7 @@ onMounted(() => {
                 </div>
                 <div class="space-x-2">
                     <Button variant="outline" @click="clearAllAvailability">{{ $t('constraints.timeRange.clearAll')
-                        }}</Button>
+                    }}</Button>
                 </div>
             </div>
         </div>

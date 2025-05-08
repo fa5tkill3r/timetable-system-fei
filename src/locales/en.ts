@@ -46,7 +46,7 @@ export default {
       levels: {
         clear: 'Clear',
         weak: 'Weak',
-        normal: 'Normal',
+        medium: 'Medium',
         strong: 'Strong',
       },
       instructions:

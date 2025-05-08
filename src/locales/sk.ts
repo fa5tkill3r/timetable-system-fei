@@ -46,7 +46,7 @@ export default {
       levels: {
         clear: 'Vymazať',
         weak: 'Slabá',
-        normal: 'Normálna',
+        medium: 'Stredná',
         strong: 'Silná',
       },
       instructions:
