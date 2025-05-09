@@ -128,9 +128,40 @@ function handleMouseOver(dayIndex: number, timeIndex: number, event: MouseEvent)
     }
 }
 
+// Debounce utility function
+function debounce<T extends (...args: any[]) => void>(
+    func: T,
+    delay: number
+): { (...args: Parameters<T>): void; cancel: () => void } {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const debouncedFunc = (...args: Parameters<T>) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+
+    debouncedFunc.cancel = () => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+        }
+    };
+
+    return debouncedFunc;
+}
+
+// Create a debounced version of updateConstraintsFromCells
+// Adjust the delay (e.g., 300-500ms) as needed for the best user experience
+const debouncedUpdateConstraints = debounce(updateConstraintsFromCells, 2000);
+
 function handleMouseUp() {
     if (isMouseDown.value || isRightMouseDown.value) {
-        updateConstraintsFromCells();
+        // Call the debounced version instead of direct call
+        debouncedUpdateConstraints();
     }
     isMouseDown.value = false
     isRightMouseDown.value = false
@@ -145,16 +176,26 @@ function handleCellRightClick(dayIndex: number, timeIndex: number, updateConstra
     if (existingCellIndex !== -1) {
         availabilityCells.value.splice(existingCellIndex, 1)
 
+        // If updateConstraints is true here, it implies an immediate update is desired.
+        // However, typically right-click drag also defers to mouseup.
+        // For consistency, we'll let handleMouseUp trigger the debounced update.
+        // If an immediate update is strictly needed for standalone right clicks,
+        // this part might need specific handling or not use the debounced version.
+        // Based on current usage (called with false from mouse events), this is fine.
         if (updateConstraints) {
-            updateConstraintsFromCells();
+            // Consider if this scenario needs immediate or debounced update.
+            // For now, assuming most updates are funneled through handleMouseUp.
+            debouncedUpdateConstraints();
         }
     }
 }
 
 function clearAllAvailability() {
     if (confirm(t('constraints.timeRange.confirmClear'))) {
+        // Cancel any pending debounced update before clearing
+        debouncedUpdateConstraints.cancel();
         availabilityCells.value = []
-        constraints.value = []
+        constraints.value = [] // This directly updates the model
         toast({
             title: t('constraints.timeRange.cleared'),
             description: t('constraints.timeRange.clearedMessage')
@@ -448,6 +489,11 @@ watch(() => constraints.value, () => {
 
 onMounted(() => {
     initializeCellsFromConstraints();
+});
+
+onUnmounted(() => {
+    // Cancel any pending debounced updates when the component is unmounted
+    debouncedUpdateConstraints.cancel();
 });
 </script>
 
