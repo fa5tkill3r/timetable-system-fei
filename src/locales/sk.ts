@@ -145,4 +145,5 @@ export default {
     },
   },
   reset: 'Resetovať',
+  saving: 'Ukladanie...',
 }

@@ -145,4 +145,5 @@ export default {
     },
   },
   reset: 'Reset',
+  saving: 'Saving...',
 }

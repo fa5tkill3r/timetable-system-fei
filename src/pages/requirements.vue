@@ -272,7 +272,6 @@ const selectedConstraintData = computed({
 
 watch(selectedConstraintData, (newValue) => {
   console.log("Selected constraint data changed:", newValue)
-
 }, { deep: true })
 
 watch(activeTab, async (newTab) => {
@@ -367,7 +366,7 @@ onMounted(async () => {
     <div class="flex-1 p-4 border-l border-gray-200">
       <div class="flex flex-col gap-4">
         <div class="p-4">
-          <component v-if="selectedConstraint" v-model="selectedConstraintData"
+          <component v-if="selectedConstraint" v-model="selectedConstraintData" :is-updating="isUpdating"
             :is="loadConstraintComponent(selectedConstraint?.id)" />
           <div v-else class="flex flex-col justify-center items-center h-full min-h-[400px]">
             <h1 class="text-2xl font-medium text-center text-muted-foreground">
