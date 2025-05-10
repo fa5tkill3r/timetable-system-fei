@@ -106,6 +106,15 @@ export function useConflicts(options: ConflictOptions): Conflicts {
           timeIndex <= existingEventEndIndex &&
           endTimeIndex >= existingEventStartIndex
         ) {
+          // Check weeks overlap - events must have at least one common week
+          const eventWeeksBitmask = event.weeks_bitmask || 0
+          const existingEventWeeksBitmask = e.weeks_bitmask || 0
+
+          // Only consider it a conflict if weeks overlap (at least one bit in common)
+          if ((eventWeeksBitmask & existingEventWeeksBitmask) === 0) {
+            continue // No weeks in common, not a conflict
+          }
+
           // Room conflict check
           const roomConflict = event.room_id === e.room_id
 
