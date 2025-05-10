@@ -87,7 +87,6 @@ const roomId = ref<number | null>(null)
 const selectedTimetableName = ref<string>('')
 const isOverMenu = ref(false)
 const isResizing = ref(false)
-const events = ref<CalendarEvent[]>([])
 const preferredRoom = ref<number | undefined>(undefined)
 const overrideRooms = ref<boolean>(false)
 const draggedEvent = ref<CalendarEvent | null>(null)
@@ -194,7 +193,6 @@ async function fetchTimetableEvents(timetableId: number) {
     }
 
     await timetableEventStore.fetchEvents(timetableId)
-    processTimetableEvents()
   } catch (error) {
     console.error('Error fetching timetable events:', error)
     toast({
@@ -655,16 +653,13 @@ const {
 })
 
 const {
+  events,
   timeSlots,
   timeToIndex,
   calculateEndTime,
   getRowEventPositions,
   getDayRowPositions,
-  processTimetableEvents,
-  getSubjectName,
-  getSubjectCode
 } = useTimeTableBase({
-  events,
   filteredEvents
 })
 

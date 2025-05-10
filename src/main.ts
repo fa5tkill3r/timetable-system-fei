@@ -6,9 +6,12 @@ import './assets/index.css'
 import router from '@/router.ts'
 import _ from 'lodash'
 import i18n from './lib/i18n'
+import { PiniaSharedState } from './lib/sharedState'
 
 const app = createApp(App)
 const pinia = createPinia()
+
+pinia.use(PiniaSharedState())
 
 app.use(router)
 app.use(pinia)

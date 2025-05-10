@@ -10,7 +10,6 @@ import { DEFAULT_TIME_CONFIG as TIME_CONFIG } from '@/utils/timetable'
 import { useTimetableSettingsStore } from '@/store/timetableSettings'
 
 export interface TimeTableBaseOptions {
-  events: Ref<CalendarEvent[]>
   filteredEvents: ComputedRef<CalendarEvent[]>
 }
 
@@ -19,13 +18,12 @@ type Room = components['schemas']['Room']
 export function useTimeTableBase(options: TimeTableBaseOptions) {
   const subjectStore = useSubjectStore()
   const timetableEventStore = useTimetableEventStore()
-
   const timetableSettings = useTimetableSettingsStore()
 
-  const { events, filteredEvents } = options
+  const { filteredEvents } = options
 
-  function processTimetableEvents() {
-    events.value = []
+  const events = computed<CalendarEvent[]>(() => {
+    const processedEvents: CalendarEvent[] = []
 
     timetableEventStore.events.forEach((event) => {
       const ttaData = event.tta as any
@@ -36,17 +34,17 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
       const subjectCode = getSubjectCode(subjectId)
 
       const timeIndex = Math.min(event.start_time!, timeSlots.value.length - 1)
-      const startTime = timeSlots.value[timeIndex]!.from
+      const startTime = timeSlots.value[timeIndex]?.from
       const endTime = calculateEndTime(startTime, event.duration!)
 
       const room = event.room as any as Room
 
       const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
 
-      events.value.push({
+      processedEvents.push({
         id: event.id!,
         day: DAYS[event.day_of_week! - 1] ?? null,
-        start_time: startTime,
+        start_time: startTime ?? null,
         end_time: endTime,
         start_index: timeToIndex(startTime),
         title: subjectName!,
@@ -60,7 +58,9 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
         weeks_bitmask: event.weeks_bitmask || 4095,
       })
     })
-  }
+
+    return processedEvents
+  })
 
   function getSubjectCode(subjectId?: number | null): string | null {
     if (!subjectId) return null
@@ -111,7 +111,7 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
 
     Object.entries(eventsByDay).forEach(([, dayEvents]) => {
       const sortedEvents = [...dayEvents].sort(
-        (a, b) => timeToIndex(a.start_time!) - timeToIndex(b.start_time!),
+        (a, b) => timeToIndex(a.start_time!)! - timeToIndex(b.start_time)!,
       )
 
       const rows: { end_time: string; event: CalendarEvent }[][] = []
@@ -188,12 +188,17 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
     return positions
   })
 
-  function timeToIndex(time: string): number {
+  function timeToIndex(time: string | null | undefined): number | null {
+    if (!time) return null
     const index = timeSlots.value.findIndex((slot) => slot.from === time)
     return index >= 0 ? index : 0
   }
 
-  function calculateEndTime(startTime: string, duration: number): string {
+  function calculateEndTime(
+    startTime: string | undefined,
+    duration: number,
+  ): string | null {
+    if (!startTime) return null
     const startIndex = timeToIndex(startTime)
 
     if (startIndex === -1) {
@@ -204,7 +209,7 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
       return startTime
     }
 
-    const endIndex = startIndex + duration - 1
+    const endIndex = startIndex! + duration - 1
     if (endIndex >= timeSlots.value.length)
       return timeSlots.value[timeSlots.value.length - 1]!.to
 
@@ -219,7 +224,7 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
   }
 
   return {
-    processTimetableEvents,
+    events,
     timeSlots,
     getRowEventPositions,
     getDayRowPositions,

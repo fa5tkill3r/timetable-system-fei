@@ -9,7 +9,7 @@ export interface CalendarEvent {
   day: string | null
   start_time: string | null
   end_time: string | null
-  start_index?: number
+  start_index: number | null
   title: string
   shortcut: string
   color: string
