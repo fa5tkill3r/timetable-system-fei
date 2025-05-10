@@ -1,19 +1,34 @@
 <template>
-  <Dialog :open="open" @update:open="$emit('update:open', $event)">
+  <Dialog
+    :open="open"
+    @update:open="$emit('update:open', $event)"
+  >
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Delete Schema</DialogTitle>
         <DialogDescription>
-          Are you sure you want to delete schema "{{ schema?.human_name }}"? This action cannot be undone.
+          Are you sure you want to delete schema "{{ schema?.human_name }}"?
+          This action cannot be undone.
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
-        <Button variant="outline" @click="$emit('update:open', false)">Cancel</Button>
-        <Button variant="destructive" @click="$emit('delete')" :disabled="isLoading">
-          <span v-if="isLoading" class="mr-2">
+        <Button
+          variant="outline"
+          @click="$emit('update:open', false)"
+          >Cancel</Button
+        >
+        <Button
+          variant="destructive"
+          @click="$emit('delete')"
+          :disabled="isLoading"
+        >
+          <span
+            v-if="isLoading"
+            class="mr-2"
+          >
             <div
-              class="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full inline-block">
-            </div>
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"
+            ></div>
           </span>
           Delete
         </Button>
@@ -23,27 +38,27 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from '@/components/ui/dialog'
-import type { components } from '@/types/schema'
+  import { Button } from '@/components/ui/button'
+  import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+  } from '@/components/ui/dialog'
+  import type { components } from '@/types/schema'
 
-type Schema = components['schemas']['schema']
+  type Schema = components['schemas']['schema']
 
-defineProps<{
-  open: boolean
-  schema?: Schema | null
-  isLoading?: boolean
-}>()
+  defineProps<{
+    open: boolean
+    schema?: Schema | null
+    isLoading?: boolean
+  }>()
 
-defineEmits<{
-  'update:open': [value: boolean]
-  'delete': []
-}>()
+  defineEmits<{
+    'update:open': [value: boolean]
+    delete: []
+  }>()
 </script>

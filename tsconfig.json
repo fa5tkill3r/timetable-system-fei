@@ -22,7 +22,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "src/**/*.ts",

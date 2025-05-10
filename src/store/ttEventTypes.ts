@@ -13,9 +13,7 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  // Get all event types
   const fetchEventTypes = async () => {
-    // Don't fetch if no active schema
     if (!schemaStore.activeSchema?.id) {
       eventTypes.value = []
       return []
@@ -38,7 +36,8 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
         return []
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       eventTypes.value = []
       return []
     } finally {
@@ -46,7 +45,6 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
     }
   }
 
-  // Create a new event type
   const createEventType = async (eventType: TTETypeRequest) => {
     isLoading.value = true
     error.value = null
@@ -65,14 +63,14 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  // Update existing event type
   const updateEventType = async (id: number, eventType: TTETypeRequest) => {
     isLoading.value = true
     error.value = null
@@ -95,14 +93,14 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  // Delete event type
   const deleteEventType = async (id: number) => {
     isLoading.value = true
     error.value = null
@@ -121,19 +119,18 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
         return false
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return false
     } finally {
       isLoading.value = false
     }
   }
 
-  // Get event type by ID
   const getEventTypeById = (id: number) => {
-    return eventTypes.value.find(type => type.id === id)
+    return eventTypes.value.find((type) => type.id === id)
   }
 
-  // Use watchEffect to automatically fetch event types when active schema changes
   watchEffect(() => {
     if (schemaStore.activeSchema?.id) {
       fetchEventTypes()
@@ -150,6 +147,6 @@ export const useTTEventTypeStore = defineStore('ttEventTypes', () => {
     createEventType,
     updateEventType,
     deleteEventType,
-    getEventTypeById
+    getEventTypeById,
   }
 })

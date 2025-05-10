@@ -8,7 +8,7 @@ export interface ConflictOptions {
   draggedOverDay: Ref<string | null>
   draggedOverTime: Ref<TimeSlot | null>
   placedEvents: Ref<CalendarEvent[]>
-  timeToIndex: (time: string) => number
+  timeToIndex: (time: string | null) => number | null
 }
 
 export interface Conflicts {
@@ -55,10 +55,9 @@ export function useConflicts(options: ConflictOptions): Conflicts {
       }
 
     const timeIndex = timeToIndex(draggedOverTime.value.from)
-    return checkConflicts(draggedOverDay.value, timeIndex)
+    return checkConflicts(draggedOverDay.value, timeIndex!)
   })
 
-  // Simplified cell conflict check
   const cellHasConflict = (dayIndex: number, timeIndex: number | undefined) => {
     const result = checkConflicts(dayIndex, timeIndex)
     return { hasConflict: result.hasConflict, types: result.types }
@@ -98,7 +97,7 @@ export function useConflicts(options: ConflictOptions): Conflicts {
         if (!e.day || !e.start_time || !e.end_time) continue
         if (e.day !== dayName) continue
 
-        const existingEventStartIndex = timeToIndex(e.start_time)
+        const existingEventStartIndex = timeToIndex(e.start_time)!
         const existingEventEndIndex = existingEventStartIndex + e.duration - 1
 
         // Check time overlap

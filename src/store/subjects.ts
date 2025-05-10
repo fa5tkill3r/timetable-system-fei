@@ -48,7 +48,6 @@ export const useSubjectStore = defineStore('subjects', () => {
     }
   })
 
-  // Create a new subject
   const createSubject = async (subject: SubjectRequest) => {
     isLoading.value = true
     error.value = null
@@ -75,7 +74,6 @@ export const useSubjectStore = defineStore('subjects', () => {
     }
   }
 
-  // Update existing subject
   const updateSubject = async (id: number, subject: SubjectRequest) => {
     isLoading.value = true
     error.value = null
@@ -106,7 +104,6 @@ export const useSubjectStore = defineStore('subjects', () => {
     }
   }
 
-  // Delete subject
   const deleteSubject = async (id: number) => {
     isLoading.value = true
     error.value = null

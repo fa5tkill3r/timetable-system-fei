@@ -3,9 +3,11 @@
     :open="open"
     @update:open="emit('update:open', $event)"
   >
-    <DialogContent class="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+    <DialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[700px]">
       <DialogHeader>
-        <DialogTitle>Import Data to "{{ schema?.human_name }}" Schema</DialogTitle>
+        <DialogTitle
+          >Import Data to "{{ schema?.human_name }}" Schema</DialogTitle
+        >
         <DialogDescription>
           Select a term and directory containing CSV files to import to your
           schema.
@@ -14,14 +16,14 @@
 
       <div class="py-4">
         <!-- Step indicator -->
-        <div class="flex items-center justify-center mb-6">
+        <div class="mb-6 flex items-center justify-center">
           <div
             v-for="(s, index) in steps"
             :key="s"
             class="flex items-center"
           >
             <div
-              class="rounded-full w-8 h-8 flex items-center justify-center"
+              class="flex h-8 w-8 items-center justify-center rounded-full"
               :class="
                 currentStep === index
                   ? 'bg-primary text-primary-foreground'
@@ -42,7 +44,7 @@
             </span>
             <div
               v-if="index < steps.length - 1"
-              class="w-12 h-px mx-2"
+              class="mx-2 h-px w-12"
               :class="currentStep > index ? 'bg-primary' : 'bg-muted'"
             ></div>
           </div>
@@ -51,9 +53,9 @@
         <!-- Step 1: Term Selection -->
         <div v-if="currentStep === 0">
           <!-- Term Filters Section -->
-          <div class="space-y-2 border-b pb-4 mb-4">
+          <div class="mb-4 space-y-2 border-b pb-4">
             <h3 class="text-sm font-medium">Term Filters</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
                 <Label for="year">Year</Label>
                 <Select v-model="filters.year">
@@ -114,19 +116,19 @@
           <!-- Terms List -->
           <div class="space-y-4">
             <div
-              class="border rounded-md min-h-[250px] max-h-[350px] overflow-y-auto"
+              class="max-h-[350px] min-h-[250px] overflow-y-auto rounded-md border"
             >
               <div
                 v-if="loadingTerms"
-                class="flex justify-center items-center h-40"
+                class="flex h-40 items-center justify-center"
               >
                 <div
-                  class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"
+                  class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"
                 ></div>
               </div>
               <div
                 v-else-if="filteredTerms.length === 0"
-                class="flex justify-center items-center h-40 text-muted-foreground"
+                class="flex h-40 items-center justify-center text-muted-foreground"
               >
                 No terms found for the selected filters
               </div>
@@ -138,7 +140,7 @@
                   <div
                     v-for="term in filteredTerms"
                     :key="term.id"
-                    class="flex items-center space-x-2 p-2 mb-1 rounded-md hover:bg-accent"
+                    class="mb-1 flex items-center space-x-2 rounded-md p-2 hover:bg-accent"
                     :class="{
                       'bg-accent/50': selectedTermId === term.id!.toString(),
                     }"
@@ -155,7 +157,7 @@
                       {{ term.department || '' }}
                       <span
                         v-if="term.phd"
-                        class="ml-1 text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full"
+                        class="ml-1 rounded-full bg-blue-100 px-1 py-0.5 text-xs text-blue-800"
                         >PhD</span
                       >
                     </label>
@@ -175,7 +177,7 @@
               {{ selectedTerm?.department }}
               <span
                 v-if="selectedTerm?.phd"
-                class="ml-1 text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full"
+                class="ml-1 rounded-full bg-blue-100 px-1 py-0.5 text-xs text-blue-800"
                 >PhD</span
               >
             </span>
@@ -191,8 +193,8 @@
         <!-- Step 3: Confirmation -->
         <div v-else-if="currentStep === 2">
           <div class="space-y-4">
-            <div class="border rounded-md bg-muted/30 p-4">
-              <h4 class="font-medium mb-2">Review Import Details</h4>
+            <div class="rounded-md border bg-muted/30 p-4">
+              <h4 class="mb-2 font-medium">Review Import Details</h4>
               <div class="space-y-2">
                 <p>
                   <span class="text-muted-foreground">Schema:</span>
@@ -203,7 +205,7 @@
                   {{ selectedTerm?.semester }} {{ selectedTerm?.year_start }}
                   <span
                     v-if="selectedTerm?.phd"
-                    class="ml-1 text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full"
+                    class="ml-1 rounded-full bg-blue-100 px-1 py-0.5 text-xs text-blue-800"
                     >PhD</span
                   >
                 </p>
@@ -243,16 +245,16 @@
         <div v-else-if="currentStep === 3 && importing">
           <div class="flex flex-col items-center justify-center py-8">
             <div
-              class="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full mb-4"
+              class="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"
             ></div>
             <p>Importing data... This may take a moment.</p>
           </div>
         </div>
 
         <div v-else-if="currentStep === 3 && importSuccess">
-          <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+          <div class="mb-4 rounded-md border border-green-200 bg-green-50 p-4">
             <div class="flex">
-              <CheckIcon class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+              <CheckIcon class="mr-2 h-5 w-5 flex-shrink-0 text-green-500" />
               <p>
                 Import successful! The data has been imported to your schema.
               </p>
@@ -261,10 +263,10 @@
         </div>
 
         <div v-else-if="currentStep === 3 && importError">
-          <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+          <div class="mb-4 rounded-md border border-red-200 bg-red-50 p-4">
             <div class="flex">
               <AlertTriangleIcon
-                class="h-5 w-5 text-red-500 mr-2 flex-shrink-0"
+                class="mr-2 h-5 w-5 flex-shrink-0 text-red-500"
               />
               <div>
                 <p class="font-medium">Import failed</p>
@@ -277,7 +279,7 @@
         </div>
 
         <!-- Navigation buttons -->
-        <div class="flex justify-between mt-6">
+        <div class="mt-6 flex justify-between">
           <Button
             v-if="currentStep > 0 && currentStep < 3"
             variant="outline"
@@ -371,11 +373,9 @@
     success: []
   }>()
 
-  // Step management
   const steps = ['Select Term', 'Select Directory', 'Confirm Import']
   const currentStep = ref(0)
 
-  // Term selection state
   const terms = ref<Term[]>([])
   const selectedTermId = ref<string>('')
   const loadingTerms = ref(false)
@@ -395,7 +395,6 @@
     department: 'all',
   })
 
-  // Computed property to filter terms by department
   const filteredTerms = computed(() => {
     if (filters.value.department === 'all') {
       return terms.value
@@ -405,7 +404,6 @@
     )
   })
 
-  // Get available departments from loaded terms
   const availableDepartments = computed<string[]>(() => {
     const departments = new Set<string>(
       terms.value
@@ -415,31 +413,26 @@
     return [...departments].sort()
   })
 
-  // File explorer state
   const selectedDirectory = ref('')
   const hasCsvFiles = ref(false)
   const csvFileCount = ref(0)
 
-  // Import state
   const importing = ref(false)
   const importSuccess = ref(false)
   const importError = ref(false)
   const errorMessage = ref('')
 
-  // Selected term details
   const selectedTerm = computed<Term | undefined>(() => {
     if (!selectedTermId.value) return undefined
     return terms.value.find((t) => t.id!.toString() === selectedTermId.value)
   })
 
-  // Can import validation
   const canImport = computed(() => {
     return (
       !!props.schema?.id && !!selectedTermId.value && !!selectedDirectory.value
     )
   })
 
-  // Method to fetch terms based on filters
   async function fetchTerms() {
     loadingTerms.value = true
 
@@ -475,14 +468,12 @@
     }
   }
 
-  // Navigation methods
   function nextStep() {
     if (currentStep.value < steps.length) {
       currentStep.value++
     }
   }
 
-  // Import data from selected directory
   async function importData() {
     if (!canImport.value) return
 
@@ -492,14 +483,13 @@
     importError.value = false
 
     try {
-      // Ensure the path begins with "/"
       const formattedPath = selectedDirectory.value.startsWith('/')
         ? selectedDirectory.value
         : `/${selectedDirectory.value}`
 
       const { error } = await client.POST(
         '/api/imports_exports/fei/import/dir/',
-        //@ts-ignore
+
         {
           params: {
             query: {
@@ -509,7 +499,7 @@
             header: {
               'X-Term': props.schema?.schema_name || '',
             },
-          }
+          },
         },
       )
 
@@ -530,10 +520,9 @@
     }
   }
 
-  // Close dialog and reset state
   function closeDialog() {
     emit('update:open', false)
-    // Reset the state when the dialog is closed
+
     setTimeout(resetState, 300)
   }
 
@@ -546,23 +535,20 @@
     errorMessage.value = ''
   }
 
-  // Filters watcher (year, semester)
   watch(
     [() => filters.value.year, () => filters.value.semester],
     ([newYear, newSemester], [oldYear, oldSemester]) => {
       if (newYear !== oldYear || newSemester !== oldSemester) {
         fetchTerms()
       }
-    }
+    },
   )
 
-  // Handle CSV stats from file explorer
   function handleCsvStats(stats: { count: number; hasFiles: boolean }) {
     hasCsvFiles.value = stats.hasFiles
     csvFileCount.value = stats.count
   }
 
-  // Watch for dialog open to reset state and fetch terms
   watch(
     () => props.open,
     (isOpen) => {
@@ -579,11 +565,9 @@
     }
   })
 
-  // Watch for changes in the filtered terms
   watch(
     filteredTerms,
     (newFilteredTerms) => {
-      // If a term is selected but is no longer in the filtered list, clear the selection
       if (
         selectedTermId.value &&
         !newFilteredTerms.some(

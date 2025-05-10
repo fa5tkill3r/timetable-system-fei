@@ -43,47 +43,43 @@
   type Schema = components['schemas']['schema']
 
   const schemaStore = useSchemaStore()
-  
+
   const open = ref(false)
   const showNewSchemaDialog = ref(false)
   const selectedType = ref<'timetable' | 'term'>('timetable')
   const newSchemaName = ref('')
-  
+
   const selectedSchema = computed(() => schemaStore.activeSchema)
 
-  // Group schemas by year
   const schemasByYear = computed(() => {
     if (!schemaStore.schemas.length) return []
-    
+
     const groupedSchemas: Record<string, Schema[]> = {}
     schemaStore.schemas.forEach((schema) => {
-      // Extract year from schema - assuming year field exists or extract from version
-      const year = schema.start_date && schema.end_date 
-        ? `${new Date(schema.start_date).getFullYear()}/${new Date(schema.end_date).getFullYear().toString().slice(-2)}`
-        : 'Unknown'
-      
+      const year =
+        schema.start_date && schema.end_date
+          ? `${new Date(schema.start_date).getFullYear()}/${new Date(schema.end_date).getFullYear().toString().slice(-2)}`
+          : 'Unknown'
+
       if (!groupedSchemas[year]) {
         groupedSchemas[year] = []
       }
       groupedSchemas[year].push(schema)
     })
-    
+
     return Object.entries(groupedSchemas).map(([year, items]) => ({
       label: year,
-      schemas: items
+      schemas: items,
     }))
   })
-  
+
   async function createNewSchema() {
-    // API call to create a new schema would go here
-    // This is a placeholder for when the API is available
     showNewSchemaDialog.value = false
     newSchemaName.value = ''
-    
-    // Refresh schemas after creating a new one
+
     await schemaStore.fetchSchemas()
   }
-  
+
   function selectSchema(schema: Schema) {
     if (schema.id) {
       schemaStore.setActiveSchema(schema.id.toString())
@@ -109,9 +105,12 @@
       </PopoverTrigger>
       <PopoverContent class="w-[200px] p-0">
         <Command
-          :filter-function="((list: any[], term: string) =>
-            list.filter((i: any) => (i as Schema).human_name?.toLowerCase()?.includes(term))
-          )"
+          :filter-function="
+            (list: any[], term: string) =>
+              list.filter((i: any) =>
+                (i as Schema).human_name?.toLowerCase()?.includes(term),
+              )
+          "
         >
           <CommandList>
             <CommandInput placeholder="Search schema..." />
@@ -175,7 +174,11 @@
         <div class="space-y-4 py-2 pb-4">
           <div class="space-y-2">
             <Label for="name">Schema name</Label>
-            <Input id="name" v-model="newSchemaName" placeholder="LS v1" />
+            <Input
+              id="name"
+              v-model="newSchemaName"
+              placeholder="LS v1"
+            />
           </div>
           <div class="space-y-2">
             <Label for="type">Schema Type</Label>
@@ -202,10 +205,16 @@
         </div>
       </div>
       <DialogFooter>
-        <Button variant="outline" @click="showNewSchemaDialog = false">
+        <Button
+          variant="outline"
+          @click="showNewSchemaDialog = false"
+        >
           Cancel
         </Button>
-        <Button type="submit" @click="createNewSchema">
+        <Button
+          type="submit"
+          @click="createNewSchema"
+        >
           Create
         </Button>
       </DialogFooter>

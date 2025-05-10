@@ -4,8867 +4,8873 @@
  */
 
 export interface paths {
-    "/api/allowence/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["allowence_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["allowence_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/allowence/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["allowence_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["allowence_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["allowence_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["allowence_partial_update"];
-        trace?: never;
-    };
-    "/api/buildings/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["buildings_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["buildings_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/buildings/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["buildings_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["buildings_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["buildings_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["buildings_partial_update"];
-        trace?: never;
-    };
-    "/api/conflicts/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["conflicts_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/conflicts/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["conflicts_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/conflicts/{id}/update_status/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** @description Update the status of a conflict */
-        patch: operations["conflicts_update_status_partial_update"];
-        trace?: never;
-    };
-    "/api/constraints/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["constraints_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["constraints_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/constraints/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["constraints_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["constraints_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["constraints_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["constraints_partial_update"];
-        trace?: never;
-    };
-    "/api/constraints/all_constraint_data_schema/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Schema for all constraint data types (for OpenAPI component registration only) */
-        post: operations["constraints_all_constraint_data_schema_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/equipment/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["equipment_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["equipment_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/equipment/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["equipment_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["equipment_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["equipment_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["equipment_partial_update"];
-        trace?: never;
-    };
-    "/api/import/lsData/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List contents of a directory in the DATA directory
-         * @description Lists all files and directories in the specified path under the DATA directory.
-         */
-        get: operations["import_lsData_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/imports_exports/fei/import/db/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Import data from live AIS DB
-         * @description Import data by connecting to the live FEI database.
-         */
-        post: operations["imports_exports_fei_import_db_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/imports_exports/fei/import/dir/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Import FEI dataset from DATA directory
-         * @description Import FEI exports from dir specified.
-         */
-        post: operations["imports_exports_fei_import_dir_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/imports_exports/fei/import/zip/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Import DB data from ZIP of CSVs
-         * @description Import data from a ZIP file. Optionally persist it in the DATA directory.
-         */
-        post: operations["imports_exports_fei_import_zip_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/imports_exports/fei/terms/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description ViewSet for retrieving and importing AIS terms.
-         *     GET operations for terms data, POST operations for imports. */
-        get: operations["imports_exports_fei_terms_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/imports_exports/fei/terms/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description ViewSet for retrieving and importing AIS terms.
-         *     GET operations for terms data, POST operations for imports. */
-        get: operations["imports_exports_fei_terms_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/imports_exports/fei/terms/import/dir/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Import terms from directory
-         * @description Import data from a directory in the DATA folder.
-         */
-        post: operations["imports_exports_fei_terms_import_dir_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/imports_exports/fei/terms/import/zip/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Import terms from ZIP file
-         * @description Import data from a ZIP file. Optionally persist it in the DATA directory.
-         */
-        post: operations["imports_exports_fei_terms_import_zip_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/room-equipment/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["room_equipment_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["room_equipment_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/room-equipment/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["room_equipment_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["room_equipment_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["room_equipment_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["room_equipment_partial_update"];
-        trace?: never;
-    };
-    "/api/room-groups/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["room_groups_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["room_groups_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/room-groups/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["room_groups_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["room_groups_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["room_groups_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["room_groups_partial_update"];
-        trace?: never;
-    };
-    "/api/room-groups/list_groups/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Returns all unique room group names with counts of rooms in each group */
-        get: operations["room_groups_list_groups_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/rooms/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["rooms_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["rooms_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/rooms/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["rooms_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["rooms_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["rooms_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["rooms_partial_update"];
-        trace?: never;
-    };
-    "/api/schemas/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["schemas_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["schemas_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/schemas/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["schemas_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["schemas_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["schemas_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["schemas_partial_update"];
-        trace?: never;
-    };
-    "/api/schemas/{id}/activate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Explicit endpoint to activate a schema */
-        post: operations["schemas_activate_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/subject-groups/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["subject_groups_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["subject_groups_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/subject-groups/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["subject_groups_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["subject_groups_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["subject_groups_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["subject_groups_partial_update"];
-        trace?: never;
-    };
-    "/api/subject-groups/groups/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get list of unique subject groups with their counts */
-        get: operations["subject_groups_groups_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/subject-user-collisions/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description List subject user collisions */
-        get: operations["subject_user_collisions_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/subject-user-roles/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["subject_user_roles_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["subject_user_roles_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/subject-user-roles/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["subject_user_roles_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["subject_user_roles_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["subject_user_roles_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["subject_user_roles_partial_update"];
-        trace?: never;
-    };
-    "/api/subject-user-roles/list-roles/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get all roles
-         * @description Get all roles
-         */
-        get: operations["subject_user_roles_list_roles_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/subjects/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["subjects_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["subjects_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/subjects/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["subjects_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["subjects_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["subjects_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["subjects_partial_update"];
-        trace?: never;
-    };
-    "/api/subjects/get_student_count/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Retrieve the count of students for a subject
-         * @description Returns the count of students for a specific subject or for all subjects if no subject_id is provided. Invalid subject_id results in ok with count 0.
-         */
-        get: operations["subjects_get_student_count_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/token/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Takes a set of user credentials and returns an access and refresh JSON web
-         *     token pair to prove the authentication of those credentials. */
-        post: operations["token_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/token/refresh/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Takes a refresh type JSON web token and returns an access type JSON web
-         *     token if the refresh token is valid. */
-        post: operations["token_refresh_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/tt/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["tt_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["tt_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/tt/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["tt_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["tt_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["tt_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["tt_partial_update"];
-        trace?: never;
-    };
-    "/api/ttactivity/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["ttactivity_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["ttactivity_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ttactivity/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["ttactivity_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["ttactivity_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["ttactivity_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["ttactivity_partial_update"];
-        trace?: never;
-    };
-    "/api/ttecontroller/generate-tte-events/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Generate TTE events
-         * @description Generate TTE events for subjectgroup groups.e.g. subjectgroup=B-API, TT-id=1, it generates events for B-API subjectgroup into TT B-API-1_testX.If nominal_semester is not specified, all events are generated.
-         */
-        get: operations["ttecontroller_generate_tte_events_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ttetype/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["ttetype_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["ttetype_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ttetype/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["ttetype_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["ttetype_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["ttetype_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["ttetype_partial_update"];
-        trace?: never;
-    };
-    "/api/ttetypemapper/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["ttetypemapper_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["ttetypemapper_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ttetypemapper/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["ttetypemapper_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["ttetypemapper_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["ttetypemapper_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["ttetypemapper_partial_update"];
-        trace?: never;
-    };
-    "/api/ttevent/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["ttevent_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["ttevent_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ttevent/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["ttevent_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["ttevent_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["ttevent_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["ttevent_partial_update"];
-        trace?: never;
-    };
-    "/api/ttgroup/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["ttgroup_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["ttgroup_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ttgroup/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["ttgroup_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["ttgroup_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["ttgroup_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["ttgroup_partial_update"];
-        trace?: never;
-    };
-    "/api/ttgroup/groups/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get list of unique tt groups with their counts */
-        get: operations["ttgroup_groups_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List all objects
-         * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
-         */
-        get: operations["users_list"];
-        put?: never;
-        /**
-         * Create new object
-         * @description Creates a new object with the provided data. Returns the created object.
-         */
-        post: operations["users_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get single object
-         * @description Retrieves a specific object by its unique identifier (ID).
-         */
-        get: operations["users_retrieve"];
-        /**
-         * Update object
-         * @description Fully updates an existing object. All fields must be provided.
-         */
-        put: operations["users_update"];
-        post?: never;
-        /**
-         * Delete object
-         * @description Permanently removes the specified object from the database.
-         */
-        delete: operations["users_destroy"];
-        options?: never;
-        head?: never;
-        /**
-         * Partial update object
-         * @description Partially updates an existing object. Only specified fields will be modified.
-         */
-        patch: operations["users_partial_update"];
-        trace?: never;
-    };
+  '/api/allowence/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['allowence_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['allowence_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/allowence/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['allowence_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['allowence_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['allowence_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['allowence_partial_update']
+    trace?: never
+  }
+  '/api/buildings/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['buildings_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['buildings_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/buildings/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['buildings_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['buildings_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['buildings_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['buildings_partial_update']
+    trace?: never
+  }
+  '/api/conflicts/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['conflicts_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/conflicts/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['conflicts_retrieve']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/conflicts/{id}/update_status/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** @description Update the status of a conflict */
+    patch: operations['conflicts_update_status_partial_update']
+    trace?: never
+  }
+  '/api/constraints/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['constraints_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['constraints_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/constraints/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['constraints_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['constraints_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['constraints_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['constraints_partial_update']
+    trace?: never
+  }
+  '/api/constraints/all_constraint_data_schema/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Schema for all constraint data types (for OpenAPI component registration only) */
+    post: operations['constraints_all_constraint_data_schema_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/equipment/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['equipment_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['equipment_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/equipment/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['equipment_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['equipment_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['equipment_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['equipment_partial_update']
+    trace?: never
+  }
+  '/api/import/lsData/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List contents of a directory in the DATA directory
+     * @description Lists all files and directories in the specified path under the DATA directory.
+     */
+    get: operations['import_lsData_retrieve']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/imports_exports/fei/import/db/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Import data from live AIS DB
+     * @description Import data by connecting to the live FEI database.
+     */
+    post: operations['imports_exports_fei_import_db_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/imports_exports/fei/import/dir/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Import FEI dataset from DATA directory
+     * @description Import FEI exports from dir specified.
+     */
+    post: operations['imports_exports_fei_import_dir_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/imports_exports/fei/import/zip/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Import DB data from ZIP of CSVs
+     * @description Import data from a ZIP file. Optionally persist it in the DATA directory.
+     */
+    post: operations['imports_exports_fei_import_zip_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/imports_exports/fei/terms/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description ViewSet for retrieving and importing AIS terms.
+     *     GET operations for terms data, POST operations for imports. */
+    get: operations['imports_exports_fei_terms_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/imports_exports/fei/terms/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description ViewSet for retrieving and importing AIS terms.
+     *     GET operations for terms data, POST operations for imports. */
+    get: operations['imports_exports_fei_terms_retrieve']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/imports_exports/fei/terms/import/dir/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Import terms from directory
+     * @description Import data from a directory in the DATA folder.
+     */
+    post: operations['imports_exports_fei_terms_import_dir_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/imports_exports/fei/terms/import/zip/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Import terms from ZIP file
+     * @description Import data from a ZIP file. Optionally persist it in the DATA directory.
+     */
+    post: operations['imports_exports_fei_terms_import_zip_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/room-equipment/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['room_equipment_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['room_equipment_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/room-equipment/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['room_equipment_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['room_equipment_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['room_equipment_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['room_equipment_partial_update']
+    trace?: never
+  }
+  '/api/room-groups/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['room_groups_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['room_groups_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/room-groups/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['room_groups_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['room_groups_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['room_groups_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['room_groups_partial_update']
+    trace?: never
+  }
+  '/api/room-groups/list_groups/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Returns all unique room group names with counts of rooms in each group */
+    get: operations['room_groups_list_groups_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/rooms/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['rooms_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['rooms_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/rooms/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['rooms_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['rooms_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['rooms_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['rooms_partial_update']
+    trace?: never
+  }
+  '/api/schemas/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['schemas_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['schemas_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/schemas/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['schemas_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['schemas_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['schemas_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['schemas_partial_update']
+    trace?: never
+  }
+  '/api/schemas/{id}/activate/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Explicit endpoint to activate a schema */
+    post: operations['schemas_activate_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/subject-groups/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['subject_groups_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['subject_groups_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/subject-groups/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['subject_groups_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['subject_groups_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['subject_groups_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['subject_groups_partial_update']
+    trace?: never
+  }
+  '/api/subject-groups/groups/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Get list of unique subject groups with their counts */
+    get: operations['subject_groups_groups_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/subject-user-collisions/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description List subject user collisions */
+    get: operations['subject_user_collisions_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/subject-user-roles/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['subject_user_roles_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['subject_user_roles_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/subject-user-roles/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['subject_user_roles_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['subject_user_roles_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['subject_user_roles_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['subject_user_roles_partial_update']
+    trace?: never
+  }
+  '/api/subject-user-roles/list-roles/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all roles
+     * @description Get all roles
+     */
+    get: operations['subject_user_roles_list_roles_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/subjects/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['subjects_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['subjects_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/subjects/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['subjects_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['subjects_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['subjects_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['subjects_partial_update']
+    trace?: never
+  }
+  '/api/subjects/get_student_count/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Retrieve the count of students for a subject
+     * @description Returns the count of students for a specific subject or for all subjects if no subject_id is provided. Invalid subject_id results in ok with count 0.
+     */
+    get: operations['subjects_get_student_count_retrieve']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/token/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Takes a set of user credentials and returns an access and refresh JSON web
+     *     token pair to prove the authentication of those credentials. */
+    post: operations['token_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/token/refresh/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Takes a refresh type JSON web token and returns an access type JSON web
+     *     token if the refresh token is valid. */
+    post: operations['token_refresh_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/tt/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['tt_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['tt_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/tt/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['tt_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['tt_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['tt_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['tt_partial_update']
+    trace?: never
+  }
+  '/api/ttactivity/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['ttactivity_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['ttactivity_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/ttactivity/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['ttactivity_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['ttactivity_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['ttactivity_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['ttactivity_partial_update']
+    trace?: never
+  }
+  '/api/ttecontroller/generate-tte-events/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Generate TTE events
+     * @description Generate TTE events for subjectgroup groups.e.g. subjectgroup=B-API, TT-id=1, it generates events for B-API subjectgroup into TT B-API-1_testX.If nominal_semester is not specified, all events are generated.
+     */
+    get: operations['ttecontroller_generate_tte_events_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/ttetype/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['ttetype_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['ttetype_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/ttetype/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['ttetype_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['ttetype_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['ttetype_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['ttetype_partial_update']
+    trace?: never
+  }
+  '/api/ttetypemapper/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['ttetypemapper_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['ttetypemapper_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/ttetypemapper/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['ttetypemapper_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['ttetypemapper_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['ttetypemapper_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['ttetypemapper_partial_update']
+    trace?: never
+  }
+  '/api/ttevent/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['ttevent_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['ttevent_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/ttevent/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['ttevent_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['ttevent_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['ttevent_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['ttevent_partial_update']
+    trace?: never
+  }
+  '/api/ttgroup/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['ttgroup_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['ttgroup_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/ttgroup/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['ttgroup_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['ttgroup_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['ttgroup_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['ttgroup_partial_update']
+    trace?: never
+  }
+  '/api/ttgroup/groups/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Get list of unique tt groups with their counts */
+    get: operations['ttgroup_groups_list']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/users/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all objects
+     * @description Returns a paginated list of all available objects. Can be filtered using query parameters.
+     */
+    get: operations['users_list']
+    put?: never
+    /**
+     * Create new object
+     * @description Creates a new object with the provided data. Returns the created object.
+     */
+    post: operations['users_create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/users/{id}/': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get single object
+     * @description Retrieves a specific object by its unique identifier (ID).
+     */
+    get: operations['users_retrieve']
+    /**
+     * Update object
+     * @description Fully updates an existing object. All fields must be provided.
+     */
+    put: operations['users_update']
+    post?: never
+    /**
+     * Delete object
+     * @description Permanently removes the specified object from the database.
+     */
+    delete: operations['users_destroy']
+    options?: never
+    head?: never
+    /**
+     * Partial update object
+     * @description Partially updates an existing object. Only specified fields will be modified.
+     */
+    patch: operations['users_partial_update']
+    trace?: never
+  }
 }
-export type webhooks = Record<string, never>;
+export type webhooks = Record<string, never>
 export interface components {
-    schemas: {
-        /** @description Serializer for AIS terms */
-        AISObdobie: {
-            readonly id?: number;
-            /**
-             * @description * `ZS` - Zimny
-             *     * `LS` - Letny
-             * @enum {string}
-             */
-            semester: "ZS" | "LS";
-            year_start: number;
-            phd?: boolean;
-            department: string;
-            prev?: number | null;
-            next?: number | null;
-            /** Format: date-time */
-            start_date: string;
-            /** Format: date-time */
-            end_date: string;
-        };
-        AllConstraintData: components["schemas"]["RootConstraintData"] | components["schemas"]["OperationData"] | components["schemas"]["TimeRangeData"];
-        AllConstraintMainRequest: components["schemas"]["RootConstraintRequest"] | components["schemas"]["OperationConstraintRequest"] | components["schemas"]["TimeRangeConstraintRequest"];
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        Allowance: {
-            readonly id?: number;
-            tta: number;
-            amount?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        AllowanceRequest: {
-            tta: number;
-            amount?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        Building: {
-            readonly id?: number;
-            name: string;
-            abbrev: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        BuildingRequest: {
-            name: string;
-            abbrev: string;
-        };
-        /** @description Serializer for constraint conflicts */
-        Conflict: {
-            readonly id?: number;
-            ttevent: number;
-            constraint: number;
-            /**
-             * @description * `ACTIVE` - Active
-             *     * `RESOLVED` - Resolved
-             *     * `IGNORED` - Ignored
-             * @enum {string}
-             */
-            status: "ACTIVE" | "RESOLVED" | "IGNORED";
-            /** @description JSON data for conflict details(constraint_type specific) */
-            data: {
-                [key: string]: string;
-            };
-        };
-        Constraint: {
-            readonly id?: number;
-            /**
-             * @description * `NONE` - None
-             *     * `ROOT` - Root Constraint
-             *     * `OPERATION` - Operation Constraint
-             *     * `TIMERANGE` - Time Range Constraint
-             *     * `RESOURCE` - Resource Constraint
-             * @default NONE
-             * @enum {string}
-             */
-            type: "NONE" | "ROOT" | "OPERATION" | "TIMERANGE" | "RESOURCE";
-            /**
-             * @description * `WEAK` - Weak
-             *     * `MEDIUM` - Medium
-             *     * `STRONG` - Strong
-             * @default WEAK
-             * @enum {string}
-             */
-            strength: "WEAK" | "MEDIUM" | "STRONG";
-            /** @description JSON data for constraint parameters (constraint_type specific) */
-            data: {
-                [key: string]: unknown;
-            };
-            /**
-             * @description Return IDs of child constraints
-             * @default []
-             */
-            readonly children: number[];
-            readonly owner?: number | null;
-            parent?: number | null;
-        };
-        ConstraintRequest: {
-            /**
-             * @description * `NONE` - None
-             *     * `ROOT` - Root Constraint
-             *     * `OPERATION` - Operation Constraint
-             *     * `TIMERANGE` - Time Range Constraint
-             *     * `RESOURCE` - Resource Constraint
-             * @default NONE
-             * @enum {string}
-             */
-            type: "NONE" | "ROOT" | "OPERATION" | "TIMERANGE" | "RESOURCE";
-            /**
-             * @description * `WEAK` - Weak
-             *     * `MEDIUM` - Medium
-             *     * `STRONG` - Strong
-             * @default WEAK
-             * @enum {string}
-             */
-            strength: "WEAK" | "MEDIUM" | "STRONG";
-            /** @description JSON data for constraint parameters (constraint_type specific) */
-            data: {
-                [key: string]: unknown;
-            };
-            /**
-             * @description Nested children constraints. Only used during creation.
-             * @default [
-             *       {
-             *         "type": "ROOT",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "target_type": "USER",
-             *           "target_id": 0
-             *         }
-             *       },
-             *       {
-             *         "type": "OPERATION",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "operator": "AND"
-             *         }
-             *       },
-             *       {
-             *         "type": "TIMERANGE",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "start_time": 0,
-             *           "duration": 2,
-             *           "day_of_week": 0
-             *         }
-             *       }
-             *     ]
-             */
-            nested_children: unknown;
-            parent?: number | null;
-        };
-        CrossSubjectCollision: {
-            subject_a: number | null;
-            subject_b: number | null;
-            collision_count: number;
-            subject_a_code?: string | null;
-            subject_b_code?: string | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        Equipment: {
-            readonly id?: number;
-            name: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        EquipmentRequest: {
-            name: string;
-        };
-        Err_serializer: {
-            code: number;
-            message: string;
-            /** Format: date-time */
-            timestamp: string;
-        };
-        Ok_serializer: {
-            code: number;
-            message: string;
-            /** Format: date-time */
-            timestamp: string;
-        };
-        OperationConstraintRequest: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "OperationConstraintRequest";
-            /**
-             * @description * `WEAK` - Weak
-             *     * `MEDIUM` - Medium
-             *     * `STRONG` - Strong
-             * @default WEAK
-             * @enum {string}
-             */
-            strength: "WEAK" | "MEDIUM" | "STRONG";
-            data: {
-                [key: string]: unknown;
-            };
-            /**
-             * @description Nested children constraints. Only used during creation.
-             * @default [
-             *       {
-             *         "type": "ROOT",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "target_type": "USER",
-             *           "target_id": 0
-             *         }
-             *       },
-             *       {
-             *         "type": "OPERATION",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "operator": "AND"
-             *         }
-             *       },
-             *       {
-             *         "type": "TIMERANGE",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "start_time": 0,
-             *           "duration": 2,
-             *           "day_of_week": 0
-             *         }
-             *       }
-             *     ]
-             */
-            nested_children: unknown;
-            parent?: number | null;
-        };
-        OperationData: {
-            /**
-             * @description * `AND` - AND
-             *     * `OR` - OR
-             * @default AND
-             * @enum {string}
-             */
-            operator: "AND" | "OR";
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            "parent.type": "OperationData";
-        };
-        PaginatedAISObdobieList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["AISObdobie"][];
-        };
-        PaginatedAllowanceList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Allowance"][];
-        };
-        PaginatedBuildingList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Building"][];
-        };
-        PaginatedConflictList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Conflict"][];
-        };
-        PaginatedConstraintList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Constraint"][];
-        };
-        PaginatedCrossSubjectCollisionList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["CrossSubjectCollision"][];
-        };
-        PaginatedEquipmentList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Equipment"][];
-        };
-        PaginatedRoleList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Role"][];
-        };
-        PaginatedRoomEquipmentList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["RoomEquipment"][];
-        };
-        PaginatedRoomGroupList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["RoomGroup"][];
-        };
-        PaginatedRoomGroupNameCountList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["RoomGroupNameCount"][];
-        };
-        PaginatedRoomList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Room"][];
-        };
-        PaginatedSubjectGroupCountsList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["SubjectGroupCounts"][];
-        };
-        PaginatedSubjectGroupList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["SubjectGroup"][];
-        };
-        PaginatedSubjectList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["Subject"][];
-        };
-        PaginatedSubjectUserRoleList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["SubjectUserRole"][];
-        };
-        PaginatedTTActivityList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["TTActivity"][];
-        };
-        PaginatedTTEventList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["TTEvent"][];
-        };
-        PaginatedTTEventTypeList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["TTEventType"][];
-        };
-        PaginatedTTEventTypeRoleMapList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["TTEventTypeRoleMap"][];
-        };
-        PaginatedTTGroupCountsList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["TTGroupCounts"][];
-        };
-        PaginatedTTGroupList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["TTGroup"][];
-        };
-        PaginatedTTList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["TT"][];
-        };
-        PaginatedUserList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["User"][];
-        };
-        PaginatedschemaList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=400&limit=100
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?offset=200&limit=100
-             */
-            previous?: string | null;
-            results: components["schemas"]["schema"][];
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedAllowanceRequest: {
-            tta?: number;
-            amount?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedBuildingRequest: {
-            name?: string;
-            abbrev?: string;
-        };
-        /** @description Serializer for constraint conflicts */
-        PatchedConflictRequest: {
-            ttevent?: number;
-            constraint?: number;
-            /**
-             * @description * `ACTIVE` - Active
-             *     * `RESOLVED` - Resolved
-             *     * `IGNORED` - Ignored
-             * @enum {string}
-             */
-            status?: "ACTIVE" | "RESOLVED" | "IGNORED";
-            /** @description JSON data for conflict details(constraint_type specific) */
-            data?: {
-                [key: string]: string;
-            };
-        };
-        PatchedConstraintRequest: {
-            /**
-             * @description * `NONE` - None
-             *     * `ROOT` - Root Constraint
-             *     * `OPERATION` - Operation Constraint
-             *     * `TIMERANGE` - Time Range Constraint
-             *     * `RESOURCE` - Resource Constraint
-             * @default NONE
-             * @enum {string}
-             */
-            type: "NONE" | "ROOT" | "OPERATION" | "TIMERANGE" | "RESOURCE";
-            /**
-             * @description * `WEAK` - Weak
-             *     * `MEDIUM` - Medium
-             *     * `STRONG` - Strong
-             * @default WEAK
-             * @enum {string}
-             */
-            strength: "WEAK" | "MEDIUM" | "STRONG";
-            /** @description JSON data for constraint parameters (constraint_type specific) */
-            data?: {
-                [key: string]: unknown;
-            };
-            /**
-             * @description Nested children constraints. Only used during creation.
-             * @default [
-             *       {
-             *         "type": "ROOT",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "target_type": "USER",
-             *           "target_id": 0
-             *         }
-             *       },
-             *       {
-             *         "type": "OPERATION",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "operator": "AND"
-             *         }
-             *       },
-             *       {
-             *         "type": "TIMERANGE",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "start_time": 0,
-             *           "duration": 2,
-             *           "day_of_week": 0
-             *         }
-             *       }
-             *     ]
-             */
-            nested_children: unknown;
-            parent?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedEquipmentRequest: {
-            name?: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedRoomEquipmentRequest: {
-            room?: number;
-            equipment?: number;
-            count?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedRoomGroupRequest: {
-            name?: string;
-            room?: number;
-            owner?: number | null;
-        };
-        PatchedRoomRequest: {
-            name?: string;
-            capacity?: number;
-            building?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedSubjectGroupRequest: {
-            subject?: number;
-            name?: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedSubjectRequest: {
-            name?: string;
-            code?: string;
-            nominal_semester?: number | null;
-            building?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedSubjectUserRoleRequest: {
-            user?: number;
-            subject?: number;
-            role?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedTTActivityRequest: {
-            subject?: number;
-            event_type?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedTTEventRequest: {
-            tt?: number;
-            tta?: number;
-            day_of_week?: number | null;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
-            start_time?: number | null;
-            duration?: number | null;
-            room?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedTTEventTypeRequest: {
-            name?: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedTTEventTypeRoleMapRequest: {
-            event_type?: number;
-            role?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedTTGroupRequest: {
-            name?: string;
-            tt?: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedTTRequest: {
-            name?: string;
-            description?: string | null;
-            owner?: number;
-            /**
-             * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
-             *
-             *     * `PUBLISHED` - Published - Published final version
-             *     * `FINAL` - Final - Representative of group
-             *     * `TEST` - Test - Minor version in group
-             * @enum {string}
-             */
-            status?: "PUBLISHED" | "FINAL" | "TEST";
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        PatchedUserRequest: {
-            username?: string;
-            full_name?: string | null;
-            /** Format: date-time */
-            last_logout?: string | null;
-        };
-        PatchedschemaRequest: {
-            human_name?: string;
-            /** Format: date */
-            start_date?: string | null;
-            /** Format: date */
-            end_date?: string | null;
-            is_active?: boolean;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        Role: {
-            readonly id?: number;
-            name: string;
-            display_name: string;
-            description?: string;
-        };
-        Room: {
-            readonly id?: number;
-            name: string;
-            capacity: number;
-            building: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        RoomEquipment: {
-            readonly id?: number;
-            room: number;
-            equipment: number;
-            count: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        RoomEquipmentRequest: {
-            room: number;
-            equipment: number;
-            count: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        RoomGroup: {
-            readonly id?: number;
-            name: string;
-            room: number;
-            owner?: number | null;
-        };
-        RoomGroupNameCount: {
-            name: string;
-            count: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        RoomGroupRequest: {
-            name: string;
-            room: number;
-            owner?: number | null;
-        };
-        RoomRequest: {
-            name: string;
-            capacity: number;
-            building: number | null;
-        };
-        RootConstraintData: {
-            /**
-             * @description * `USER` - USER
-             *     * `ROOM` - ROOM
-             *     * `TTA` - TTA
-             * @default USER
-             * @enum {string}
-             */
-            target_type: "USER" | "ROOM" | "TTA";
-            /** @default 0 */
-            target_id: number;
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            "parent.type": "RootConstraintData";
-        };
-        RootConstraintRequest: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "RootConstraintRequest";
-            /**
-             * @description * `WEAK` - Weak
-             *     * `MEDIUM` - Medium
-             *     * `STRONG` - Strong
-             * @default WEAK
-             * @enum {string}
-             */
-            strength: "WEAK" | "MEDIUM" | "STRONG";
-            /** @description Data specific to ROOT constraint */
-            data: {
-                [key: string]: unknown;
-            };
-            /**
-             * @description Nested children constraints. Only used during creation.
-             * @default [
-             *       {
-             *         "type": "ROOT",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "target_type": "USER",
-             *           "target_id": 0
-             *         }
-             *       },
-             *       {
-             *         "type": "OPERATION",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "operator": "AND"
-             *         }
-             *       },
-             *       {
-             *         "type": "TIMERANGE",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "start_time": 0,
-             *           "duration": 2,
-             *           "day_of_week": 0
-             *         }
-             *       }
-             *     ]
-             */
-            nested_children: unknown;
-            parent?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        Subject: {
-            readonly id?: number;
-            name: string;
-            code: string;
-            nominal_semester?: number | null;
-            building?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        SubjectGroup: {
-            readonly id?: number;
-            subject: number;
-            name: string;
-        };
-        /** @description Serializer for subject groups */
-        SubjectGroupCounts: {
-            /** @description Name of the subject group */
-            name: string;
-            /** @description Number of subjects in this group */
-            count: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        SubjectGroupRequest: {
-            subject: number;
-            name: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        SubjectRequest: {
-            name: string;
-            code: string;
-            nominal_semester?: number | null;
-            building?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        SubjectUserRole: {
-            readonly id?: number;
-            user: number;
-            subject: number;
-            role: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        SubjectUserRoleRequest: {
-            user: number;
-            subject: number;
-            role: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TT: {
-            readonly id?: number;
-            name: string;
-            description?: string | null;
-            owner: number;
-            /**
-             * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
-             *
-             *     * `PUBLISHED` - Published - Published final version
-             *     * `FINAL` - Final - Representative of group
-             *     * `TEST` - Test - Minor version in group
-             * @enum {string}
-             */
-            status?: "PUBLISHED" | "FINAL" | "TEST";
-            /** Format: date-time */
-            readonly created_at?: string;
-            /** Format: date-time */
-            readonly updated_at?: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTActivity: {
-            readonly id?: number;
-            subject: number;
-            event_type: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTActivityRequest: {
-            subject: number;
-            event_type: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTEvent: {
-            readonly id?: number;
-            tt: number;
-            tta: number;
-            day_of_week?: number | null;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
-            start_time?: number | null;
-            duration?: number | null;
-            room?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTEventRequest: {
-            tt: number;
-            tta: number;
-            day_of_week?: number | null;
-            /** Format: int64 */
-            weeks_bitmask?: number | null;
-            start_time?: number | null;
-            duration?: number | null;
-            room?: number | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTEventType: {
-            readonly id?: number;
-            name: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTEventTypeRequest: {
-            name: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTEventTypeRoleMap: {
-            readonly id?: number;
-            event_type: number;
-            role: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTEventTypeRoleMapRequest: {
-            event_type: number;
-            role: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTGroup: {
-            readonly id?: number;
-            name: string;
-            tt: number;
-        };
-        TTGroupCounts: {
-            /** @description Name of the tt group */
-            name: string;
-            /** @description Number of tt in this group */
-            count: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTGroupRequest: {
-            name: string;
-            tt: number;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        TTRequest: {
-            name: string;
-            description?: string | null;
-            owner: number;
-            /**
-             * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
-             *
-             *     * `PUBLISHED` - Published - Published final version
-             *     * `FINAL` - Final - Representative of group
-             *     * `TEST` - Test - Minor version in group
-             * @enum {string}
-             */
-            status?: "PUBLISHED" | "FINAL" | "TEST";
-        };
-        TimeRangeConstraintRequest: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "None";
-            /**
-             * @description * `WEAK` - Weak
-             *     * `MEDIUM` - Medium
-             *     * `STRONG` - Strong
-             * @default WEAK
-             * @enum {string}
-             */
-            strength: "WEAK" | "MEDIUM" | "STRONG";
-            data: {
-                [key: string]: unknown;
-            };
-            /**
-             * @description Nested children constraints. Only used during creation.
-             * @default [
-             *       {
-             *         "type": "ROOT",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "target_type": "USER",
-             *           "target_id": 0
-             *         }
-             *       },
-             *       {
-             *         "type": "OPERATION",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "operator": "AND"
-             *         }
-             *       },
-             *       {
-             *         "type": "TIMERANGE",
-             *         "strength": "MEDIUM",
-             *         "parent": 0,
-             *         "data": {
-             *           "start_time": 0,
-             *           "duration": 2,
-             *           "day_of_week": 0
-             *         }
-             *       }
-             *     ]
-             */
-            nested_children: unknown;
-            parent?: number | null;
-        };
-        TimeRangeData: {
-            /** @default 0 */
-            start_time: number;
-            /** @default 2 */
-            duration: number;
-            /** @default 0 */
-            day_of_week: number;
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            "parent.type": "TimeRangeData";
-        };
-        TokenObtainPair: {
-            readonly access?: string;
-            readonly refresh?: string;
-        };
-        TokenObtainPairRequest: {
-            username: string;
-            password: string;
-        };
-        TokenRefresh: {
-            readonly access?: string;
-        };
-        TokenRefreshRequest: {
-            refresh: string;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        User: {
-            readonly id?: number;
-            username: string;
-            full_name?: string | null;
-            /** Format: date-time */
-            last_logout?: string | null;
-        };
-        /** @description Base serializer that automatically handles nested serialization with caching */
-        UserRequest: {
-            username: string;
-            full_name?: string | null;
-            /** Format: date-time */
-            last_logout?: string | null;
-        };
-        schema: {
-            readonly id?: number;
-            human_name: string;
-            /** Format: date */
-            start_date?: string | null;
-            readonly schema_name?: string;
-            /** Format: date */
-            end_date?: string | null;
-            is_active?: boolean;
-        };
-        schemaRequest: {
-            human_name: string;
-            /** Format: date */
-            start_date?: string | null;
-            /** Format: date */
-            end_date?: string | null;
-            is_active?: boolean;
-        };
-    };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+  schemas: {
+    /** @description Serializer for AIS terms */
+    AISObdobie: {
+      readonly id?: number
+      /**
+       * @description * `ZS` - Zimny
+       *     * `LS` - Letny
+       * @enum {string}
+       */
+      semester: 'ZS' | 'LS'
+      year_start: number
+      phd?: boolean
+      department: string
+      prev?: number | null
+      next?: number | null
+      /** Format: date-time */
+      start_date: string
+      /** Format: date-time */
+      end_date: string
+    }
+    AllConstraintData:
+      | components['schemas']['RootConstraintData']
+      | components['schemas']['OperationData']
+      | components['schemas']['TimeRangeData']
+    AllConstraintMainRequest:
+      | components['schemas']['RootConstraintRequest']
+      | components['schemas']['OperationConstraintRequest']
+      | components['schemas']['TimeRangeConstraintRequest']
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    Allowance: {
+      readonly id?: number
+      tta: number
+      amount?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    AllowanceRequest: {
+      tta: number
+      amount?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    Building: {
+      readonly id?: number
+      name: string
+      abbrev: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    BuildingRequest: {
+      name: string
+      abbrev: string
+    }
+    /** @description Serializer for constraint conflicts */
+    Conflict: {
+      readonly id?: number
+      ttevent: number
+      constraint: number
+      /**
+       * @description * `ACTIVE` - Active
+       *     * `RESOLVED` - Resolved
+       *     * `IGNORED` - Ignored
+       * @enum {string}
+       */
+      status: 'ACTIVE' | 'RESOLVED' | 'IGNORED'
+      /** @description JSON data for conflict details(constraint_type specific) */
+      data: {
+        [key: string]: string
+      }
+    }
+    Constraint: {
+      readonly id?: number
+      /**
+       * @description * `NONE` - None
+       *     * `ROOT` - Root Constraint
+       *     * `OPERATION` - Operation Constraint
+       *     * `TIMERANGE` - Time Range Constraint
+       *     * `RESOURCE` - Resource Constraint
+       * @default NONE
+       * @enum {string}
+       */
+      type: 'NONE' | 'ROOT' | 'OPERATION' | 'TIMERANGE' | 'RESOURCE'
+      /**
+       * @description * `WEAK` - Weak
+       *     * `MEDIUM` - Medium
+       *     * `STRONG` - Strong
+       * @default WEAK
+       * @enum {string}
+       */
+      strength: 'WEAK' | 'MEDIUM' | 'STRONG'
+      /** @description JSON data for constraint parameters (constraint_type specific) */
+      data: {
+        [key: string]: unknown
+      }
+      /**
+       * @description Return IDs of child constraints
+       * @default []
+       */
+      readonly children: number[]
+      readonly owner?: number | null
+      parent?: number | null
+    }
+    ConstraintRequest: {
+      /**
+       * @description * `NONE` - None
+       *     * `ROOT` - Root Constraint
+       *     * `OPERATION` - Operation Constraint
+       *     * `TIMERANGE` - Time Range Constraint
+       *     * `RESOURCE` - Resource Constraint
+       * @default NONE
+       * @enum {string}
+       */
+      type: 'NONE' | 'ROOT' | 'OPERATION' | 'TIMERANGE' | 'RESOURCE'
+      /**
+       * @description * `WEAK` - Weak
+       *     * `MEDIUM` - Medium
+       *     * `STRONG` - Strong
+       * @default WEAK
+       * @enum {string}
+       */
+      strength: 'WEAK' | 'MEDIUM' | 'STRONG'
+      /** @description JSON data for constraint parameters (constraint_type specific) */
+      data: {
+        [key: string]: unknown
+      }
+      /**
+       * @description Nested children constraints. Only used during creation.
+       * @default [
+       *       {
+       *         "type": "ROOT",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "target_type": "USER",
+       *           "target_id": 0
+       *         }
+       *       },
+       *       {
+       *         "type": "OPERATION",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "operator": "AND"
+       *         }
+       *       },
+       *       {
+       *         "type": "TIMERANGE",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "start_time": 0,
+       *           "duration": 2,
+       *           "day_of_week": 0
+       *         }
+       *       }
+       *     ]
+       */
+      nested_children: unknown
+      parent?: number | null
+    }
+    CrossSubjectCollision: {
+      subject_a: number | null
+      subject_b: number | null
+      collision_count: number
+      subject_a_code?: string | null
+      subject_b_code?: string | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    Equipment: {
+      readonly id?: number
+      name: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    EquipmentRequest: {
+      name: string
+    }
+    Err_serializer: {
+      code: number
+      message: string
+      /** Format: date-time */
+      timestamp: string
+    }
+    Ok_serializer: {
+      code: number
+      message: string
+      /** Format: date-time */
+      timestamp: string
+    }
+    OperationConstraintRequest: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: 'OperationConstraintRequest'
+      /**
+       * @description * `WEAK` - Weak
+       *     * `MEDIUM` - Medium
+       *     * `STRONG` - Strong
+       * @default WEAK
+       * @enum {string}
+       */
+      strength: 'WEAK' | 'MEDIUM' | 'STRONG'
+      data: {
+        [key: string]: unknown
+      }
+      /**
+       * @description Nested children constraints. Only used during creation.
+       * @default [
+       *       {
+       *         "type": "ROOT",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "target_type": "USER",
+       *           "target_id": 0
+       *         }
+       *       },
+       *       {
+       *         "type": "OPERATION",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "operator": "AND"
+       *         }
+       *       },
+       *       {
+       *         "type": "TIMERANGE",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "start_time": 0,
+       *           "duration": 2,
+       *           "day_of_week": 0
+       *         }
+       *       }
+       *     ]
+       */
+      nested_children: unknown
+      parent?: number | null
+    }
+    OperationData: {
+      /**
+       * @description * `AND` - AND
+       *     * `OR` - OR
+       * @default AND
+       * @enum {string}
+       */
+      operator: 'AND' | 'OR'
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      'parent.type': 'OperationData'
+    }
+    PaginatedAISObdobieList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['AISObdobie'][]
+    }
+    PaginatedAllowanceList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Allowance'][]
+    }
+    PaginatedBuildingList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Building'][]
+    }
+    PaginatedConflictList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Conflict'][]
+    }
+    PaginatedConstraintList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Constraint'][]
+    }
+    PaginatedCrossSubjectCollisionList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['CrossSubjectCollision'][]
+    }
+    PaginatedEquipmentList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Equipment'][]
+    }
+    PaginatedRoleList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Role'][]
+    }
+    PaginatedRoomEquipmentList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['RoomEquipment'][]
+    }
+    PaginatedRoomGroupList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['RoomGroup'][]
+    }
+    PaginatedRoomGroupNameCountList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['RoomGroupNameCount'][]
+    }
+    PaginatedRoomList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Room'][]
+    }
+    PaginatedSubjectGroupCountsList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['SubjectGroupCounts'][]
+    }
+    PaginatedSubjectGroupList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['SubjectGroup'][]
+    }
+    PaginatedSubjectList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['Subject'][]
+    }
+    PaginatedSubjectUserRoleList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['SubjectUserRole'][]
+    }
+    PaginatedTTActivityList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['TTActivity'][]
+    }
+    PaginatedTTEventList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['TTEvent'][]
+    }
+    PaginatedTTEventTypeList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['TTEventType'][]
+    }
+    PaginatedTTEventTypeRoleMapList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['TTEventTypeRoleMap'][]
+    }
+    PaginatedTTGroupCountsList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['TTGroupCounts'][]
+    }
+    PaginatedTTGroupList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['TTGroup'][]
+    }
+    PaginatedTTList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['TT'][]
+    }
+    PaginatedUserList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['User'][]
+    }
+    PaginatedschemaList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=400&limit=100
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?offset=200&limit=100
+       */
+      previous?: string | null
+      results: components['schemas']['schema'][]
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedAllowanceRequest: {
+      tta?: number
+      amount?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedBuildingRequest: {
+      name?: string
+      abbrev?: string
+    }
+    /** @description Serializer for constraint conflicts */
+    PatchedConflictRequest: {
+      ttevent?: number
+      constraint?: number
+      /**
+       * @description * `ACTIVE` - Active
+       *     * `RESOLVED` - Resolved
+       *     * `IGNORED` - Ignored
+       * @enum {string}
+       */
+      status?: 'ACTIVE' | 'RESOLVED' | 'IGNORED'
+      /** @description JSON data for conflict details(constraint_type specific) */
+      data?: {
+        [key: string]: string
+      }
+    }
+    PatchedConstraintRequest: {
+      /**
+       * @description * `NONE` - None
+       *     * `ROOT` - Root Constraint
+       *     * `OPERATION` - Operation Constraint
+       *     * `TIMERANGE` - Time Range Constraint
+       *     * `RESOURCE` - Resource Constraint
+       * @default NONE
+       * @enum {string}
+       */
+      type: 'NONE' | 'ROOT' | 'OPERATION' | 'TIMERANGE' | 'RESOURCE'
+      /**
+       * @description * `WEAK` - Weak
+       *     * `MEDIUM` - Medium
+       *     * `STRONG` - Strong
+       * @default WEAK
+       * @enum {string}
+       */
+      strength: 'WEAK' | 'MEDIUM' | 'STRONG'
+      /** @description JSON data for constraint parameters (constraint_type specific) */
+      data?: {
+        [key: string]: unknown
+      }
+      /**
+       * @description Nested children constraints. Only used during creation.
+       * @default [
+       *       {
+       *         "type": "ROOT",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "target_type": "USER",
+       *           "target_id": 0
+       *         }
+       *       },
+       *       {
+       *         "type": "OPERATION",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "operator": "AND"
+       *         }
+       *       },
+       *       {
+       *         "type": "TIMERANGE",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "start_time": 0,
+       *           "duration": 2,
+       *           "day_of_week": 0
+       *         }
+       *       }
+       *     ]
+       */
+      nested_children: unknown
+      parent?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedEquipmentRequest: {
+      name?: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedRoomEquipmentRequest: {
+      room?: number
+      equipment?: number
+      count?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedRoomGroupRequest: {
+      name?: string
+      room?: number
+      owner?: number | null
+    }
+    PatchedRoomRequest: {
+      name?: string
+      capacity?: number
+      building?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedSubjectGroupRequest: {
+      subject?: number
+      name?: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedSubjectRequest: {
+      name?: string
+      code?: string
+      nominal_semester?: number | null
+      building?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedSubjectUserRoleRequest: {
+      user?: number
+      subject?: number
+      role?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedTTActivityRequest: {
+      subject?: number
+      event_type?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedTTEventRequest: {
+      tt?: number
+      tta?: number
+      day_of_week?: number | null
+      /** Format: int64 */
+      weeks_bitmask?: number | null
+      start_time?: number | null
+      duration?: number | null
+      room?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedTTEventTypeRequest: {
+      name?: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedTTEventTypeRoleMapRequest: {
+      event_type?: number
+      role?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedTTGroupRequest: {
+      name?: string
+      tt?: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedTTRequest: {
+      name?: string
+      description?: string | null
+      owner?: number
+      /**
+       * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
+       *
+       *     * `PUBLISHED` - Published - Published final version
+       *     * `FINAL` - Final - Representative of group
+       *     * `TEST` - Test - Minor version in group
+       * @enum {string}
+       */
+      status?: 'PUBLISHED' | 'FINAL' | 'TEST'
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    PatchedUserRequest: {
+      username?: string
+      full_name?: string | null
+      /** Format: date-time */
+      last_logout?: string | null
+    }
+    PatchedschemaRequest: {
+      human_name?: string
+      /** Format: date */
+      start_date?: string | null
+      /** Format: date */
+      end_date?: string | null
+      is_active?: boolean
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    Role: {
+      readonly id?: number
+      name: string
+      display_name: string
+      description?: string
+    }
+    Room: {
+      readonly id?: number
+      name: string
+      capacity: number
+      building: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    RoomEquipment: {
+      readonly id?: number
+      room: number
+      equipment: number
+      count: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    RoomEquipmentRequest: {
+      room: number
+      equipment: number
+      count: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    RoomGroup: {
+      readonly id?: number
+      name: string
+      room: number
+      owner?: number | null
+    }
+    RoomGroupNameCount: {
+      name: string
+      count: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    RoomGroupRequest: {
+      name: string
+      room: number
+      owner?: number | null
+    }
+    RoomRequest: {
+      name: string
+      capacity: number
+      building: number | null
+    }
+    RootConstraintData: {
+      /**
+       * @description * `USER` - USER
+       *     * `ROOM` - ROOM
+       *     * `TTA` - TTA
+       * @default USER
+       * @enum {string}
+       */
+      target_type: 'USER' | 'ROOM' | 'TTA'
+      /** @default 0 */
+      target_id: number
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      'parent.type': 'RootConstraintData'
+    }
+    RootConstraintRequest: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: 'RootConstraintRequest'
+      /**
+       * @description * `WEAK` - Weak
+       *     * `MEDIUM` - Medium
+       *     * `STRONG` - Strong
+       * @default WEAK
+       * @enum {string}
+       */
+      strength: 'WEAK' | 'MEDIUM' | 'STRONG'
+      /** @description Data specific to ROOT constraint */
+      data: {
+        [key: string]: unknown
+      }
+      /**
+       * @description Nested children constraints. Only used during creation.
+       * @default [
+       *       {
+       *         "type": "ROOT",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "target_type": "USER",
+       *           "target_id": 0
+       *         }
+       *       },
+       *       {
+       *         "type": "OPERATION",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "operator": "AND"
+       *         }
+       *       },
+       *       {
+       *         "type": "TIMERANGE",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "start_time": 0,
+       *           "duration": 2,
+       *           "day_of_week": 0
+       *         }
+       *       }
+       *     ]
+       */
+      nested_children: unknown
+      parent?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    Subject: {
+      readonly id?: number
+      name: string
+      code: string
+      nominal_semester?: number | null
+      building?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    SubjectGroup: {
+      readonly id?: number
+      subject: number
+      name: string
+    }
+    /** @description Serializer for subject groups */
+    SubjectGroupCounts: {
+      /** @description Name of the subject group */
+      name: string
+      /** @description Number of subjects in this group */
+      count: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    SubjectGroupRequest: {
+      subject: number
+      name: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    SubjectRequest: {
+      name: string
+      code: string
+      nominal_semester?: number | null
+      building?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    SubjectUserRole: {
+      readonly id?: number
+      user: number
+      subject: number
+      role: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    SubjectUserRoleRequest: {
+      user: number
+      subject: number
+      role: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TT: {
+      readonly id?: number
+      name: string
+      description?: string | null
+      owner: number
+      /**
+       * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
+       *
+       *     * `PUBLISHED` - Published - Published final version
+       *     * `FINAL` - Final - Representative of group
+       *     * `TEST` - Test - Minor version in group
+       * @enum {string}
+       */
+      status?: 'PUBLISHED' | 'FINAL' | 'TEST'
+      /** Format: date-time */
+      readonly created_at?: string
+      /** Format: date-time */
+      readonly updated_at?: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTActivity: {
+      readonly id?: number
+      subject: number
+      event_type: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTActivityRequest: {
+      subject: number
+      event_type: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTEvent: {
+      readonly id?: number
+      tt: number
+      tta: number
+      day_of_week?: number | null
+      /** Format: int64 */
+      weeks_bitmask?: number | null
+      start_time?: number | null
+      duration?: number | null
+      room?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTEventRequest: {
+      tt: number
+      tta: number
+      day_of_week?: number | null
+      /** Format: int64 */
+      weeks_bitmask?: number | null
+      start_time?: number | null
+      duration?: number | null
+      room?: number | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTEventType: {
+      readonly id?: number
+      name: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTEventTypeRequest: {
+      name: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTEventTypeRoleMap: {
+      readonly id?: number
+      event_type: number
+      role: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTEventTypeRoleMapRequest: {
+      event_type: number
+      role: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTGroup: {
+      readonly id?: number
+      name: string
+      tt: number
+    }
+    TTGroupCounts: {
+      /** @description Name of the tt group */
+      name: string
+      /** @description Number of tt in this group */
+      count: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTGroupRequest: {
+      name: string
+      tt: number
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    TTRequest: {
+      name: string
+      description?: string | null
+      owner: number
+      /**
+       * @description Published - Published final version, Final - Representative of group, Test - Minor version in group, Only one Final per TTgroup.
+       *
+       *     * `PUBLISHED` - Published - Published final version
+       *     * `FINAL` - Final - Representative of group
+       *     * `TEST` - Test - Minor version in group
+       * @enum {string}
+       */
+      status?: 'PUBLISHED' | 'FINAL' | 'TEST'
+    }
+    TimeRangeConstraintRequest: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: 'None'
+      /**
+       * @description * `WEAK` - Weak
+       *     * `MEDIUM` - Medium
+       *     * `STRONG` - Strong
+       * @default WEAK
+       * @enum {string}
+       */
+      strength: 'WEAK' | 'MEDIUM' | 'STRONG'
+      data: {
+        [key: string]: unknown
+      }
+      /**
+       * @description Nested children constraints. Only used during creation.
+       * @default [
+       *       {
+       *         "type": "ROOT",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "target_type": "USER",
+       *           "target_id": 0
+       *         }
+       *       },
+       *       {
+       *         "type": "OPERATION",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "operator": "AND"
+       *         }
+       *       },
+       *       {
+       *         "type": "TIMERANGE",
+       *         "strength": "MEDIUM",
+       *         "parent": 0,
+       *         "data": {
+       *           "start_time": 0,
+       *           "duration": 2,
+       *           "day_of_week": 0
+       *         }
+       *       }
+       *     ]
+       */
+      nested_children: unknown
+      parent?: number | null
+    }
+    TimeRangeData: {
+      /** @default 0 */
+      start_time: number
+      /** @default 2 */
+      duration: number
+      /** @default 0 */
+      day_of_week: number
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      'parent.type': 'TimeRangeData'
+    }
+    TokenObtainPair: {
+      readonly access?: string
+      readonly refresh?: string
+    }
+    TokenObtainPairRequest: {
+      username: string
+      password: string
+    }
+    TokenRefresh: {
+      readonly access?: string
+    }
+    TokenRefreshRequest: {
+      refresh: string
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    User: {
+      readonly id?: number
+      username: string
+      full_name?: string | null
+      /** Format: date-time */
+      last_logout?: string | null
+    }
+    /** @description Base serializer that automatically handles nested serialization with caching */
+    UserRequest: {
+      username: string
+      full_name?: string | null
+      /** Format: date-time */
+      last_logout?: string | null
+    }
+    schema: {
+      readonly id?: number
+      human_name: string
+      /** Format: date */
+      start_date?: string | null
+      readonly schema_name?: string
+      /** Format: date */
+      end_date?: string | null
+      is_active?: boolean
+    }
+    schemaRequest: {
+      human_name: string
+      /** Format: date */
+      start_date?: string | null
+      /** Format: date */
+      end_date?: string | null
+      is_active?: boolean
+    }
+  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
-export type $defs = Record<string, never>;
+export type $defs = Record<string, never>
 export interface operations {
-    allowence_list: {
-        parameters: {
-            query?: {
-                amount?: number;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                tta?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedAllowanceList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    allowence_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AllowanceRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AllowanceRequest"];
-                "multipart/form-data": components["schemas"]["AllowanceRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Allowance"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    allowence_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this allowance. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Allowance"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    allowence_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this allowance. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AllowanceRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AllowanceRequest"];
-                "multipart/form-data": components["schemas"]["AllowanceRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Allowance"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    allowence_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this allowance. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    allowence_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this allowance. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedAllowanceRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedAllowanceRequest"];
-                "multipart/form-data": components["schemas"]["PatchedAllowanceRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Allowance"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    buildings_list: {
-        parameters: {
-            query?: {
-                abbrev?: string;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                name?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedBuildingList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    buildings_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BuildingRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BuildingRequest"];
-                "multipart/form-data": components["schemas"]["BuildingRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Building"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    buildings_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this building. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Building"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    buildings_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this building. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BuildingRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BuildingRequest"];
-                "multipart/form-data": components["schemas"]["BuildingRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Building"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    buildings_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this building. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    buildings_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this building. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedBuildingRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBuildingRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBuildingRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Building"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    conflicts_list: {
-        parameters: {
-            query?: {
-                constraint?: number;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                status?: string;
-                ttevent?: number;
-                ttevent__tta?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedConflictList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    conflicts_retrieve: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this conflict. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Conflict"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    conflicts_update_status_partial_update: {
-        parameters: {
-            query: {
-                /** @description The NEW status of the conflict */
-                status: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this conflict. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedConflictRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedConflictRequest"];
-                "multipart/form-data": components["schemas"]["PatchedConflictRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Conflict"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    constraints_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedConstraintList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    constraints_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ConstraintRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["ConstraintRequest"];
-                "multipart/form-data": components["schemas"]["ConstraintRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Constraint"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    constraints_retrieve: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this constraint. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Constraint"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    constraints_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this constraint. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ConstraintRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["ConstraintRequest"];
-                "multipart/form-data": components["schemas"]["ConstraintRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Constraint"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    constraints_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this constraint. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    constraints_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this constraint. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedConstraintRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedConstraintRequest"];
-                "multipart/form-data": components["schemas"]["PatchedConstraintRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Constraint"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    constraints_all_constraint_data_schema_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["AllConstraintMainRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AllConstraintMainRequest"];
-                "multipart/form-data": components["schemas"]["AllConstraintMainRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AllConstraintData"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    equipment_list: {
-        parameters: {
-            query?: {
-                id?: number;
-                /** @description Multiple values may be separated by commas. */
-                id__in?: number[];
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                name?: string;
-                name__icontains?: string;
-                name__iregex?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedEquipmentList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    equipment_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EquipmentRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["EquipmentRequest"];
-                "multipart/form-data": components["schemas"]["EquipmentRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Equipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    equipment_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Equipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    equipment_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EquipmentRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["EquipmentRequest"];
-                "multipart/form-data": components["schemas"]["EquipmentRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Equipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    equipment_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    equipment_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedEquipmentRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedEquipmentRequest"];
-                "multipart/form-data": components["schemas"]["PatchedEquipmentRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Equipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    import_lsData_retrieve: {
-        parameters: {
-            query: {
-                /** @description Specifies the target directory path */
-                path: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Directory contents */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description No such path or directory. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    imports_exports_fei_import_db_create: {
-        parameters: {
-            query: {
-                /** @description Timetable ID */
-                id: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Ok_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    imports_exports_fei_import_dir_create: {
-        parameters: {
-            query: {
-                /** @description Specifies the target directory path */
-                path: string;
-                /** @description Specifies the AIS term to import; if not specified, imports terms first, call GET get_terms */
-                term?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Ok_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    imports_exports_fei_import_zip_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "multipart/form-data": {
-                    /**
-                     * Format: binary
-                     * @description ZIP file containing CSV data
-                     */
-                    file: string;
-                    /**
-                     * @description Whether to persist the ZIP in the DATA directory
-                     * @default false
-                     */
-                    persist?: boolean;
-                    /**
-                     * @description AIS term to import
-                     * @example 2023
-                     */
-                    term?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Ok_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    imports_exports_fei_terms_list: {
-        parameters: {
-            query?: {
-                department?: string;
-                /** @description Multiple values may be separated by commas. */
-                department__in?: string[];
-                id?: number;
-                /** @description Multiple values may be separated by commas. */
-                id__in?: number[];
-                /** @description Number of results to return per page. */
-                limit?: number;
-                next?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                phd?: boolean;
-                prev?: number;
-                /** @description * `ZS` - Zimny
-                 *     * `LS` - Letny */
-                semester?: "LS" | "ZS";
-                /** @description Multiple values may be separated by commas. */
-                semester__in?: string[];
-                /** @description Filter by exact year (e.g., 2023/2024) */
-                year_start?: string;
-                year_start__gte?: number;
-                /** @description Multiple values may be separated by commas. */
-                year_start__in?: number[];
-                year_start__lte?: number;
-                /** @description Filter by partial year (e.g., 2023) */
-                year_start_contains?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedAISObdobieList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    imports_exports_fei_terms_retrieve: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this AIS obdobie. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AISObdobie"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    imports_exports_fei_terms_import_dir_create: {
-        parameters: {
-            query: {
-                /** @description Directory path in DATA folder */
-                path: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Ok_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    imports_exports_fei_terms_import_zip_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "multipart/form-data": {
-                    /** Format: binary */
-                    file: string;
-                    /** @default false */
-                    persist?: boolean;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Ok_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_equipment_list: {
-        parameters: {
-            query?: {
-                count?: number;
-                count__gte?: number;
-                count__lte?: number;
-                equipment?: number;
-                /** @description Multiple values may be separated by commas. */
-                equipment__in?: number[];
-                equipment__name?: string;
-                equipment__name__icontains?: string;
-                equipment__name__iregex?: string;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                room?: number;
-                room__building?: number;
-                room__building__abbrev?: string;
-                room__building__abbrev__icontains?: string;
-                room__building__abbrev__iregex?: string;
-                /** @description Multiple values may be separated by commas. */
-                room__building__in?: number[];
-                room__building__name?: string;
-                room__building__name__icontains?: string;
-                room__building__name__iregex?: string;
-                /** @description Multiple values may be separated by commas. */
-                room__in?: number[];
-                room__name?: string;
-                room__name__icontains?: string;
-                room__name__iregex?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedRoomEquipmentList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_equipment_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RoomEquipmentRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RoomEquipmentRequest"];
-                "multipart/form-data": components["schemas"]["RoomEquipmentRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomEquipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_equipment_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomEquipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_equipment_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RoomEquipmentRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RoomEquipmentRequest"];
-                "multipart/form-data": components["schemas"]["RoomEquipmentRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomEquipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_equipment_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_equipment_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room equipment. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedRoomEquipmentRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedRoomEquipmentRequest"];
-                "multipart/form-data": components["schemas"]["PatchedRoomEquipmentRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomEquipment"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_groups_list: {
-        parameters: {
-            query?: {
-                id?: number;
-                /** @description Multiple values may be separated by commas. */
-                id__in?: number[];
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                name?: string;
-                name__icontains?: string;
-                name__iregex?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                owner?: number;
-                /** @description Multiple values may be separated by commas. */
-                owner__in?: number[];
-                owner__username?: string;
-                owner__username__icontains?: string;
-                owner__username__iregex?: string;
-                room?: number;
-                room__building?: number;
-                room__building__abbrev?: string;
-                room__building__abbrev__icontains?: string;
-                room__building__abbrev__iregex?: string;
-                /** @description Multiple values may be separated by commas. */
-                room__building__in?: number[];
-                room__building__name?: string;
-                room__building__name__icontains?: string;
-                room__building__name__iregex?: string;
-                room__equipment?: number[];
-                /** @description Multiple values may be separated by commas. */
-                room__equipment__in?: number[];
-                room__equipment__name?: string;
-                room__equipment__name__icontains?: string;
-                room__equipment__name__iregex?: string;
-                /** @description Multiple values may be separated by commas. */
-                room__in?: number[];
-                room__name?: string;
-                room__name__icontains?: string;
-                room__name__iregex?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedRoomGroupList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_groups_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RoomGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RoomGroupRequest"];
-                "multipart/form-data": components["schemas"]["RoomGroupRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_groups_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_groups_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RoomGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RoomGroupRequest"];
-                "multipart/form-data": components["schemas"]["RoomGroupRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_groups_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_groups_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedRoomGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedRoomGroupRequest"];
-                "multipart/form-data": components["schemas"]["PatchedRoomGroupRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoomGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    room_groups_list_groups_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedRoomGroupNameCountList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    rooms_list: {
-        parameters: {
-            query?: {
-                building?: number;
-                building__abbrev?: string;
-                building__abbrev__icontains?: string;
-                building__abbrev__iregex?: string;
-                /** @description Multiple values may be separated by commas. */
-                building__in?: number[];
-                building__name?: string;
-                building__name__icontains?: string;
-                building__name__iregex?: string;
-                capacity?: number;
-                capacity__gte?: number;
-                capacity__lte?: number;
-                equipment?: number[];
-                /** @description Multiple values may be separated by commas. */
-                equipment__in?: number[];
-                equipment__name?: string;
-                equipment__name__icontains?: string;
-                equipment__name__iregex?: string;
-                id?: number;
-                /** @description Multiple values may be separated by commas. */
-                id__in?: number[];
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                name?: string;
-                name__icontains?: string;
-                name__iregex?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedRoomList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    rooms_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RoomRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RoomRequest"];
-                "multipart/form-data": components["schemas"]["RoomRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Room"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    rooms_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Room"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    rooms_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RoomRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RoomRequest"];
-                "multipart/form-data": components["schemas"]["RoomRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Room"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    rooms_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    rooms_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this room. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedRoomRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedRoomRequest"];
-                "multipart/form-data": components["schemas"]["PatchedRoomRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Room"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    schemas_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedschemaList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    schemas_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["schemaRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["schemaRequest"];
-                "multipart/form-data": components["schemas"]["schemaRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["schema"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    schemas_retrieve: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this schema. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["schema"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    schemas_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this schema. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["schemaRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["schemaRequest"];
-                "multipart/form-data": components["schemas"]["schemaRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["schema"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    schemas_destroy: {
-        parameters: {
-            query?: {
-                /** @description If true, deactivates and deletes an active schema. If false, prevents deletion of active schemas. */
-                force?: boolean;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this schema. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    schemas_partial_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this schema. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedschemaRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedschemaRequest"];
-                "multipart/form-data": components["schemas"]["PatchedschemaRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["schema"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    schemas_activate_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this schema. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["schema"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_groups_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                name?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                subject?: number;
-                subject__code?: string;
-                subject__nominal_semester?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedSubjectGroupList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_groups_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectGroupRequest"];
-                "multipart/form-data": components["schemas"]["SubjectGroupRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_groups_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_groups_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectGroupRequest"];
-                "multipart/form-data": components["schemas"]["SubjectGroupRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_groups_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_groups_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedSubjectGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedSubjectGroupRequest"];
-                "multipart/form-data": components["schemas"]["PatchedSubjectGroupRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_groups_groups_list: {
-        parameters: {
-            query?: {
-                /** @description Filter groups with at least this many subjects */
-                count_gte?: number;
-                /** @description Number of results to return per page */
-                limit?: number;
-                /** @description Filter group names by regex pattern (case insensitive) */
-                name_regex?: string;
-                /** @description The initial index from which to return the results */
-                offset?: number;
-                /** @description Order by count (use - for descending) */
-                order?: "-count" | "count";
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedSubjectGroupCountsList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_collisions_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                subject_a?: number;
-                subject_b?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedCrossSubjectCollisionList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_roles_list: {
-        parameters: {
-            query?: {
-                count__gte?: number;
-                count__lte?: number;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                role?: string;
-                role__name?: string;
-                /** @description Multiple values may be separated by commas. */
-                role_id__in?: number[];
-                subject?: number;
-                subject__code?: string;
-                /** @description Multiple values may be separated by commas. */
-                subject_id__in?: number[];
-                user?: number;
-                /** @description Multiple values may be separated by commas. */
-                user__in?: number[];
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedSubjectUserRoleList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_roles_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectUserRoleRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectUserRoleRequest"];
-                "multipart/form-data": components["schemas"]["SubjectUserRoleRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_roles_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_roles_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectUserRoleRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectUserRoleRequest"];
-                "multipart/form-data": components["schemas"]["SubjectUserRoleRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_roles_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_roles_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject user role. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedSubjectUserRoleRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedSubjectUserRoleRequest"];
-                "multipart/form-data": components["schemas"]["PatchedSubjectUserRoleRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubjectUserRole"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subject_user_roles_list_roles_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedRoleList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subjects_list: {
-        parameters: {
-            query?: {
-                code?: string;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                name?: string;
-                nominal_semester?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedSubjectList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subjects_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectRequest"];
-                "multipart/form-data": components["schemas"]["SubjectRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Subject"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subjects_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Subject"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subjects_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubjectRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SubjectRequest"];
-                "multipart/form-data": components["schemas"]["SubjectRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Subject"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subjects_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subjects_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this subject. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedSubjectRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedSubjectRequest"];
-                "multipart/form-data": components["schemas"]["PatchedSubjectRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Subject"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    subjects_get_student_count_retrieve: {
-        parameters: {
-            query?: {
-                /** @description ID of the subject to filter by */
-                subject_id?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description List of subjects with student counts. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        subject_id?: number;
-                        student_count?: number;
-                    }[];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    token_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TokenObtainPairRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TokenObtainPairRequest"];
-                "multipart/form-data": components["schemas"]["TokenObtainPairRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenObtainPair"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    token_refresh_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TokenRefreshRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TokenRefreshRequest"];
-                "multipart/form-data": components["schemas"]["TokenRefreshRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenRefresh"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    tt_list: {
-        parameters: {
-            query?: {
-                /** @description Filter by creation date (format: YYYY-MM-DD) */
-                created_at?: string;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description Case-insensitive search for timetable name */
-                name?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description Filter by timetable status
-                 *
-                 *     * `PUBLISHED` - Published - Published final version
-                 *     * `FINAL` - Final - Representative of group
-                 *     * `TEST` - Test - Minor version in group */
-                status?: "FINAL" | "PUBLISHED" | "TEST";
-                /** @description Filter by last update date (format: YYYY-MM-DD) */
-                updated_at?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    tt_create: {
-        parameters: {
-            query?: {
-                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
-                force?: boolean;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTRequest"];
-                "multipart/form-data": components["schemas"]["TTRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TT"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    tt_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TT"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    tt_update: {
-        parameters: {
-            query?: {
-                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
-                force?: boolean;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTRequest"];
-                "multipart/form-data": components["schemas"]["TTRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TT"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    tt_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    tt_partial_update: {
-        parameters: {
-            query?: {
-                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
-                force?: boolean;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedTTRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTRequest"];
-                "multipart/form-data": components["schemas"]["PatchedTTRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TT"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttactivity_list: {
-        parameters: {
-            query?: {
-                /** @description Filter by event type ID */
-                event_type?: number;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description Filter by subject ID */
-                subject?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTActivityList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttactivity_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTActivityRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTActivityRequest"];
-                "multipart/form-data": components["schemas"]["TTActivityRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTActivity"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttactivity_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt activity. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTActivity"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttactivity_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt activity. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTActivityRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTActivityRequest"];
-                "multipart/form-data": components["schemas"]["TTActivityRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTActivity"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttactivity_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt activity. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttactivity_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt activity. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedTTActivityRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTActivityRequest"];
-                "multipart/form-data": components["schemas"]["PatchedTTActivityRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTActivity"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttecontroller_generate_tte_events_list: {
-        parameters: {
-            query: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Specifies the subjectgroup name */
-                subjectgroup_name: string;
-                /** @description Specifies subjects by nominal_semester */
-                subjects__nominal_semester?: string;
-                /** @description Specifies the tt by ID */
-                tt_id: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTEventList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetype_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description Case-insensitive search for event type name */
-                name?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTEventTypeList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetype_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTEventTypeRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRequest"];
-                "multipart/form-data": components["schemas"]["TTEventTypeRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventType"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetype_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventType"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetype_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTEventTypeRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRequest"];
-                "multipart/form-data": components["schemas"]["TTEventTypeRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventType"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetype_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetype_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedTTEventTypeRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTEventTypeRequest"];
-                "multipart/form-data": components["schemas"]["PatchedTTEventTypeRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventType"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetypemapper_list: {
-        parameters: {
-            query?: {
-                /** @description Filter by event type ID */
-                event_type?: number;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description Filter by role ID */
-                role?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTEventTypeRoleMapList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetypemapper_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTEventTypeRoleMapRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRoleMapRequest"];
-                "multipart/form-data": components["schemas"]["TTEventTypeRoleMapRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetypemapper_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type role map. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetypemapper_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type role map. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTEventTypeRoleMapRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTEventTypeRoleMapRequest"];
-                "multipart/form-data": components["schemas"]["TTEventTypeRoleMapRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetypemapper_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type role map. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttetypemapper_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event type role map. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedTTEventTypeRoleMapRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTEventTypeRoleMapRequest"];
-                "multipart/form-data": components["schemas"]["PatchedTTEventTypeRoleMapRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEventTypeRoleMap"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttevent_list: {
-        parameters: {
-            query?: {
-                /** @description Day of week (0=Monday, 1=Tuesday, ..., 6=Sunday) */
-                day_of_week?: number;
-                /** @description Event duration in number of time slots */
-                duration?: number;
-                /** @description Filter by event type ID (lecture, lab, etc.) */
-                event_type?: number;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description Filter by room ID */
-                room?: number;
-                /** @description Time slot (e.g., 0=07:00, 1=8:30, 2=10:00) */
-                start_time?: number;
-                /** @description Filter by subject ID */
-                subject?: number;
-                /** @description Regex search for subject code (e.g., API, AZA) */
-                subject__code?: string;
-                /** @description Filter by timetable ID */
-                tt?: number;
-                /** @description Binary mask for weeks (e.g., 15=first 4 weeks, 255=first 8 weeks) */
-                weeks_bitmask?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTEventList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttevent_create: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTEventRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTEventRequest"];
-                "multipart/form-data": components["schemas"]["TTEventRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEvent"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttevent_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEvent"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttevent_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTEventRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTEventRequest"];
-                "multipart/form-data": components["schemas"]["TTEventRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEvent"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttevent_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttevent_partial_update: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt event. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedTTEventRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTEventRequest"];
-                "multipart/form-data": components["schemas"]["PatchedTTEventRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTEvent"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttgroup_list: {
-        parameters: {
-            query?: {
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description Case-insensitive search for group name */
-                name?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description Filter by timetable ID */
-                timetables?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTGroupList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttgroup_create: {
-        parameters: {
-            query?: {
-                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
-                force?: boolean;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTGroupRequest"];
-                "multipart/form-data": components["schemas"]["TTGroupRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttgroup_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttgroup_update: {
-        parameters: {
-            query?: {
-                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
-                force?: boolean;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TTGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TTGroupRequest"];
-                "multipart/form-data": components["schemas"]["TTGroupRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttgroup_destroy: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttgroup_partial_update: {
-        parameters: {
-            query?: {
-                /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
-                force?: boolean;
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path: {
-                /** @description A unique integer value identifying this tt group. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedTTGroupRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedTTGroupRequest"];
-                "multipart/form-data": components["schemas"]["PatchedTTGroupRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TTGroup"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    ttgroup_groups_list: {
-        parameters: {
-            query?: {
-                /** @description Filter groups with at least this many subjects */
-                count_gte?: number;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Filter group names by regex pattern (case insensitive) */
-                name_regex?: string;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Order by count (use - for descending) */
-                order?: "-count" | "count";
-            };
-            header: {
-                /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
-                "X-Term": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedTTGroupCountsList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    users_list: {
-        parameters: {
-            query?: {
-                full_name?: string;
-                /** @description Number of results to return per page. */
-                limit?: number;
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-                /** @description The initial index from which to return the results. */
-                offset?: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                username?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedUserList"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    users_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["UserRequest"];
-                "multipart/form-data": components["schemas"]["UserRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    users_retrieve: {
-        parameters: {
-            query?: {
-                /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
-                "max-level"?: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this user. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    users_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this user. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["UserRequest"];
-                "multipart/form-data": components["schemas"]["UserRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    users_destroy: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this user. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
-    users_partial_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this user. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedUserRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedUserRequest"];
-                "multipart/form-data": components["schemas"]["PatchedUserRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-            /** @description Default Error Model */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-            /** @description Default Error Model */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Err_serializer"];
-                };
-            };
-        };
-    };
+  allowence_list: {
+    parameters: {
+      query?: {
+        amount?: number
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        tta?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedAllowanceList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  allowence_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AllowanceRequest']
+        'application/x-www-form-urlencoded': components['schemas']['AllowanceRequest']
+        'multipart/form-data': components['schemas']['AllowanceRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Allowance']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  allowence_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this allowance. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Allowance']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  allowence_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this allowance. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AllowanceRequest']
+        'application/x-www-form-urlencoded': components['schemas']['AllowanceRequest']
+        'multipart/form-data': components['schemas']['AllowanceRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Allowance']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  allowence_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this allowance. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  allowence_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this allowance. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedAllowanceRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedAllowanceRequest']
+        'multipart/form-data': components['schemas']['PatchedAllowanceRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Allowance']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  buildings_list: {
+    parameters: {
+      query?: {
+        abbrev?: string
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        name?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedBuildingList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  buildings_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BuildingRequest']
+        'application/x-www-form-urlencoded': components['schemas']['BuildingRequest']
+        'multipart/form-data': components['schemas']['BuildingRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Building']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  buildings_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this building. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Building']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  buildings_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this building. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BuildingRequest']
+        'application/x-www-form-urlencoded': components['schemas']['BuildingRequest']
+        'multipart/form-data': components['schemas']['BuildingRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Building']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  buildings_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this building. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  buildings_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this building. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedBuildingRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedBuildingRequest']
+        'multipart/form-data': components['schemas']['PatchedBuildingRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Building']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  conflicts_list: {
+    parameters: {
+      query?: {
+        constraint?: number
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        status?: string
+        ttevent?: number
+        ttevent__tta?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedConflictList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  conflicts_retrieve: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this conflict. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Conflict']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  conflicts_update_status_partial_update: {
+    parameters: {
+      query: {
+        /** @description The NEW status of the conflict */
+        status: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this conflict. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedConflictRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedConflictRequest']
+        'multipart/form-data': components['schemas']['PatchedConflictRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Conflict']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  constraints_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedConstraintList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  constraints_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConstraintRequest']
+        'application/x-www-form-urlencoded': components['schemas']['ConstraintRequest']
+        'multipart/form-data': components['schemas']['ConstraintRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Constraint']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  constraints_retrieve: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this constraint. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Constraint']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  constraints_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this constraint. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConstraintRequest']
+        'application/x-www-form-urlencoded': components['schemas']['ConstraintRequest']
+        'multipart/form-data': components['schemas']['ConstraintRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Constraint']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  constraints_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this constraint. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  constraints_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this constraint. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedConstraintRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedConstraintRequest']
+        'multipart/form-data': components['schemas']['PatchedConstraintRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Constraint']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  constraints_all_constraint_data_schema_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['AllConstraintMainRequest']
+        'application/x-www-form-urlencoded': components['schemas']['AllConstraintMainRequest']
+        'multipart/form-data': components['schemas']['AllConstraintMainRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AllConstraintData']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  equipment_list: {
+    parameters: {
+      query?: {
+        id?: number
+        /** @description Multiple values may be separated by commas. */
+        id__in?: number[]
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        name?: string
+        name__icontains?: string
+        name__iregex?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedEquipmentList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  equipment_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EquipmentRequest']
+        'application/x-www-form-urlencoded': components['schemas']['EquipmentRequest']
+        'multipart/form-data': components['schemas']['EquipmentRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Equipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  equipment_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Equipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  equipment_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EquipmentRequest']
+        'application/x-www-form-urlencoded': components['schemas']['EquipmentRequest']
+        'multipart/form-data': components['schemas']['EquipmentRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Equipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  equipment_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  equipment_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedEquipmentRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedEquipmentRequest']
+        'multipart/form-data': components['schemas']['PatchedEquipmentRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Equipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  import_lsData_retrieve: {
+    parameters: {
+      query: {
+        /** @description Specifies the target directory path */
+        path: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Directory contents */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description No such path or directory. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  imports_exports_fei_import_db_create: {
+    parameters: {
+      query: {
+        /** @description Timetable ID */
+        id: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Ok_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  imports_exports_fei_import_dir_create: {
+    parameters: {
+      query: {
+        /** @description Specifies the target directory path */
+        path: string
+        /** @description Specifies the AIS term to import; if not specified, imports terms first, call GET get_terms */
+        term?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Ok_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  imports_exports_fei_import_zip_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'multipart/form-data': {
+          /**
+           * Format: binary
+           * @description ZIP file containing CSV data
+           */
+          file: string
+          /**
+           * @description Whether to persist the ZIP in the DATA directory
+           * @default false
+           */
+          persist?: boolean
+          /**
+           * @description AIS term to import
+           * @example 2023
+           */
+          term?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Ok_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  imports_exports_fei_terms_list: {
+    parameters: {
+      query?: {
+        department?: string
+        /** @description Multiple values may be separated by commas. */
+        department__in?: string[]
+        id?: number
+        /** @description Multiple values may be separated by commas. */
+        id__in?: number[]
+        /** @description Number of results to return per page. */
+        limit?: number
+        next?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        phd?: boolean
+        prev?: number
+        /** @description * `ZS` - Zimny
+         *     * `LS` - Letny */
+        semester?: 'LS' | 'ZS'
+        /** @description Multiple values may be separated by commas. */
+        semester__in?: string[]
+        /** @description Filter by exact year (e.g., 2023/2024) */
+        year_start?: string
+        year_start__gte?: number
+        /** @description Multiple values may be separated by commas. */
+        year_start__in?: number[]
+        year_start__lte?: number
+        /** @description Filter by partial year (e.g., 2023) */
+        year_start_contains?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedAISObdobieList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  imports_exports_fei_terms_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this AIS obdobie. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AISObdobie']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  imports_exports_fei_terms_import_dir_create: {
+    parameters: {
+      query: {
+        /** @description Directory path in DATA folder */
+        path: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Ok_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  imports_exports_fei_terms_import_zip_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string
+          /** @default false */
+          persist?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Ok_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_equipment_list: {
+    parameters: {
+      query?: {
+        count?: number
+        count__gte?: number
+        count__lte?: number
+        equipment?: number
+        /** @description Multiple values may be separated by commas. */
+        equipment__in?: number[]
+        equipment__name?: string
+        equipment__name__icontains?: string
+        equipment__name__iregex?: string
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        room?: number
+        room__building?: number
+        room__building__abbrev?: string
+        room__building__abbrev__icontains?: string
+        room__building__abbrev__iregex?: string
+        /** @description Multiple values may be separated by commas. */
+        room__building__in?: number[]
+        room__building__name?: string
+        room__building__name__icontains?: string
+        room__building__name__iregex?: string
+        /** @description Multiple values may be separated by commas. */
+        room__in?: number[]
+        room__name?: string
+        room__name__icontains?: string
+        room__name__iregex?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedRoomEquipmentList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_equipment_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoomEquipmentRequest']
+        'application/x-www-form-urlencoded': components['schemas']['RoomEquipmentRequest']
+        'multipart/form-data': components['schemas']['RoomEquipmentRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomEquipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_equipment_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomEquipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_equipment_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoomEquipmentRequest']
+        'application/x-www-form-urlencoded': components['schemas']['RoomEquipmentRequest']
+        'multipart/form-data': components['schemas']['RoomEquipmentRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomEquipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_equipment_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_equipment_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room equipment. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedRoomEquipmentRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedRoomEquipmentRequest']
+        'multipart/form-data': components['schemas']['PatchedRoomEquipmentRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomEquipment']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_groups_list: {
+    parameters: {
+      query?: {
+        id?: number
+        /** @description Multiple values may be separated by commas. */
+        id__in?: number[]
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        name?: string
+        name__icontains?: string
+        name__iregex?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        owner?: number
+        /** @description Multiple values may be separated by commas. */
+        owner__in?: number[]
+        owner__username?: string
+        owner__username__icontains?: string
+        owner__username__iregex?: string
+        room?: number
+        room__building?: number
+        room__building__abbrev?: string
+        room__building__abbrev__icontains?: string
+        room__building__abbrev__iregex?: string
+        /** @description Multiple values may be separated by commas. */
+        room__building__in?: number[]
+        room__building__name?: string
+        room__building__name__icontains?: string
+        room__building__name__iregex?: string
+        room__equipment?: number[]
+        /** @description Multiple values may be separated by commas. */
+        room__equipment__in?: number[]
+        room__equipment__name?: string
+        room__equipment__name__icontains?: string
+        room__equipment__name__iregex?: string
+        /** @description Multiple values may be separated by commas. */
+        room__in?: number[]
+        room__name?: string
+        room__name__icontains?: string
+        room__name__iregex?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedRoomGroupList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_groups_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoomGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['RoomGroupRequest']
+        'multipart/form-data': components['schemas']['RoomGroupRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_groups_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_groups_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoomGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['RoomGroupRequest']
+        'multipart/form-data': components['schemas']['RoomGroupRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_groups_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_groups_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedRoomGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedRoomGroupRequest']
+        'multipart/form-data': components['schemas']['PatchedRoomGroupRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RoomGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  room_groups_list_groups_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedRoomGroupNameCountList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  rooms_list: {
+    parameters: {
+      query?: {
+        building?: number
+        building__abbrev?: string
+        building__abbrev__icontains?: string
+        building__abbrev__iregex?: string
+        /** @description Multiple values may be separated by commas. */
+        building__in?: number[]
+        building__name?: string
+        building__name__icontains?: string
+        building__name__iregex?: string
+        capacity?: number
+        capacity__gte?: number
+        capacity__lte?: number
+        equipment?: number[]
+        /** @description Multiple values may be separated by commas. */
+        equipment__in?: number[]
+        equipment__name?: string
+        equipment__name__icontains?: string
+        equipment__name__iregex?: string
+        id?: number
+        /** @description Multiple values may be separated by commas. */
+        id__in?: number[]
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        name?: string
+        name__icontains?: string
+        name__iregex?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedRoomList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  rooms_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoomRequest']
+        'application/x-www-form-urlencoded': components['schemas']['RoomRequest']
+        'multipart/form-data': components['schemas']['RoomRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Room']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  rooms_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Room']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  rooms_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RoomRequest']
+        'application/x-www-form-urlencoded': components['schemas']['RoomRequest']
+        'multipart/form-data': components['schemas']['RoomRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Room']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  rooms_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  rooms_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this room. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedRoomRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedRoomRequest']
+        'multipart/form-data': components['schemas']['PatchedRoomRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Room']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  schemas_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedschemaList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  schemas_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['schemaRequest']
+        'application/x-www-form-urlencoded': components['schemas']['schemaRequest']
+        'multipart/form-data': components['schemas']['schemaRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['schema']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  schemas_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this schema. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['schema']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  schemas_update: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this schema. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['schemaRequest']
+        'application/x-www-form-urlencoded': components['schemas']['schemaRequest']
+        'multipart/form-data': components['schemas']['schemaRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['schema']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  schemas_destroy: {
+    parameters: {
+      query?: {
+        /** @description If true, deactivates and deletes an active schema. If false, prevents deletion of active schemas. */
+        force?: boolean
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this schema. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  schemas_partial_update: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this schema. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedschemaRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedschemaRequest']
+        'multipart/form-data': components['schemas']['PatchedschemaRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['schema']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  schemas_activate_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this schema. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['schema']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_groups_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        name?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        subject?: number
+        subject__code?: string
+        subject__nominal_semester?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedSubjectGroupList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_groups_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubjectGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['SubjectGroupRequest']
+        'multipart/form-data': components['schemas']['SubjectGroupRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_groups_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_groups_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubjectGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['SubjectGroupRequest']
+        'multipart/form-data': components['schemas']['SubjectGroupRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_groups_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_groups_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedSubjectGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedSubjectGroupRequest']
+        'multipart/form-data': components['schemas']['PatchedSubjectGroupRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_groups_groups_list: {
+    parameters: {
+      query?: {
+        /** @description Filter groups with at least this many subjects */
+        count_gte?: number
+        /** @description Number of results to return per page */
+        limit?: number
+        /** @description Filter group names by regex pattern (case insensitive) */
+        name_regex?: string
+        /** @description The initial index from which to return the results */
+        offset?: number
+        /** @description Order by count (use - for descending) */
+        order?: '-count' | 'count'
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedSubjectGroupCountsList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_collisions_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        subject_a?: number
+        subject_b?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedCrossSubjectCollisionList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_roles_list: {
+    parameters: {
+      query?: {
+        count__gte?: number
+        count__lte?: number
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        role?: string
+        role__name?: string
+        /** @description Multiple values may be separated by commas. */
+        role_id__in?: number[]
+        subject?: number
+        subject__code?: string
+        /** @description Multiple values may be separated by commas. */
+        subject_id__in?: number[]
+        user?: number
+        /** @description Multiple values may be separated by commas. */
+        user__in?: number[]
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedSubjectUserRoleList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_roles_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubjectUserRoleRequest']
+        'application/x-www-form-urlencoded': components['schemas']['SubjectUserRoleRequest']
+        'multipart/form-data': components['schemas']['SubjectUserRoleRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectUserRole']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_roles_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject user role. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectUserRole']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_roles_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject user role. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubjectUserRoleRequest']
+        'application/x-www-form-urlencoded': components['schemas']['SubjectUserRoleRequest']
+        'multipart/form-data': components['schemas']['SubjectUserRoleRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectUserRole']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_roles_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject user role. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_roles_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject user role. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedSubjectUserRoleRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedSubjectUserRoleRequest']
+        'multipart/form-data': components['schemas']['PatchedSubjectUserRoleRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SubjectUserRole']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subject_user_roles_list_roles_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedRoleList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subjects_list: {
+    parameters: {
+      query?: {
+        code?: string
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        name?: string
+        nominal_semester?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedSubjectList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subjects_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubjectRequest']
+        'application/x-www-form-urlencoded': components['schemas']['SubjectRequest']
+        'multipart/form-data': components['schemas']['SubjectRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Subject']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subjects_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Subject']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subjects_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubjectRequest']
+        'application/x-www-form-urlencoded': components['schemas']['SubjectRequest']
+        'multipart/form-data': components['schemas']['SubjectRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Subject']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subjects_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subjects_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this subject. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedSubjectRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedSubjectRequest']
+        'multipart/form-data': components['schemas']['PatchedSubjectRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Subject']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  subjects_get_student_count_retrieve: {
+    parameters: {
+      query?: {
+        /** @description ID of the subject to filter by */
+        subject_id?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description List of subjects with student counts. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            subject_id?: number
+            student_count?: number
+          }[]
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  token_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TokenObtainPairRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TokenObtainPairRequest']
+        'multipart/form-data': components['schemas']['TokenObtainPairRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TokenObtainPair']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  token_refresh_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TokenRefreshRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TokenRefreshRequest']
+        'multipart/form-data': components['schemas']['TokenRefreshRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TokenRefresh']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  tt_list: {
+    parameters: {
+      query?: {
+        /** @description Filter by creation date (format: YYYY-MM-DD) */
+        created_at?: string
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description Case-insensitive search for timetable name */
+        name?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Filter by timetable status
+         *
+         *     * `PUBLISHED` - Published - Published final version
+         *     * `FINAL` - Final - Representative of group
+         *     * `TEST` - Test - Minor version in group */
+        status?: 'FINAL' | 'PUBLISHED' | 'TEST'
+        /** @description Filter by last update date (format: YYYY-MM-DD) */
+        updated_at?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  tt_create: {
+    parameters: {
+      query?: {
+        /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+        force?: boolean
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTRequest']
+        'multipart/form-data': components['schemas']['TTRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TT']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  tt_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TT']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  tt_update: {
+    parameters: {
+      query?: {
+        /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+        force?: boolean
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTRequest']
+        'multipart/form-data': components['schemas']['TTRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TT']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  tt_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  tt_partial_update: {
+    parameters: {
+      query?: {
+        /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+        force?: boolean
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedTTRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedTTRequest']
+        'multipart/form-data': components['schemas']['PatchedTTRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TT']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttactivity_list: {
+    parameters: {
+      query?: {
+        /** @description Filter by event type ID */
+        event_type?: number
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Filter by subject ID */
+        subject?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTActivityList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttactivity_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTActivityRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTActivityRequest']
+        'multipart/form-data': components['schemas']['TTActivityRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTActivity']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttactivity_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt activity. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTActivity']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttactivity_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt activity. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTActivityRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTActivityRequest']
+        'multipart/form-data': components['schemas']['TTActivityRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTActivity']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttactivity_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt activity. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttactivity_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt activity. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedTTActivityRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedTTActivityRequest']
+        'multipart/form-data': components['schemas']['PatchedTTActivityRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTActivity']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttecontroller_generate_tte_events_list: {
+    parameters: {
+      query: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Specifies the subjectgroup name */
+        subjectgroup_name: string
+        /** @description Specifies subjects by nominal_semester */
+        subjects__nominal_semester?: string
+        /** @description Specifies the tt by ID */
+        tt_id: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTEventList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetype_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description Case-insensitive search for event type name */
+        name?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTEventTypeList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetype_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTEventTypeRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTEventTypeRequest']
+        'multipart/form-data': components['schemas']['TTEventTypeRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventType']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetype_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventType']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetype_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTEventTypeRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTEventTypeRequest']
+        'multipart/form-data': components['schemas']['TTEventTypeRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventType']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetype_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetype_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedTTEventTypeRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedTTEventTypeRequest']
+        'multipart/form-data': components['schemas']['PatchedTTEventTypeRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventType']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetypemapper_list: {
+    parameters: {
+      query?: {
+        /** @description Filter by event type ID */
+        event_type?: number
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Filter by role ID */
+        role?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTEventTypeRoleMapList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetypemapper_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTEventTypeRoleMapRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTEventTypeRoleMapRequest']
+        'multipart/form-data': components['schemas']['TTEventTypeRoleMapRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventTypeRoleMap']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetypemapper_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type role map. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventTypeRoleMap']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetypemapper_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type role map. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTEventTypeRoleMapRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTEventTypeRoleMapRequest']
+        'multipart/form-data': components['schemas']['TTEventTypeRoleMapRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventTypeRoleMap']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetypemapper_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type role map. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttetypemapper_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event type role map. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedTTEventTypeRoleMapRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedTTEventTypeRoleMapRequest']
+        'multipart/form-data': components['schemas']['PatchedTTEventTypeRoleMapRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEventTypeRoleMap']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttevent_list: {
+    parameters: {
+      query?: {
+        /** @description Day of week (0=Monday, 1=Tuesday, ..., 6=Sunday) */
+        day_of_week?: number
+        /** @description Event duration in number of time slots */
+        duration?: number
+        /** @description Filter by event type ID (lecture, lab, etc.) */
+        event_type?: number
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Filter by room ID */
+        room?: number
+        /** @description Time slot (e.g., 0=07:00, 1=8:30, 2=10:00) */
+        start_time?: number
+        /** @description Filter by subject ID */
+        subject?: number
+        /** @description Regex search for subject code (e.g., API, AZA) */
+        subject__code?: string
+        /** @description Filter by timetable ID */
+        tt?: number
+        /** @description Binary mask for weeks (e.g., 15=first 4 weeks, 255=first 8 weeks) */
+        weeks_bitmask?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTEventList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttevent_create: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTEventRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTEventRequest']
+        'multipart/form-data': components['schemas']['TTEventRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEvent']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttevent_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEvent']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttevent_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTEventRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTEventRequest']
+        'multipart/form-data': components['schemas']['TTEventRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEvent']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttevent_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttevent_partial_update: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt event. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedTTEventRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedTTEventRequest']
+        'multipart/form-data': components['schemas']['PatchedTTEventRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTEvent']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttgroup_list: {
+    parameters: {
+      query?: {
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description Case-insensitive search for group name */
+        name?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Filter by timetable ID */
+        timetables?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTGroupList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttgroup_create: {
+    parameters: {
+      query?: {
+        /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+        force?: boolean
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTGroupRequest']
+        'multipart/form-data': components['schemas']['TTGroupRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttgroup_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttgroup_update: {
+    parameters: {
+      query?: {
+        /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+        force?: boolean
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TTGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['TTGroupRequest']
+        'multipart/form-data': components['schemas']['TTGroupRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttgroup_destroy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttgroup_partial_update: {
+    parameters: {
+      query?: {
+        /** @description When true, forces update of TT status even if conflicts exist by setting remote_statuses to TEST */
+        force?: boolean
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path: {
+        /** @description A unique integer value identifying this tt group. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedTTGroupRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedTTGroupRequest']
+        'multipart/form-data': components['schemas']['PatchedTTGroupRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TTGroup']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  ttgroup_groups_list: {
+    parameters: {
+      query?: {
+        /** @description Filter groups with at least this many subjects */
+        count_gte?: number
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Filter group names by regex pattern (case insensitive) */
+        name_regex?: string
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Order by count (use - for descending) */
+        order?: '-count' | 'count'
+      }
+      header: {
+        /** @description Term provided in a header, e.g., 'term_WS_2024_2025' */
+        'X-Term': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedTTGroupCountsList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  users_list: {
+    parameters: {
+      query?: {
+        full_name?: string
+        /** @description Number of results to return per page. */
+        limit?: number
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+        /** @description The initial index from which to return the results. */
+        offset?: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        username?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedUserList']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  users_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserRequest']
+        'application/x-www-form-urlencoded': components['schemas']['UserRequest']
+        'multipart/form-data': components['schemas']['UserRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['User']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  users_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Maximum nesting level for serialized objects.Use with causion of circular references */
+        'max-level'?: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this user. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['User']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  users_update: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this user. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserRequest']
+        'application/x-www-form-urlencoded': components['schemas']['UserRequest']
+        'multipart/form-data': components['schemas']['UserRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['User']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  users_destroy: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this user. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
+  users_partial_update: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this user. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedUserRequest']
+        'application/x-www-form-urlencoded': components['schemas']['PatchedUserRequest']
+        'multipart/form-data': components['schemas']['PatchedUserRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['User']
+        }
+      }
+      /** @description Default Error Model */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+      /** @description Default Error Model */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Err_serializer']
+        }
+      }
+    }
+  }
 }

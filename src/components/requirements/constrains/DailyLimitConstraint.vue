@@ -1,7 +1,3 @@
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-
-<template>
-    Daily limit
-</template>
+<template>Daily limit</template>

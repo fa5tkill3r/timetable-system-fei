@@ -8,8 +8,8 @@ const i18n = createI18n({
   fallbackLocale: 'en',
   messages: {
     en,
-    sk
-  }
+    sk,
+  },
 })
 
 export default i18n

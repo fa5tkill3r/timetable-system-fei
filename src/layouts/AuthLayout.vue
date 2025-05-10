@@ -1,11 +1,11 @@
 <script setup lang="ts">
-// No imports needed
+  // No imports needed
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen h-screen">
+  <div class="flex h-screen min-h-screen flex-col">
     <!-- Auth content - full height, no header -->
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex flex-1 overflow-hidden">
       <slot></slot>
     </div>
   </div>

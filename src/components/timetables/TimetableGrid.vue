@@ -1,155 +1,195 @@
 <script setup lang="ts">
-import { ref, computed, CSSProperties, PropType } from 'vue'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Skeleton } from '@/components/ui/skeleton'
+  import { ref, computed, CSSProperties, PropType } from 'vue'
+  import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+  import { Skeleton } from '@/components/ui/skeleton'
 
-interface TimeSlot {
-  from: string
-  to: string
-  index: number
-}
-
-const props = defineProps({
-  days: {
-    type: Array as PropType<string[]>,
-    required: true
-  },
-  timeSlots: {
-    type: Array as PropType<TimeSlot[]>,
-    required: true
-  },
-  getCellStyle: {
-    type: Function as PropType<(dayIndex: number, timeIndex: number) => CSSProperties>,
-    required: true
-  },
-  getHeaderStyle: {
-    type: Function as PropType<(index: number) => CSSProperties>,
-    required: true
-  },
-  getDayStyle: {
-    type: Function as PropType<(index: number) => CSSProperties>,
-    required: true
-  },
-  cornerCellStyle: {
-    type: Object as PropType<CSSProperties>,
-    required: true
-  },
-  containerStyle: {
-    type: Object as PropType<CSSProperties>,
-    required: true
-  },
-  isResizing: {
-    type: Boolean,
-    default: false
-  },
-  compact: {
-    type: Boolean,
-    default: false
-  },
-  isDragging: {
-    type: Boolean,
-    default: false
+  interface TimeSlot {
+    from: string
+    to: string
+    index: number
   }
-})
 
-const emit = defineEmits([
-  'cellClick',
-  'cellMouseOver',
-  'cellMouseDown',
-  'mouseLeave',
-  'dragOver',
-  'dragEnter',
-  'dragLeave',
-  'drop',
-  'dragEnd',
-  'cellContextMenu'
-])
+  const props = defineProps({
+    days: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    timeSlots: {
+      type: Array as PropType<TimeSlot[]>,
+      required: true,
+    },
+    getCellStyle: {
+      type: Function as PropType<
+        (dayIndex: number, timeIndex: number) => CSSProperties
+      >,
+      required: true,
+    },
+    getHeaderStyle: {
+      type: Function as PropType<(index: number) => CSSProperties>,
+      required: true,
+    },
+    getDayStyle: {
+      type: Function as PropType<(index: number) => CSSProperties>,
+      required: true,
+    },
+    cornerCellStyle: {
+      type: Object as PropType<CSSProperties>,
+      required: true,
+    },
+    containerStyle: {
+      type: Object as PropType<CSSProperties>,
+      required: true,
+    },
+    isResizing: {
+      type: Boolean,
+      default: false,
+    },
+    compact: {
+      type: Boolean,
+      default: false,
+    },
+    isDragging: {
+      type: Boolean,
+      default: false,
+    },
+  })
 
-function handleCellClick(dayIndex: number, timeIndex: number) {
-  emit('cellClick', dayIndex, timeIndex)
-}
+  const emit = defineEmits([
+    'cellClick',
+    'cellMouseOver',
+    'cellMouseDown',
+    'mouseLeave',
+    'dragOver',
+    'dragEnter',
+    'dragLeave',
+    'drop',
+    'dragEnd',
+    'cellContextMenu',
+  ])
 
-function handleMouseDown(event: MouseEvent, dayIndex: number, timeIndex: number) {
-  emit('cellMouseDown', dayIndex, timeIndex, event)
-}
+  function handleCellClick(dayIndex: number, timeIndex: number) {
+    emit('cellClick', dayIndex, timeIndex)
+  }
 
-function handleMouseOver(event: MouseEvent, dayIndex: number, timeIndex: number) {
-  emit('cellMouseOver', dayIndex, timeIndex, event)
-}
+  function handleMouseDown(
+    event: MouseEvent,
+    dayIndex: number,
+    timeIndex: number,
+  ) {
+    emit('cellMouseDown', dayIndex, timeIndex, event)
+  }
 
-function handleMouseLeave() {
-  emit('mouseLeave')
-}
+  function handleMouseOver(
+    event: MouseEvent,
+    dayIndex: number,
+    timeIndex: number,
+  ) {
+    emit('cellMouseOver', dayIndex, timeIndex, event)
+  }
 
-function handleDragOver(event: DragEvent) {
-  emit('dragOver', event)
-}
+  function handleMouseLeave() {
+    emit('mouseLeave')
+  }
 
-function handleDragEnter(event: DragEvent) {
-  emit('dragEnter', event)
-}
+  function handleDragOver(event: DragEvent) {
+    emit('dragOver', event)
+  }
 
-function handleDragLeave(event: DragEvent) {
-  emit('dragLeave', event)
-}
+  function handleDragEnter(event: DragEvent) {
+    emit('dragEnter', event)
+  }
 
-function handleDrop(event: DragEvent) {
-  emit('drop', event)
-}
+  function handleDragLeave(event: DragEvent) {
+    emit('dragLeave', event)
+  }
 
-function handleDragEnd(event: DragEvent) {
-  emit('dragEnd', event)
-}
+  function handleDrop(event: DragEvent) {
+    emit('drop', event)
+  }
 
-function handleContextMenu(event: MouseEvent, dayIndex: number, timeIndex: number) {
-  event.preventDefault();
-  emit('cellContextMenu', dayIndex, timeIndex);
-}
+  function handleDragEnd(event: DragEvent) {
+    emit('dragEnd', event)
+  }
+
+  function handleContextMenu(
+    event: MouseEvent,
+    dayIndex: number,
+    timeIndex: number,
+  ) {
+    event.preventDefault()
+    emit('cellContextMenu', dayIndex, timeIndex)
+  }
 </script>
 
 <template>
   <ScrollArea class="h-full">
-    <div :style="containerStyle" class="bg-white rounded-lg shadow-md overflow-hidden mb-2"
-      @mouseleave="handleMouseLeave" @dragover="handleDragOver" @dragenter="handleDragEnter"
-      @dragleave="handleDragLeave" @drop="handleDrop" @dragend="handleDragEnd">
+    <div
+      :style="containerStyle"
+      class="mb-2 overflow-hidden rounded-lg bg-white shadow-md"
+      @mouseleave="handleMouseLeave"
+      @dragover="handleDragOver"
+      @dragenter="handleDragEnter"
+      @dragleave="handleDragLeave"
+      @drop="handleDrop"
+      @dragend="handleDragEnd"
+    >
       <div :style="cornerCellStyle"></div>
 
-      <div v-for="(time, index) in timeSlots" :key="index" :style="getHeaderStyle(index)"
-        class="bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+      <div
+        v-for="(time, index) in timeSlots"
+        :key="index"
+        :style="getHeaderStyle(index)"
+        class="bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200"
+      >
         <template v-if="compact">
           {{ time.from }}
         </template>
-        <template v-else>
-          {{ time.from }} - {{ time.to }}
-        </template>
+        <template v-else> {{ time.from }} - {{ time.to }} </template>
       </div>
 
-      <div v-for="(day, index) in days" :key="day" :style="getDayStyle(index)">
+      <div
+        v-for="(day, index) in days"
+        :key="day"
+        :style="getDayStyle(index)"
+      >
         {{ $t(`days.${day}`) }}
       </div>
 
       <template v-if="isResizing">
         <div class="absolute inset-0 z-10 overflow-hidden">
-          <Skeleton class="absolute w-full h-full" :style="{
-            width: `${containerStyle.width}px`,
-            height: `${containerStyle.height}px`
-          }" />
+          <Skeleton
+            class="absolute h-full w-full"
+            :style="{
+              width: `${containerStyle.width}px`,
+              height: `${containerStyle.height}px`,
+            }"
+          />
         </div>
       </template>
 
       <template v-else>
-        <div v-for="(day, dayIndex) in days" :key="`day-${day}`">
-          <div v-for="(time, timeIndex) in timeSlots" :key="`${day}-${time.index}`"
-            :style="getCellStyle(dayIndex, timeIndex)" @click="handleCellClick(dayIndex, timeIndex)"
+        <div
+          v-for="(day, dayIndex) in days"
+          :key="`day-${day}`"
+        >
+          <div
+            v-for="(time, timeIndex) in timeSlots"
+            :key="`${day}-${time.index}`"
+            :style="getCellStyle(dayIndex, timeIndex)"
+            @click="handleCellClick(dayIndex, timeIndex)"
             @mousedown="(event) => handleMouseDown(event, dayIndex, timeIndex)"
             @mouseover="(event) => handleMouseOver(event, dayIndex, timeIndex)"
             @contextmenu="handleContextMenu($event, dayIndex, timeIndex)"
-            class="cursor-pointer hover:opacity-80 transition-opacity" />
+            class="cursor-pointer transition-opacity hover:opacity-80"
+          />
         </div>
       </template>
 
       <!-- Apply moderate opacity to events during drag -->
-      <div :class="{ 'opacity-85': isDragging }" style="z-index: 20">
+      <div
+        :class="{ 'opacity-85': isDragging }"
+        style="z-index: 20"
+      >
         <slot></slot>
       </div>
     </div>

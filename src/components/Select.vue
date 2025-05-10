@@ -11,8 +11,8 @@
   import { ref, watch } from 'vue'
 
   const props = defineProps<{
-    items: string[],
-    placeholder?: string,
+    items: string[]
+    placeholder?: string
   }>()
 
   const model = defineModel<string>()
@@ -25,7 +25,11 @@
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
-        <SelectItem v-for="item in props.items" :key="item" :value="item">
+        <SelectItem
+          v-for="item in props.items"
+          :key="item"
+          :value="item"
+        >
           {{ item }}
         </SelectItem>
       </SelectGroup>

@@ -12,7 +12,7 @@ export interface TimeTableStyleOptions {
     Map<number, { row: number; maxRows: number }>
   >
   getDayRowPositions: ComputedRef<number[]>
-  timeToIndex: (time: string) => number
+  timeToIndex: (time: string | null) => number | null
   filteredEvents: ComputedRef<CalendarEvent[]>
   conflicts: Conflicts | null
   timeSlots: ComputedRef<TimeSlot[]>
@@ -59,7 +59,7 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
 
     return {
       position: 'absolute',
-      left: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * startIndex}px`,
+      left: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * startIndex!}px`,
       top: `${dayPositions[dayIndex]! + topOffset}px`,
       width: `${timetableSettings.config.CELL_WIDTH * duration - 4}px`,
       height: `${eventHeight}px`,

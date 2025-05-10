@@ -11,7 +11,6 @@ export const useSchemaStore = defineStore('schemas', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  // Get all available schemas
   const fetchSchemas = async () => {
     isLoading.value = true
     error.value = null
@@ -30,13 +29,12 @@ export const useSchemaStore = defineStore('schemas', () => {
     }
   }
 
-  // Create a new schema
   const createSchema = async (schemaData: SchemaRequest) => {
     isLoading.value = true
     error.value = null
     try {
       const response = await client.POST('/api/schemas/', {
-        body: schemaData
+        body: schemaData,
       })
       if (response.data) {
         await fetchSchemas()
@@ -53,20 +51,18 @@ export const useSchemaStore = defineStore('schemas', () => {
     }
   }
 
-  // Update a schema
   const updateSchema = async (schemaId: number, schemaData: SchemaRequest) => {
     isLoading.value = true
     error.value = null
     try {
       const response = await client.PUT('/api/schemas/{id}/', {
         params: {
-          path: { id: schemaId }
+          path: { id: schemaId },
         },
-        body: schemaData
+        body: schemaData,
       })
       if (response.data) {
-        // Update local data
-        const index = schemas.value.findIndex(s => s.id === schemaId)
+        const index = schemas.value.findIndex((s) => s.id === schemaId)
         if (index !== -1) {
           schemas.value[index] = response.data
         }
@@ -83,22 +79,20 @@ export const useSchemaStore = defineStore('schemas', () => {
     }
   }
 
-  // Delete a schema
   const deleteSchema = async (schemaId: number) => {
     isLoading.value = true
     error.value = null
     try {
       const response = await client.DELETE('/api/schemas/{id}/', {
         params: {
-          path: { id: schemaId }
-        }
+          path: { id: schemaId },
+        },
       })
       if (response.error) {
         error.value = 'Failed to delete schema'
         return false
       }
-      // Remove from local data
-      schemas.value = schemas.value.filter(s => s.id !== schemaId)
+      schemas.value = schemas.value.filter((s) => s.id !== schemaId)
       return true
     } catch (err) {
       error.value =
@@ -109,7 +103,6 @@ export const useSchemaStore = defineStore('schemas', () => {
     }
   }
 
-  // Set active schema
   const setActiveSchema = async (schemaId: string) => {
     isLoading.value = true
     error.value = null
@@ -141,12 +134,10 @@ export const useSchemaStore = defineStore('schemas', () => {
     }
   }
 
-  // Get active schema object
   const activeSchema = computed<Schema | null>(
     () => schemas.value.find((schema) => schema.is_active) || null,
   )
 
-  // Get term header for API requests
   const termHeader = computed(() => {
     return activeSchema.value?.id
       ? { 'X-Term': String(activeSchema.value?.schema_name) }

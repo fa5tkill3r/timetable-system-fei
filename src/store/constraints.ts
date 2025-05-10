@@ -10,7 +10,6 @@ type ConstraintRequest = components['schemas']['ConstraintRequest']
 type PatchedConstraintRequest =
   components['schemas']['PatchedConstraintRequest']
 
-// Function to transform flat constraint array to nested structure
 const transformToNested = (
   constraints: Constraint[],
   rootId: number,
@@ -22,11 +21,10 @@ const transformToNested = (
     constraintMap.set(c.id, {
       ...c,
       nested_children: [],
-      parent: null, // Initialize parent reference
+      parent: null,
     } as ConstraintData)
   })
 
-  // Build the hierarchy
   constraints.forEach((c) => {
     if (c.children && c.children.length) {
       c.children.forEach((childId) => {
@@ -35,7 +33,7 @@ const transformToNested = (
           const parent = constraintMap.get(c.id!)
           if (parent) {
             parent.nested_children?.push(child)
-            child.parent = parent // Set parent reference
+            child.parent = parent
           }
         }
       })
@@ -44,8 +42,6 @@ const transformToNested = (
 
   return constraintMap.get(rootId) || null
 }
-
-// Default constraint structure for a new user
 
 export const useConstraintStore = defineStore('constraints', () => {
   const schemaStore = useSchemaStore()
@@ -224,7 +220,6 @@ export const useConstraintStore = defineStore('constraints', () => {
       rootConstraint = await createDefaultConstraint(targetId)
     }
 
-    // Transform to nested format
     const nestedConstraint = transformToNested(
       constraints.value,
       rootConstraint.id!,
@@ -233,20 +228,17 @@ export const useConstraintStore = defineStore('constraints', () => {
     return nestedConstraint
   }
 
-  // Transform nested structure back to flat format for API updates
   const transformToFlat = (nestedConstraint: any) => {
     if (!nestedConstraint) return []
 
     const result: any[] = []
 
-    // Process the constraint and its children recursively
     const processConstraint = (
       constraint: any,
       parentId: number | null = null,
     ) => {
       const { nested_children, ...rest } = constraint
 
-      // Create a flattened version without nested_children
       const flatConstraint = {
         ...rest,
         parent: parentId,
@@ -255,7 +247,6 @@ export const useConstraintStore = defineStore('constraints', () => {
 
       result.push(flatConstraint)
 
-      // Process children
       if (nested_children && nested_children.length > 0) {
         nested_children.forEach((child: any) => {
           processConstraint(child, constraint.id)

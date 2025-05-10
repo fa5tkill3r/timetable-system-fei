@@ -33,7 +33,8 @@ export const useRoomGroupStore = defineStore('roomGroups', () => {
         error.value = 'Failed to fetch room groups'
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
     } finally {
       isLoading.value = false
     }
@@ -65,7 +66,8 @@ export const useRoomGroupStore = defineStore('roomGroups', () => {
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
@@ -94,7 +96,8 @@ export const useRoomGroupStore = defineStore('roomGroups', () => {
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
@@ -119,7 +122,8 @@ export const useRoomGroupStore = defineStore('roomGroups', () => {
         return false
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return false
     } finally {
       isLoading.value = false
@@ -128,51 +132,46 @@ export const useRoomGroupStore = defineStore('roomGroups', () => {
 
   const groupsByName = computed(() => {
     const groups: { [name: string]: RoomGroup[] } = {}
-    roomGroups.value.forEach(group => {
+    roomGroups.value.forEach((group) => {
       if (!groups[group.name]) {
         groups[group.name] = []
       }
-      (groups[group.name] ??= []).push(group)
+      ;(groups[group.name] ??= []).push(group)
     })
     return groups
   })
 
-  // Get unique group names
   const uniqueGroupNames = computed(() => {
-    return Array.from(new Set(roomGroups.value.map(group => group.name)))
+    return Array.from(new Set(roomGroups.value.map((group) => group.name)))
   })
-  
-  // Check if a room is in a specific group by name
+
   const isRoomInGroup = (roomId: number, groupName: string) => {
-    return roomGroups.value.some(group => 
-      group.name === groupName && group.room === roomId
+    return roomGroups.value.some(
+      (group) => group.name === groupName && group.room === roomId,
     )
   }
 
-  // Get all groups that a room belongs to
   const getRoomGroups = (roomId: number) => {
-    return roomGroups.value.filter(group => group.room === roomId)
+    return roomGroups.value.filter((group) => group.room === roomId)
   }
 
-  // Get all rooms that belong to a specific group name
   const getRoomsByGroupName = (groupName: string) => {
     return roomGroups.value
-      .filter(group => group.name === groupName)
-      .map(group => group.room)
+      .filter((group) => group.name === groupName)
+      .map((group) => group.room)
   }
 
-  // Group options for filtering (unique names with room counts)
   const groupOptions = computed(() => {
     const options: { label: string; value: string; count: number }[] = []
-    
+
     Object.entries(groupsByName.value).forEach(([name, groups]) => {
       options.push({
         label: name,
-        value: name, // Use name as value since that's what we filter by
-        count: groups.length
+        value: name,
+        count: groups.length,
       })
     })
-    
+
     return options
   })
 
@@ -188,6 +187,6 @@ export const useRoomGroupStore = defineStore('roomGroups', () => {
     getRoomGroups,
     getRoomsByGroupName,
     uniqueGroupNames,
-    groupOptions
+    groupOptions,
   }
 })

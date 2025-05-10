@@ -9,7 +9,10 @@
 </script>
 
 <template>
-  <FormField v-slot="{ value, handleChange }" name="marketing_emails">
+  <FormField
+    v-slot="{ value, handleChange }"
+    name="marketing_emails"
+  >
     <FormItem
       class="flex flex-row items-center justify-between rounded-lg border p-4"
     >
@@ -20,7 +23,10 @@
         </FormDescription>
       </div>
       <FormControl>
-        <Switch :checked="value" @update:checked="handleChange" />
+        <Switch
+          :checked="value"
+          @update:checked="handleChange"
+        />
       </FormControl>
     </FormItem>
   </FormField>

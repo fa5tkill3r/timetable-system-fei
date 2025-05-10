@@ -58,8 +58,8 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
           header: schemaStore.termHeader,
           query: {
             'max-level': 2,
-            'role_id__in': [1,3] // Prednasajuci a cviciaci
-          }
+            role_id__in: [1, 3], // Prednasajuci a cviciaci
+          },
         },
       })
       if (response.data) {
@@ -76,11 +76,13 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
 
   const getLecturersForSubject = (subjectId: number) => {
     return lecturers.value.filter(
-      lecturer => (lecturer.subject as any as Subject)?.id === subjectId
+      (lecturer) => (lecturer.subject as any as Subject)?.id === subjectId,
     )
   }
 
-  const createSubjectUserRole = async (subjectUserRole: SubjectUserRoleRequest) => {
+  const createSubjectUserRole = async (
+    subjectUserRole: SubjectUserRoleRequest,
+  ) => {
     isLoading.value = true
     try {
       const response = await client.POST('/api/subject-user-roles/', {
@@ -103,7 +105,10 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
     }
   }
 
-  const updateSubjectUserRole = async (id: number, subjectUserRole: Partial<SubjectUserRoleRequest>) => {
+  const updateSubjectUserRole = async (
+    id: number,
+    subjectUserRole: Partial<SubjectUserRoleRequest>,
+  ) => {
     isLoading.value = true
     try {
       const response = await client.PATCH('/api/subject-user-roles/{id}/', {
@@ -126,15 +131,18 @@ export const useSubjectUserRoleStore = defineStore('subjectUserRoles', () => {
   const deleteSubjectUserRole = async (id: number) => {
     isLoading.value = true
     try {
-      const { response } = await client.DELETE('/api/subject-user-roles/{id}/', {
-        params: {
-          path: { id },
-          header: schemaStore.termHeader,
+      const { response } = await client.DELETE(
+        '/api/subject-user-roles/{id}/',
+        {
+          params: {
+            path: { id },
+            header: schemaStore.termHeader,
+          },
         },
-      })
+      )
       if (response.status === 204) {
         await fetchLecturers()
-        
+
         return true
       } else {
         return false

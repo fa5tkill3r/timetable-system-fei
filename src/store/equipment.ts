@@ -13,9 +13,7 @@ export const useEquipmentStore = defineStore('equipment', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  // Get all equipment
   const fetchEquipment = async () => {
-    // Don't fetch if no active schema
     if (!schemaStore.activeSchema?.id) {
       equipment.value = []
       return []
@@ -38,7 +36,8 @@ export const useEquipmentStore = defineStore('equipment', () => {
         return []
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       equipment.value = []
       return []
     } finally {
@@ -46,7 +45,6 @@ export const useEquipmentStore = defineStore('equipment', () => {
     }
   }
 
-  // Create new equipment
   const createEquipment = async (equipmentData: EquipmentRequest) => {
     isLoading.value = true
     error.value = null
@@ -65,15 +63,18 @@ export const useEquipmentStore = defineStore('equipment', () => {
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  // Update equipment
-  const updateEquipment = async (id: number, equipmentData: EquipmentRequest) => {
+  const updateEquipment = async (
+    id: number,
+    equipmentData: EquipmentRequest,
+  ) => {
     isLoading.value = true
     error.value = null
     try {
@@ -92,14 +93,14 @@ export const useEquipmentStore = defineStore('equipment', () => {
         return null
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  // Delete equipment
   const deleteEquipment = async (id: number) => {
     isLoading.value = true
     error.value = null
@@ -118,14 +119,14 @@ export const useEquipmentStore = defineStore('equipment', () => {
         return false
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      error.value =
+        err instanceof Error ? err.message : 'Unknown error occurred'
       return false
     } finally {
       isLoading.value = false
     }
   }
 
-  // Watch for schema changes to reload data
   watchEffect(() => {
     if (schemaStore.activeSchema?.id) {
       fetchEquipment()
