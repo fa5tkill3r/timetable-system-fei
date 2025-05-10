@@ -678,8 +678,8 @@ const conflicts = useConflicts({
 })
 
 const {
-  cellHasConflict,
   hasRoomConflict,
+  checkConflicts
 } = conflicts
 
 
@@ -883,7 +883,7 @@ watch(
                       <template v-for="(slot, slotIndex) in timeSlots" :key="`conflict-icons-${day}-${slot.index}`">
                         <div v-if="
                           isDragging &&
-                          cellHasConflict(dayIndex, slot.index).hasConflict
+                          checkConflicts(dayIndex, slot.index).cellInvolvedInOverlap
                         " :style="{
                           position: 'absolute',
                           left: `${timetableSettings.config.DAY_COLUMN_WIDTH + timetableSettings.config.CELL_WIDTH * slot.index + 4}px`,
@@ -891,7 +891,7 @@ watch(
                           zIndex: 30,
                           pointerEvents: 'none',
                         }">
-                          <ConflictIcons :conflicts="cellHasConflict(dayIndex, slot.index).types" />
+                          <ConflictIcons :conflicts="checkConflicts(dayIndex, slot.index).types" />
                         </div>
                       </template>
                     </div>
@@ -952,7 +952,7 @@ watch(
       left: mousePosition.x + 15 + 'px',
       top: mousePosition.y + 15 + 'px',
       width: `${timetableSettings.config.CELL_WIDTH * draggedEvent!.duration - 4}px`,
-      height: `${timetableSettings.config.CELL_HEIGHT - 4}px`,
+      height: `${timetableSettings.compactView ? 'auto' : `${timetableSettings.config.CELL_HEIGHT - 4}px`}`,
       border: hasRoomConflict ? '2px solid #e53935' : '2px solid #2196f3',
       pointerEvents: 'none',
     }" :class="{
@@ -966,7 +966,7 @@ watch(
       </div>
 
       <div class="mt-1 flex justify-between text-sm text-gray-600">
-        <div v-if="draggedOverTime">
+        <div v-if="draggedOverTime && !timetableSettings.compactView">
           {{ draggedOverTime.from }} -
           {{
             calculateEndTime(

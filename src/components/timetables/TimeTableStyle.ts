@@ -89,17 +89,12 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
     const cellHeight = timetableSettings.config.CELL_HEIGHT * maxRows
 
     const isDraggedOver = Boolean(
-      draggedOverDay.value === DAYS[dayIndex] &&
+      draggedEvent.value &&
+        draggedOverDay.value === DAYS[dayIndex] &&
         draggedOverTime.value &&
         timeIndex >= draggedOverTime.value.index &&
-        timeIndex < draggedOverTime.value.index + draggedEvent.value!.duration,
+        timeIndex < draggedOverTime.value.index + draggedEvent.value.duration,
     )
-
-    const wouldConflict =
-      checkConflicts?.(dayIndex, timeIndex)?.hasConflict || false
-
-    const conflictResult = cellHasConflict?.(dayIndex, timeIndex)
-    const hasConflict = (isDraggedOver && conflictResult?.hasConflict) || false
 
     return {
       position: 'absolute',
@@ -113,22 +108,36 @@ export function useTimeTableStyle(options: TimeTableStyleOptions) {
       zIndex: 5,
       cursor: 'auto',
       backgroundColor: (() => {
-        if (!draggedEvent.value) return 'transparent'
+        if (!draggedEvent.value) return 'transparent' // No drag, no special background
 
-        // If conflict detected, use orange background
-        if (isDraggedOver && hasConflict) {
-          return 'rgba(255, 171, 145, 0.7)' // Semi-transparent orange for conflicts
+        // Only apply conflict styling if conflicts system is active
+        if (conflicts && conflicts.checkConflicts) {
+          // 1. Darker Orange: If current cell is part of the dragged event's span AND the overall drag operation causes a conflict.
+          if (isDraggedOver && conflicts.hasRoomConflict.value) {
+            return 'rgba(255, 171, 145, 0.7)' // Semi-transparent orange for conflicts
+          }
+
+          // 2. Lighter Orange: If placing the event *starting at this cell* would cause this cell to be part of an overlap.
+          const hypotheticalConflictDetails = conflicts.checkConflicts(
+            dayIndex,
+            timeIndex,
+          )
+
+          if (
+            hypotheticalConflictDetails &&
+            hypotheticalConflictDetails.cellInvolvedInOverlap
+          ) {
+            return 'rgba(255, 224, 178, 0.7)' // Semi-transparent light orange for potential conflicts this cell is part of
+          }
         }
 
-        // Show ALL conflicting cells in light orange when dragging
-        if (wouldConflict) {
-          return 'rgba(255, 224, 178, 0.7)' // Semi-transparent light orange for conflicts
-        }
-
-        // For regular hover during drag
-        if (isDraggedOver) {
-          return timeIndex + draggedEvent.value.duration <=
+        // 3. Blue/Red: If current cell is part of dragged event's span (and no conflict color applied if conflicts active)
+        // show validity of placement based on timetable bounds.
+        if (isDraggedOver && draggedEvent.value && draggedOverTime.value) {
+          const isValidPlacement =
+            draggedOverTime.value.index + draggedEvent.value.duration <=
             timeSlots.value.length
+          return isValidPlacement
             ? 'rgba(227, 242, 253, 0.7)' // Semi-transparent blue for valid placement
             : 'rgba(255, 205, 210, 0.7)' // Semi-transparent red for invalid placement
         }
