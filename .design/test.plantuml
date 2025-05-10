@@ -270,3 +270,52 @@ package "Timetable" {
 }
 @enduml
 
+
+@startuml
+
+class "ROOT (1)" as root {
+  Type: ROOT
+  Strength: STRONG
+  Data:
+    target_id: 111407
+    target_type: USER
+}
+
+class "OPERATION (2)" as op2 {
+  Type: OPERATION
+  Strength: STRONG
+  Data:
+    operator: AND
+}
+
+class "OPERATION (3)" as op3 {
+  Type: OPERATION
+  Strength: STRONG
+  Data:
+    operator: AND
+}
+
+class "TIMERANGE" as tr1 {
+  Type: TIMERANGE
+  Strength: WEAK
+  Data:
+    day_of_week: 0
+    start_time: 1
+    duration: 1
+}
+
+class "TIMERANGE" as tr2 {
+  Type: TIMERANGE
+  Strength: WEAK
+  Data:
+    day_of_week: 0
+    start_time: 2
+    duration: 1
+}
+
+root --> op2 : "nested_children"
+op2 --> op3 : "nested_children"
+op3 --> tr1 : "nested_children"
+op3 --> tr2 : "nested_children"
+
+@enduml
