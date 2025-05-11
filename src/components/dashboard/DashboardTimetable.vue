@@ -21,7 +21,6 @@
   const authStore = useAuthStore()
   const { toast } = useToast()
 
-  const events = ref<CalendarEvent[]>([])
   const isLoading = ref(true)
 
   const currentUserId = computed(() => {
@@ -59,13 +58,13 @@
   })
 
   const {
+    events,
     timeSlots,
+    timeToIndex,
+    calculateEndTime,
     getRowEventPositions,
     getDayRowPositions,
-    processTimetableEvents,
-    timeToIndex,
   } = useTimeTableBase({
-    events,
     filteredEvents,
   })
 
@@ -94,8 +93,6 @@
       await timetableEventStore.fetchEvents()
       await subjectStore.fetchSubjects()
       await subjectUserRoleStore.fetchLecturers()
-
-      processTimetableEvents()
     } catch (error) {
       console.error('Error fetching timetable events:', error)
       toast({
