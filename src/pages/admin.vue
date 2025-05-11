@@ -46,12 +46,6 @@
           icon: LibraryIcon,
         },
         {
-          label: 'Terms',
-          path: '/admin/terms',
-          pathMatch: 'terms',
-          icon: CalendarIcon,
-        },
-        {
           label: 'Import',
           path: '/admin/import',
           pathMatch: 'import',
@@ -61,17 +55,17 @@
     },
   ]
 
-  const pageTitles: Record<string, string> = {
-    '/admin/subjects': 'Subjects',
-    '/admin/buildings': 'Buildings',
-    '/admin/equipment': 'Equipment',
-    '/admin/import': 'Import Files',
-    '/admin/terms': 'Terms Management',
-    default: 'Admin Dashboard',
-  }
-
   const pageTitle = computed(() => {
-    return pageTitles[route.path] || pageTitles['default']
+    const path = route.path
+
+    for (const section of navSections) {
+      const matchedItem = section.items.find((item) =>
+        path.includes(item.pathMatch),
+      )
+      if (matchedItem) return matchedItem.label
+    }
+
+    return 'Admin Dashboard'
   })
 </script>
 
