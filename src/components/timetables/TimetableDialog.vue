@@ -48,7 +48,7 @@
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="WIP">WIP</SelectItem>
+                <SelectItem value="TEST">Test</SelectItem>
                 <SelectItem value="PUBLISHED">Pending</SelectItem>
                 <SelectItem value="HIDDEN">Hidden</SelectItem>
               </SelectContent>
