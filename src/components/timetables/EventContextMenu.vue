@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, useTemplateRef } from 'vue'
   import {
     Card,
     CardContent,
@@ -21,6 +21,8 @@
     visible: boolean
     position: { x: number; y: number }
   }
+
+  const menuRef = useTemplateRef('menuRef')
 
   const props = defineProps<Props>()
   const emit = defineEmits<{
@@ -149,15 +151,32 @@
       return
     }
   }
+
+  const adjustedPosition = computed(() => {
+    const menuHeight = menuRef.value?.offsetHeight || 0
+    const viewportHeight = window.innerHeight
+
+    let y = props.position.y
+
+    if (y + menuHeight > viewportHeight) {
+      y = Math.max(10, viewportHeight - menuHeight - 10)
+    }
+
+    return {
+      x: props.position.x,
+      y,
+    }
+  })
 </script>
 
 <template>
   <div
     v-if="visible"
+    ref="menuRef"
     :style="{
       position: 'absolute',
       left: `${position.x}px`,
-      top: `${position.y}px`,
+      top: `${adjustedPosition.y}px`,
       zIndex: 1000,
     }"
   >
