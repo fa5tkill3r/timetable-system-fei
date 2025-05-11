@@ -167,7 +167,6 @@
               <div class="flex items-center justify-between">
                 <div class="event-title truncate font-semibold text-gray-800">
                   {{ event.shortcut }}
-                  <span class="sr-only">{{ event.title }}</span>
                 </div>
               </div>
               <div class="flex justify-between text-sm text-gray-600">

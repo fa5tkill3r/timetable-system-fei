@@ -53,7 +53,6 @@
                   @click="openEditDialog(subject)"
                 >
                   <PencilIcon class="h-4 w-4" />
-                  <span class="sr-only">Edit</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -61,7 +60,6 @@
                   @click="confirmDelete(subject)"
                 >
                   <TrashIcon class="h-4 w-4" />
-                  <span class="sr-only">Delete</span>
                 </Button>
               </div>
             </TableCell>

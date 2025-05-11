@@ -361,7 +361,6 @@
             class="h-4 w-4"
             @click="selectedRoomId = undefined"
           >
-            <span class="sr-only">Remove</span>
             &times;
           </Button>
         </Badge>

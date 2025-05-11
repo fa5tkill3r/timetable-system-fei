@@ -106,10 +106,7 @@
           <form @submit="onSubmit">
             <div class="grid gap-2">
               <div class="grid gap-1">
-                <Label
-                  class="sr-only"
-                  for="email"
-                >
+                <Label for="email">
                   {{ $t('login.email') }}
                 </Label>
                 <Input
@@ -125,10 +122,7 @@
               </div>
 
               <div class="grid gap-1">
-                <Label
-                  class="sr-only"
-                  for="password"
-                >
+                <Label for="password">
                   {{ $t('login.password') }}
                 </Label>
                 <Input

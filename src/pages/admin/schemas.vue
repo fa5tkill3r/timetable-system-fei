@@ -60,7 +60,6 @@
                   :disabled="schema.is_active"
                 >
                   <CheckIcon class="h-4 w-4" />
-                  <span class="sr-only">Set Active</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -68,7 +67,6 @@
                   @click="openImportDialog(schema)"
                 >
                   <ImportIcon class="h-4 w-4" />
-                  <span class="sr-only">Import</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -76,7 +74,6 @@
                   @click="openEditDialog(schema)"
                 >
                   <PencilIcon class="h-4 w-4" />
-                  <span class="sr-only">Edit</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -84,7 +81,6 @@
                   @click="confirmDelete(schema)"
                 >
                   <TrashIcon class="h-4 w-4" />
-                  <span class="sr-only">Delete</span>
                 </Button>
               </div>
             </TableCell>

@@ -43,7 +43,6 @@
         class="h-8 w-8"
       >
         <Settings class="h-4 w-4" />
-        <span class="sr-only">{{ $t('timetable.settings.title') }}</span>
       </Button>
     </PopoverTrigger>
     <PopoverContent class="w-80">
