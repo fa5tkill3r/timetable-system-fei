@@ -78,11 +78,33 @@
   const searchQuery = ref<string>('')
 
   const displayedOptions = computed(() => {
-    const filteredOptions = props.options.filter((option) =>
-      option.label.toLowerCase().includes(searchQuery.value.toLowerCase()),
-    )
+    // If no search query, return all selected options first,
+    // then other options (up to 20 total)
+    if (!searchQuery.value.trim()) {
+      const selectedOptions = props.options.filter((option) =>
+        selectedValues.value.has(option.value),
+      )
+      const remainingOptions = props.options
+        .filter((option) => !selectedValues.value.has(option.value))
+        .slice(0, Math.max(0, 20 - selectedOptions.length))
+      return [...selectedOptions, ...remainingOptions]
+    }
 
-    return filteredOptions.slice(0, 20)
+    // When searching, only include options that match the search query
+    // (including selected options only if they match the search)
+    return (
+      props.options
+        .filter((option) =>
+          option.label.toLowerCase().includes(searchQuery.value.toLowerCase()),
+        )
+        // Sort to put selected items first if they match search
+        .sort((a, b) => {
+          const aSelected = selectedValues.value.has(a.value) ? -1 : 0
+          const bSelected = selectedValues.value.has(b.value) ? -1 : 0
+          return aSelected - bSelected
+        })
+        .slice(0, 20)
+    )
   })
 
   const filteredOptionsCount = computed(() => {
@@ -142,14 +164,11 @@
       class="w-[200px] p-0"
       align="start"
     >
-      <Command>
-        <CommandInput
-          :placeholder="title"
-          :value="searchQuery"
-          @input="
-            (event) => (searchQuery = (event.target as HTMLInputElement).value)
-          "
-        />
+      <Command
+        v-model:search-term="searchQuery"
+        :filter-function="(a) => a"
+      >
+        <CommandInput :placeholder="title" />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup>
