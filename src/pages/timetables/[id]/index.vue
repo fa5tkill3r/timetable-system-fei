@@ -982,13 +982,12 @@
                               v-if="event.weekType !== 'FULL'"
                               class="flex items-center rounded px-1 text-xs font-bold"
                               :class="{
-                                'bg-blue-100 text-blue-800':
-                                  event.weekType === 'A',
-                                'bg-green-100 text-green-800':
+                                'bg-black text-white':
+                                  event.weekType === 'A' ||
+                                  event.weekType === 'CUSTOM' ||
                                   event.weekType === 'B',
-                                'bg-purple-100 text-purple-800':
-                                  event.weekType === 'CUSTOM',
-                                'bg-red-500 text-red-800':
+                                'py-0.5': event.weekType === 'CUSTOM',
+                                'bg-red-800 py-0.5 text-white':
                                   event.weekType === 'NONE',
                               }"
                             >
