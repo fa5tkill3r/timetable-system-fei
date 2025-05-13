@@ -151,3 +151,7 @@ export function getBaseTimetableStyles(
     containerStyle,
   }
 }
+
+export function isPattern(bitmask: number, pattern: string): boolean {
+  return bitmask === parseInt(pattern, 2)
+}

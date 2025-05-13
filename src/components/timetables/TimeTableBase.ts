@@ -3,7 +3,7 @@ import { useSubjectStore } from '@/store/subjects'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { components } from '@/types/schema'
 import { CalendarEvent } from '@/types/types'
-import { DAYS, TimeSlot } from '@/utils/timetable'
+import { DAYS, isPattern, TimeSlot } from '@/utils/timetable'
 import _ from 'lodash'
 import { computed, ComputedRef, Ref } from 'vue'
 import { DEFAULT_TIME_CONFIG as TIME_CONFIG } from '@/utils/timetable'
@@ -41,6 +41,15 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
 
       const brightnessAdjustment = eventType === 1 ? 0.9 : 1.1
 
+      const weekType = () => {
+        if (event.weeks_bitmask === null) return 'NONE'
+        if (isPattern(event.weeks_bitmask!, '101010101010')) return 'A'
+        if (isPattern(event.weeks_bitmask!, '010101010101')) return 'B'
+        if (isPattern(event.weeks_bitmask!, '111111111111')) return 'FULL'
+        if (isPattern(event.weeks_bitmask!, '000000000000')) return 'NONE'
+        return 'CUSTOM'
+      }
+
       processedEvents.push({
         id: event.id!,
         day: DAYS[event.day_of_week! - 1] ?? null,
@@ -55,7 +64,8 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
         subject_id: subjectId,
         event_type: eventType,
         duration: event.duration || 1,
-        weeks_bitmask: event.weeks_bitmask || 4095,
+        weeks_bitmask: event.weeks_bitmask ?? 0,
+        weekType: weekType(),
       })
     })
 

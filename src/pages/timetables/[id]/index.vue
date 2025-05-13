@@ -24,7 +24,12 @@
     TabsList,
     TabsTrigger,
   } from '@/components/ui/tabs'
-  import { MoreVertical, Building } from 'lucide-vue-next'
+  import {
+    MoreVertical,
+    Building,
+    CalendarCog,
+    AlertCircle,
+  } from 'lucide-vue-next'
   import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
   import { Badge } from '@/components/ui/badge'
   import { Button } from '@/components/ui/button'
@@ -52,7 +57,7 @@
   import TimetableSettings from '@/components/timetables/TimetableSettings.vue'
   import { useTimetableSettingsStore } from '@/store/timetableSettings'
   import { useSubjectUserRoleStore } from '@/store/subjectUserRoles'
-import { EMPTY_IMAGE } from '@/lib/utils'
+  import { EMPTY_IMAGE } from '@/lib/utils'
 
   const semesterOptions = [
     { id: 'LS', name: 'Summer Semester (LS)' },
@@ -970,16 +975,41 @@ import { EMPTY_IMAGE } from '@/lib/utils'
                             class="event-title truncate font-semibold text-gray-800"
                           >
                             {{ event.shortcut }}
-                            <span class="sr-only">{{ event.title }}</span>
                           </div>
-                          <button
-                            @click.stop.prevent="() => {}"
-                            class="event-menu-button"
-                          >
-                            <MoreVertical
-                              class="h-4 w-4 shrink-0 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100"
-                            />
-                          </button>
+                          <div class="flex items-center">
+                            <!-- Pattern indicator -->
+                            <div
+                              v-if="event.weekType !== 'FULL'"
+                              class="flex items-center rounded px-1 text-xs font-bold"
+                              :class="{
+                                'bg-blue-100 text-blue-800':
+                                  event.weekType === 'A',
+                                'bg-green-100 text-green-800':
+                                  event.weekType === 'B',
+                                'bg-purple-100 text-purple-800':
+                                  event.weekType === 'CUSTOM',
+                                'bg-red-500 text-red-800':
+                                  event.weekType === 'NONE',
+                              }"
+                            >
+                              <template
+                                v-if="
+                                  event.weekType === 'A' ||
+                                  event.weekType === 'B'
+                                "
+                              >
+                                {{ event.weekType }}
+                              </template>
+                              <CalendarCog
+                                v-else-if="event.weekType === 'CUSTOM'"
+                                class="h-4 w-4"
+                              />
+                              <AlertCircle
+                                v-else-if="event.weekType === 'NONE'"
+                                class="h-4 w-4"
+                              />
+                            </div>
+                          </div>
                         </div>
                         <div class="flex justify-between text-sm text-gray-600">
                           <div v-if="!timetableSettings.compactView">

@@ -20,4 +20,5 @@ export interface CalendarEvent {
   duration: number
   original_eventId?: number | null
   weeks_bitmask: number
+  weekType: 'A' | 'B' | 'FULL' | 'CUSTOM' | 'NONE'
 }
