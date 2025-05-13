@@ -52,6 +52,7 @@
   import TimetableSettings from '@/components/timetables/TimetableSettings.vue'
   import { useTimetableSettingsStore } from '@/store/timetableSettings'
   import { useSubjectUserRoleStore } from '@/store/subjectUserRoles'
+import { EMPTY_IMAGE } from '@/lib/utils'
 
   const semesterOptions = [
     { id: 'LS', name: 'Summer Semester (LS)' },
@@ -198,16 +199,11 @@
       event.dataTransfer.effectAllowed = 'move'
       event.dataTransfer.setData('text/plain', itemData.id?.toString() || '')
 
-      const emptyImg = document.createElement('div')
-      emptyImg.style.position = 'absolute'
-      emptyImg.style.top = '-9999px'
-      emptyImg.style.opacity = '0'
-      document.body.appendChild(emptyImg)
-
-      event.dataTransfer.setDragImage(emptyImg, 0, 0)
+      // Fix dragging object preview. We are using image because of MACOS globe cursor
+      event.dataTransfer.setDragImage(EMPTY_IMAGE, 0, 0)
 
       setTimeout(() => {
-        document.body.removeChild(emptyImg)
+        // document.body.removeChild(test)
         draggedEvent.value = {
           ...itemData,
           room_id:
