@@ -24,12 +24,7 @@
     TabsList,
     TabsTrigger,
   } from '@/components/ui/tabs'
-  import {
-    MoreVertical,
-    Building,
-    CalendarCog,
-    AlertCircle,
-  } from 'lucide-vue-next'
+  import { MoreVertical, Building } from 'lucide-vue-next'
   import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
   import { Badge } from '@/components/ui/badge'
   import { Button } from '@/components/ui/button'
@@ -44,7 +39,7 @@
   import EventSelectionPanel from '@/components/timetables/EventSelectionPanel.vue'
   import { useSubjectGroupStore } from '@/store/subjectGroups'
   import TimetableGrid from '@/components/timetables/TimetableGrid.vue'
-  import { DAYS } from '@/utils/timetable'
+  import { DAYS } from '@/lib/timetable'
   import ConflictIcons from '@/components/timetables/ConflictIcons.vue'
   import EventContextMenu from '@/components/timetables/EventContextMenu.vue'
   import { templateRef } from '@vueuse/core'

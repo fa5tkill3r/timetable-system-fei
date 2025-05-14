@@ -18,7 +18,7 @@
     DEFAULT_TIME_CONFIG,
     generateTimeSlots,
     getBaseTimetableStyles,
-  } from '@/utils/timetable'
+  } from '@/lib/timetable'
 
   const { t } = useI18n()
 

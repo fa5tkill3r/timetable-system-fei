@@ -3,10 +3,10 @@ import { useSubjectStore } from '@/store/subjects'
 import { useTimetableEventStore } from '@/store/timetableEvents'
 import { components } from '@/types/schema'
 import { CalendarEvent } from '@/types/types'
-import { DAYS, isPattern, TimeSlot } from '@/utils/timetable'
+import { DAYS, isPattern, TimeSlot } from '@/lib/timetable'
 import _ from 'lodash'
 import { computed, ComputedRef, Ref } from 'vue'
-import { DEFAULT_TIME_CONFIG as TIME_CONFIG } from '@/utils/timetable'
+import { DEFAULT_TIME_CONFIG as TIME_CONFIG } from '@/lib/timetable'
 import { useTimetableSettingsStore } from '@/store/timetableSettings'
 
 export interface TimeTableBaseOptions {

@@ -1,6 +1,6 @@
 import { CalendarEvent, TimeSlot } from '@/types/types'
 import { computed, Ref } from 'vue'
-import { DAYS } from '@/utils/timetable'
+import { DAYS } from '@/lib/timetable'
 
 export interface ConflictOptions {
   isDragging: Ref<boolean>

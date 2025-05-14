@@ -1,5 +1,5 @@
 import { CalendarEvent, TimeSlot } from '@/types/types'
-import { DAYS } from '@/utils/timetable'
+import { DAYS } from '@/lib/timetable'
 import { computed, ComputedRef, CSSProperties, Ref } from 'vue'
 import { Conflicts } from './Conflicts'
 import { useTimetableSettingsStore } from '@/store/timetableSettings'

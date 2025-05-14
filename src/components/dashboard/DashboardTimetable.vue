@@ -2,7 +2,7 @@
   import { ref, computed, onMounted } from 'vue'
   import { useTimeTableBase } from '@/components/timetables/TimeTableBase'
   import { useTimeTableStyle } from '@/components/timetables/TimeTableStyle'
-  import { DAYS } from '@/utils/timetable'
+  import { DAYS } from '@/lib/timetable'
   import { useTimetableEventStore } from '@/store/timetableEvents'
   import { useTimetableSettingsStore } from '@/store/timetableSettings'
   import { useAuthStore } from '@/store/auth'

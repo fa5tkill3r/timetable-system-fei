@@ -1,8 +1,5 @@
 import { defineStore } from 'pinia'
-import {
-  DEFAULT_TIMETABLE_CONFIG,
-  type TimetableConfig,
-} from '@/utils/timetable'
+import { DEFAULT_TIMETABLE_CONFIG, type TimetableConfig } from '@/lib/timetable'
 import { ref } from 'vue'
 
 const STORAGE_KEY = 'timetable-settings'

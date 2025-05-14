@@ -11,7 +11,7 @@
   import { Settings, RotateCcw } from 'lucide-vue-next'
   import { useTimetableSettingsStore } from '@/store/timetableSettings'
   import { computed } from 'vue'
-  import type { TimetableConfig } from '@/utils/timetable'
+  import type { TimetableConfig } from '@/lib/timetable'
 
   const timetableSettingsStore = useTimetableSettingsStore()
 
