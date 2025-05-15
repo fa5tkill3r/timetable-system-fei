@@ -1,7 +1,16 @@
 <template>
   <div class="flex flex-wrap items-center justify-between gap-4 py-2">
-    <div class="text-sm text-muted-foreground">
+    <div
+      class="text-sm text-muted-foreground"
+      v-if="selectedCount !== undefined"
+    >
       {{ selectedCount }} of {{ totalCount }} row(s) selected.
+    </div>
+    <div
+      v-else
+      class="text-sm text-muted-foreground"
+    >
+      {{ totalCount }} row(s) total.
     </div>
 
     <Pagination
@@ -65,7 +74,7 @@
     currentPage: number
     pageSize: number
     totalCount: number
-    selectedCount: number
+    selectedCount?: number
   }>()
 
   defineEmits<{

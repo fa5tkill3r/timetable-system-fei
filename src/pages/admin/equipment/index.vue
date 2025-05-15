@@ -1,6 +1,5 @@
 <template>
   <div class="container space-y-6 py-6">
-    <!-- Breadcrumb navigation -->
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
@@ -18,7 +17,6 @@
       <Button @click="openEquipmentDialog()">Add New Equipment</Button>
     </div>
 
-    <!-- Equipment Table with DataTable component -->
     <DataTable
       :data="equipment"
       :columns="columns"
@@ -31,42 +29,19 @@
       enable-column-visibility
       search-placeholder="Search equipment..."
       @search-change="onSearchChange"
-      @selection-change="onSelectionChange"
     >
-      <!-- Empty state slot -->
       <template #empty> No equipment found. </template>
 
-      <!-- Selection actions slot -->
-      <template #selection-actions>
-        <div class="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-          >
-            Export Selected
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-          >
-            Delete Selected
-          </Button>
-        </div>
-      </template>
-
-      <!-- Pagination slot -->
-      <template #pagination="{ filteredCount, selectedCount }">
+      <template #pagination="{ filteredCount }">
         <TablePagination
           :current-page="pageIndex"
           :page-size="pageSize"
           :total-count="filteredCount"
-          :selected-count="selectedCount"
           @page-change="onPageChange"
         />
       </template>
     </DataTable>
 
-    <!-- Dialogs -->
     <EquipmentDialog
       :open="dialogVisible"
       :equipment="selectedEquipment"
@@ -176,10 +151,6 @@
 
   const onPageChange = (page: number) => {
     pageIndex.value = page
-  }
-
-  const onSelectionChange = (selection: Record<string, boolean>) => {
-    selectedRows.value = selection
   }
 
   onMounted(async () => {

@@ -5,70 +5,37 @@
       <Button @click="openCreateDialog()">Create New Subject</Button>
     </div>
 
-    <!-- Subject listing -->
-    <div class="overflow-hidden rounded-lg border bg-card shadow-sm">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Nominal Semester</TableHead>
-            <TableHead class="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-if="subjectStore.isLoading">
-            <TableCell
-              colspan="4"
-              class="py-4 text-center"
-            >
-              <div class="flex items-center justify-center">
-                <div
-                  class="mr-2 h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"
-                ></div>
-                Loading subjects...
-              </div>
-            </TableCell>
-          </TableRow>
-          <TableRow v-else-if="subjectStore.subjects.length === 0">
-            <TableCell
-              colspan="4"
-              class="py-4 text-center text-muted-foreground"
-            >
-              No subjects found. Create your first subject.
-            </TableCell>
-          </TableRow>
-          <TableRow
-            v-for="subject in subjectStore.subjects"
-            :key="subject.id"
-          >
-            <TableCell>{{ subject.name }}</TableCell>
-            <TableCell>{{ subject.code }}</TableCell>
-            <TableCell>{{ subject.nominal_semester }}</TableCell>
-            <TableCell class="text-right">
-              <div class="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  @click="openEditDialog(subject)"
-                >
-                  <PencilIcon class="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  @click="confirmDelete(subject)"
-                >
-                  <TrashIcon class="h-4 w-4" />
-                </Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable
+      :data="subjectStore.subjects"
+      :columns="columns"
+      :is-loading="subjectStore.isLoading"
+      :page-index="pageIndex"
+      :page-size="pageSize"
+      :search-term="searchTerm"
+      :initialColumnVisibility="initialColumnVisibility"
+      enable-search
+      enable-column-visibility
+      enable-pagination
+      search-placeholder="Search subjects..."
+      @search-change="searchTerm = $event"
+      @update:page-index="pageIndex = $event"
+    >
+      <template #empty>
+        <div class="py-4 text-center text-muted-foreground">
+          No subjects found. Create your first subject.
+        </div>
+      </template>
 
-    <!-- Subject Dialog Component -->
+      <template #pagination="{ filteredCount }">
+        <TablePagination
+          :current-page="pageIndex"
+          :page-size="pageSize"
+          :total-count="filteredCount"
+          @page-change="pageIndex = $event"
+        />
+      </template>
+    </DataTable>
+
     <SubjectDialog
       :open="dialogVisible"
       :subject="selectedSubject"
@@ -77,7 +44,6 @@
       @save="saveSubject"
     />
 
-    <!-- Delete Dialog Component -->
     <DeleteSubjectDialog
       :open="deleteDialog"
       :subject="subjectToDelete"
@@ -89,22 +55,17 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, h } from 'vue'
   import { useSubjectStore } from '@/store/subjects'
   import { PencilIcon, TrashIcon } from 'lucide-vue-next'
   import { useToast } from '@/components/ui/toast/use-toast'
   import { Button } from '@/components/ui/button'
-  import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from '@/components/ui/table'
+  import DataTable from '@/components/common/DataTable.vue'
+  import TablePagination from '@/components/common/TablePagination.vue'
   import SubjectDialog from '@/components/subjects/SubjectDialog.vue'
   import DeleteSubjectDialog from '@/components/subjects/DeleteSubjectDialog.vue'
   import { components } from '@/types/schema'
+  import { type ColumnDef } from '@tanstack/vue-table'
 
   type SubjectRequest = components['schemas']['SubjectRequest']
   type Subject = components['schemas']['Subject']
@@ -119,6 +80,67 @@
   const deleteDialog = ref(false)
   const deleteLoading = ref(false)
   const subjectToDelete = ref<Subject | null>(null)
+
+  const pageIndex = ref(0)
+  const pageSize = ref(10)
+  const searchTerm = ref('')
+
+  const initialColumnVisibility = ref({
+    code: true,
+    nominal_semester: true,
+  })
+
+  const columns: ColumnDef<Subject>[] = [
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      cell: ({ row }) => row.getValue('name'),
+    },
+    {
+      accessorKey: 'code',
+      header: 'Code',
+      cell: ({ row }) => row.getValue('code'),
+    },
+    {
+      accessorKey: 'nominal_semester',
+      header: 'Nominal Semester',
+      cell: ({ row }) => row.getValue('nominal_semester'),
+    },
+    {
+      id: 'actions',
+      header: () => h('div', { class: 'text-right' }, 'Actions'),
+      cell: ({ row }) => {
+        const subject = row.original
+
+        return h('div', { class: 'flex justify-end space-x-2' }, [
+          h(
+            Button,
+            {
+              variant: 'outline',
+              size: 'sm',
+              onClick: (e: MouseEvent) => {
+                e.stopPropagation()
+                openEditDialog(subject)
+              },
+            },
+            () => h(PencilIcon, { class: 'h-4 w-4' }),
+          ),
+          h(
+            Button,
+            {
+              variant: 'outline',
+              size: 'sm',
+              onClick: (e: MouseEvent) => {
+                e.stopPropagation()
+                confirmDelete(subject)
+              },
+            },
+            () => h(TrashIcon, { class: 'h-4 w-4' }),
+          ),
+        ])
+      },
+    },
+  ]
 
   function openCreateDialog() {
     selectedSubject.value = null

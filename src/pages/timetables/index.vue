@@ -33,23 +33,6 @@
         </div>
       </template>
 
-      <template #selection-actions>
-        <div class="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-          >
-            Export Selected
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-          >
-            Delete Selected
-          </Button>
-        </div>
-      </template>
-
       <template #pagination="{ filteredCount, selectedCount }">
         <TablePagination
           :current-page="pageIndex"

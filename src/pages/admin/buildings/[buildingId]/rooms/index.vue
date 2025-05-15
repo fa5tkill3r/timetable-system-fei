@@ -10,7 +10,6 @@
     </div>
 
     <template v-else-if="building">
-      <!-- Breadcrumb navigation -->
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -32,7 +31,6 @@
         <Button @click="openRoomDialog()">Add New Room</Button>
       </div>
 
-      <!-- Building details -->
       <div class="space-y-2 rounded-md border bg-muted/40 p-4">
         <div class="flex items-center gap-2">
           <BuildingIcon class="h-5 w-5" />
@@ -58,27 +56,9 @@
         enable-column-visibility
         search-placeholder="Search rooms..."
         @search-change="onSearchChange"
-        @selection-change="onSelectionChange"
       >
         <template #empty>
           No rooms found. Add your first room to this building.
-        </template>
-
-        <template #selection-actions>
-          <div class="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-            >
-              Export Selected
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-            >
-              Delete Selected
-            </Button>
-          </div>
         </template>
 
         <template #pagination="{ filteredCount, selectedCount }">
@@ -86,7 +66,6 @@
             :current-page="pageIndex"
             :page-size="pageSize"
             :total-count="filteredCount"
-            :selected-count="selectedCount"
             @page-change="onPageChange"
           />
         </template>
@@ -148,10 +127,8 @@
   import { type ColumnDef } from '@tanstack/vue-table'
   import { components } from '@/types/schema'
   import TablePagination from '@/components/common/TablePagination.vue'
-  import { Checkbox } from '@/components/ui/checkbox'
 
   type Room = components['schemas']['Room']
-  type Building = components['schemas']['Building']
 
   interface RouteParams {
     buildingId: string
@@ -167,7 +144,6 @@
   const searchTerm = ref('')
   const pageIndex = ref(0)
   const pageSize = ref(10)
-  const selectedRows = ref({})
 
   const buildingId = computed(() => parseInt(params.buildingId))
   const building = computed(() => buildingStore.selectedBuilding)
@@ -182,27 +158,6 @@
   const itemToDelete = ref<number | null>(null)
 
   const columns: ColumnDef<Room>[] = [
-    {
-      id: 'select',
-      header: ({ table }) =>
-        h(Checkbox, {
-          modelValue:
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate'),
-          'onUpdate:modelValue': (value: boolean) =>
-            table.toggleAllPageRowsSelected(!!value),
-          ariaLabel: 'Select all',
-        }),
-      cell: ({ row }) =>
-        h(Checkbox, {
-          modelValue: row.getIsSelected(),
-          'onUpdate:modelValue': (value: boolean) =>
-            row.toggleSelected(!!value),
-          ariaLabel: 'Select row',
-        }),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: 'name',
       header: ({ column }) => {
@@ -284,10 +239,6 @@
 
   const onPageChange = (page: number) => {
     pageIndex.value = page
-  }
-
-  const onSelectionChange = (selection: Record<string, boolean>) => {
-    selectedRows.value = selection
   }
 
   async function loadBuilding(id: number) {

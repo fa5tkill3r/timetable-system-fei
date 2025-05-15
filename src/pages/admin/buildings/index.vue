@@ -30,33 +30,14 @@
       enable-column-visibility
       search-placeholder="Search buildings..."
       @search-change="onSearchChange"
-      @selection-change="onSelectionChange"
     >
       <template #empty> No buildings found. </template>
-
-      <template #selection-actions>
-        <div class="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-          >
-            Export Selected
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-          >
-            Delete Selected
-          </Button>
-        </div>
-      </template>
 
       <template #pagination="{ filteredCount, selectedCount }">
         <TablePagination
           :current-page="pageIndex"
           :page-size="pageSize"
           :total-count="filteredCount"
-          :selected-count="selectedCount"
           @page-change="onPageChange"
         />
       </template>
@@ -91,7 +72,6 @@
   import BuildingDialog from '@/components/buildings/BuildingDialog.vue'
   import ConfirmDeleteDialog from '@/components/dialogs/ConfirmDeleteDialog.vue'
   import { RouterLink } from 'vue-router'
-  import { Checkbox } from '@/components/ui/checkbox'
   import {
     Breadcrumb,
     BreadcrumbItem,
@@ -112,7 +92,6 @@
   const searchTerm = ref('')
   const pageIndex = ref(0)
   const pageSize = ref(10)
-  const selectedRows = ref({})
 
   const buildingDialogVisible = ref(false)
   const deleteDialogVisible = ref(false)
@@ -123,27 +102,6 @@
   const itemToDelete = ref<number | null>(null)
 
   const columns: ColumnDef<Building>[] = [
-    {
-      id: 'select',
-      header: ({ table }) =>
-        h(Checkbox, {
-          modelValue:
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate'),
-          'onUpdate:modelValue': (value: boolean) =>
-            table.toggleAllPageRowsSelected(!!value),
-          ariaLabel: 'Select all',
-        }),
-      cell: ({ row }) =>
-        h(Checkbox, {
-          modelValue: row.getIsSelected(),
-          'onUpdate:modelValue': (value: boolean) =>
-            row.toggleSelected(!!value),
-          ariaLabel: 'Select row',
-        }),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: 'name',
       header: ({ column }) => {
@@ -219,10 +177,6 @@
 
   const onPageChange = (page: number) => {
     pageIndex.value = page
-  }
-
-  const onSelectionChange = (selection: Record<string, boolean>) => {
-    selectedRows.value = selection
   }
 
   onMounted(async () => {

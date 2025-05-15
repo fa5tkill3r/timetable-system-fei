@@ -53,7 +53,6 @@
             <h3 class="text-md font-medium">{{ room.name }}</h3>
           </div>
           <div class="text-muted-foreground">
-            <!-- Remove floor info, only show capacity -->
             <div>Capacity: {{ room.capacity }}</div>
           </div>
         </div>
@@ -72,27 +71,9 @@
         enable-column-visibility
         search-placeholder="Search equipment..."
         @search-change="onSearchChange"
-        @selection-change="onSelectionChange"
       >
         <template #empty>
           No equipment found. Add your first equipment to this room.
-        </template>
-
-        <template #selection-actions>
-          <div class="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-            >
-              Export Selected
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-            >
-              Delete Selected
-            </Button>
-          </div>
         </template>
 
         <template #pagination="{ filteredCount, selectedCount }">
@@ -100,7 +81,6 @@
             :current-page="pageIndex"
             :page-size="pageSize"
             :total-count="filteredCount"
-            :selected-count="selectedCount"
             @page-change="onPageChange"
           />
         </template>
@@ -164,7 +144,6 @@
   import { type ColumnDef } from '@tanstack/vue-table'
   import { components } from '@/types/schema'
   import TablePagination from '@/components/common/TablePagination.vue'
-  import { Checkbox } from '@/components/ui/checkbox'
 
   const buildingStore = useBuildingStore()
   const route = useRoute()
@@ -175,7 +154,6 @@
   const searchTerm = ref('')
   const pageIndex = ref(0)
   const pageSize = ref(10)
-  const selectedRows = ref({})
 
   interface RouteParams {
     buildingId: string
@@ -213,27 +191,6 @@
   })
 
   const columns: ColumnDef<any>[] = [
-    {
-      id: 'select',
-      header: ({ table }) =>
-        h(Checkbox, {
-          modelValue:
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate'),
-          'onUpdate:modelValue': (value: boolean) =>
-            table.toggleAllPageRowsSelected(!!value),
-          ariaLabel: 'Select all',
-        }),
-      cell: ({ row }) =>
-        h(Checkbox, {
-          modelValue: row.getIsSelected(),
-          'onUpdate:modelValue': (value: boolean) =>
-            row.toggleSelected(!!value),
-          ariaLabel: 'Select row',
-        }),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: 'name',
       header: ({ column }) => {
@@ -310,10 +267,6 @@
 
   const onPageChange = (page: number) => {
     pageIndex.value = page
-  }
-
-  const onSelectionChange = (selection: Record<string, boolean>) => {
-    selectedRows.value = selection
   }
 
   async function loadData(buildingId: number, roomId: number) {
