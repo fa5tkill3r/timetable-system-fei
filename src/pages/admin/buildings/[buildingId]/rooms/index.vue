@@ -227,7 +227,7 @@
   ]
 
   const fetchData = async () => {
-    if (buildingId.value) {
+    if (buildingId.value !== null) {
       await buildingStore.fetchRooms(buildingId.value)
     }
   }
@@ -258,7 +258,7 @@
   watch(
     () => params.buildingId,
     async (newId) => {
-      if (newId) {
+      if (newId !== null) {
         await loadBuilding(parseInt(newId as string))
       }
     },

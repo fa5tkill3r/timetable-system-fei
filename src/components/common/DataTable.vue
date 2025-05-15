@@ -156,7 +156,6 @@
     type Row,
   } from '@tanstack/vue-table'
   import { valueUpdater } from '@/lib/utils'
-  import { string } from 'zod'
 
   const props = defineProps<{
     data: any[]
