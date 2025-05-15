@@ -165,7 +165,6 @@
   import { components } from '@/types/schema'
   import TablePagination from '@/components/common/TablePagination.vue'
   import { Checkbox } from '@/components/ui/checkbox'
-  import { Room } from '@/types'
 
   const buildingStore = useBuildingStore()
   const route = useRoute()

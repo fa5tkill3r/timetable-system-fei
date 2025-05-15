@@ -13,6 +13,7 @@
   import { useToast } from '@/components/ui/toast'
   import { useSubjectUserRoleStore } from '@/store/subjectUserRoles'
   import { useSubjectStore } from '@/store/subjects'
+  import { components } from '@/types/schema'
 
   const timetableEventStore = useTimetableEventStore()
   const timetableSettings = useTimetableSettingsStore()
@@ -22,6 +23,8 @@
   const { toast } = useToast()
 
   const isLoading = ref(true)
+  type User = components['schemas']['User']
+  type Subject = components['schemas']['Subject']
 
   const currentUserId = computed(() => {
     return authStore.user?.id || null
@@ -33,8 +36,8 @@
     const subjectIds = new Set<number>()
 
     subjectUserRoleStore.lecturers.forEach((role) => {
-      if (role.user.id === Number(currentUserId.value)) {
-        subjectIds.add(role.subject.id)
+      if ((role.user as any as User).id === Number(currentUserId.value)) {
+        subjectIds.add((role.subject as any as Subject).id!)
       }
     })
 
@@ -157,7 +160,7 @@
         >
           <div
             v-for="event in filteredEvents"
-            :key="event.id"
+            :key="event.id!"
             class="group relative"
           >
             <div

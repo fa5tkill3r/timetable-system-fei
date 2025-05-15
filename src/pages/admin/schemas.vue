@@ -263,9 +263,7 @@
     if (!schemaData.id) return
 
     try {
-      const success = await schemaStore.setActiveSchema(
-        schemaData.id.toString(),
-      )
+      const success = await schemaStore.setActiveSchema(schemaData.id)
       if (success) {
         toast({
           title: 'Schema activated',

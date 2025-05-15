@@ -18,7 +18,7 @@ const transformToNested = (
 
   const constraintMap = new Map<number, ConstraintData>()
   constraints.forEach((c) => {
-    constraintMap.set(c.id, {
+    constraintMap.set(c.id!, {
       ...c,
       nested_children: [],
       parent: null,

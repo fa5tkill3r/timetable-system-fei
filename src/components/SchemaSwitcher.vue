@@ -113,7 +113,7 @@
 
   function selectSchema(schema: Schema) {
     if (schema.id) {
-      schemaStore.setActiveSchema(schema.id.toString())
+      schemaStore.setActiveSchema(schema.id)
       open.value = false
     }
   }
