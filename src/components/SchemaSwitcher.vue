@@ -34,18 +34,25 @@
     SelectTrigger,
     SelectValue,
   } from '@/components/ui/select'
+
+  import { toast, useToast } from '@/components/ui/toast/use-toast'
+
   import { cn } from '@/lib/utils'
   import { ArrowDownUp, Check, CirclePlus } from 'lucide-vue-next'
   import { ref, onMounted, computed } from 'vue'
   import { useSchemaStore } from '@/store/schemas'
   import { components } from '@/types/schema'
+  import SchemaDialog from '@/components/schemas/SchemaDialog.vue'
+  import { result } from 'lodash'
 
   type Schema = components['schemas']['schema']
+  type SchemaRequest = components['schemas']['schemaRequest']
 
   const schemaStore = useSchemaStore()
 
   const open = ref(false)
   const showNewSchemaDialog = ref(false)
+  const isCreatingSchema = ref(false)
   const selectedType = ref<'timetable' | 'term'>('timetable')
   const newSchemaName = ref('')
 
@@ -73,6 +80,30 @@
     }))
   })
 
+  async function handleSaveSchema(schemaData: SchemaRequest, id?: number) {
+    isCreatingSchema.value = true
+
+    try {
+      const result = await schemaStore.createSchema(schemaData)
+      if (result) {
+        toast({
+          title: 'Schema created',
+          description: `Schema "${schemaData.human_name}" has been created successfully.`,
+        })
+      }
+
+      showNewSchemaDialog.value = false
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: `Failed to ${id ? 'update' : 'create'} schema.`,
+        variant: 'destructive',
+      })
+    } finally {
+      isCreatingSchema.value = false
+    }
+  }
+
   async function createNewSchema() {
     showNewSchemaDialog.value = false
     newSchemaName.value = ''
@@ -89,135 +120,80 @@
 </script>
 
 <template>
-  <Dialog v-model:open="showNewSchemaDialog">
-    <Popover v-model:open="open">
-      <PopoverTrigger as-child>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded="true"
-          aria-label="Select a schema"
-          :class="cn('w-[200px] justify-between', $attrs.class ?? '')"
-        >
-          {{ selectedSchema?.human_name || 'Select Schema' }}
-          <ArrowDownUp class="ml-auto h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent class="w-[200px] p-0">
-        <Command
-          :filter-function="
-            (list: any[], term: string) =>
-              list.filter((i: any) =>
-                (i as Schema).human_name?.toLowerCase()?.includes(term),
-              )
-          "
-        >
-          <CommandList>
-            <CommandInput placeholder="Search schema..." />
-            <CommandEmpty>No schema found.</CommandEmpty>
-            <CommandGroup
-              v-for="group in schemasByYear"
-              :key="group.label"
-              :heading="group.label"
+  <SchemaDialog
+    v-model:open="showNewSchemaDialog"
+    :isLoading="isCreatingSchema"
+    @save="handleSaveSchema"
+  />
+  <Popover v-model:open="open">
+    <PopoverTrigger as-child>
+      <Button
+        variant="outline"
+        role="combobox"
+        aria-expanded="true"
+        aria-label="Select a schema"
+        :class="cn('w-[200px] justify-between', $attrs.class ?? '')"
+      >
+        {{ selectedSchema?.human_name || 'Select Schema' }}
+        <ArrowDownUp class="ml-auto h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent class="w-[200px] p-0">
+      <Command
+        :filter-function="
+          (list: any[], term: string) =>
+            list.filter((i: any) =>
+              (i as Schema).human_name?.toLowerCase()?.includes(term),
+            )
+        "
+      >
+        <CommandList>
+          <CommandInput placeholder="Search schema..." />
+          <CommandEmpty>No schema found.</CommandEmpty>
+          <CommandGroup
+            v-for="group in schemasByYear"
+            :key="group.label"
+            :heading="group.label"
+          >
+            <CommandItem
+              v-for="schema in group.schemas"
+              :key="schema.id"
+              :value="schema"
+              class="text-sm"
+              @select="() => selectSchema(schema)"
             >
-              <CommandItem
-                v-for="schema in group.schemas"
-                :key="schema.id"
-                :value="schema"
-                class="text-sm"
-                @select="() => selectSchema(schema)"
-              >
-                {{ schema.human_name }}
-                <Check
-                  :class="
-                    cn(
-                      'ml-auto h-4 w-4',
-                      selectedSchema?.id === schema.id
-                        ? 'opacity-100'
-                        : 'opacity-0',
-                    )
-                  "
-                />
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-          <CommandSeparator />
-          <CommandList>
-            <CommandGroup>
-              <DialogTrigger as-child>
-                <CommandItem
-                  value="create-schema"
-                  @select="
-                    () => {
-                      open = false
-                      showNewSchemaDialog = true
-                    }
-                  "
-                >
-                  <CirclePlus class="mr-2 h-5 w-5" />
-                  New Schema
-                </CommandItem>
-              </DialogTrigger>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Create schema</DialogTitle>
-        <DialogDescription>
-          Create a new schema for timetable or term.
-        </DialogDescription>
-      </DialogHeader>
-      <div>
-        <div class="space-y-4 py-2 pb-4">
-          <div class="space-y-2">
-            <Label for="name">Schema name</Label>
-            <Input
-              id="name"
-              v-model="newSchemaName"
-              placeholder="LS v1"
-            />
-          </div>
-          <div class="space-y-2">
-            <Label for="type">Schema Type</Label>
-            <Select v-model="selectedType">
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="timetable">
-                  <span class="font-medium">Timetable</span> -
-                  <span class="text-muted-foreground">
-                    Standard timetable
-                  </span>
-                </SelectItem>
-                <SelectItem value="term">
-                  <span class="font-medium">Terms</span> -
-                  <span class="text-muted-foreground">
-                    Timetable for terms
-                  </span>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-      <DialogFooter>
-        <Button
-          variant="outline"
-          @click="showNewSchemaDialog = false"
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          @click="createNewSchema"
-        >
-          Create
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
+              {{ schema.human_name }}
+              <Check
+                :class="
+                  cn(
+                    'ml-auto h-4 w-4',
+                    selectedSchema?.id === schema.id
+                      ? 'opacity-100'
+                      : 'opacity-0',
+                  )
+                "
+              />
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+        <CommandSeparator />
+        <CommandList>
+          <CommandGroup>
+            <CommandItem
+              value="create-schema"
+              @select="
+                () => {
+                  open = false
+                  showNewSchemaDialog = true
+                }
+              "
+            >
+              <CirclePlus class="mr-2 h-5 w-5" />
+              New Schema
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </PopoverContent>
+  </Popover>
 </template>

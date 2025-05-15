@@ -27,7 +27,7 @@
           <Button
             variant="outline"
             class="mt-2"
-            @click="openTimetableDialog"
+            @click="openTimetableDialog()"
             >Create your first timetable</Button
           >
         </div>
@@ -175,8 +175,8 @@
 
         let variant = 'default' as BadgeVariants['variant']
         if (status === 'PUBLISHED') variant = 'default'
-        if (status === 'WIP') variant = 'secondary'
-        if (status === 'HIDDEN') variant = 'outline'
+        if (status === 'TEST') variant = 'secondary'
+        if (status === 'FINAL') variant = 'outline'
 
         return h(Badge, { variant }, () => status)
       },

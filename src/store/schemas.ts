@@ -37,6 +37,7 @@ export const useSchemaStore = defineStore('schemas', () => {
         body: schemaData,
       })
       if (response.data) {
+        await setActiveSchema(response.data.id!)
         await fetchSchemas()
         return response.data
       }
@@ -103,7 +104,7 @@ export const useSchemaStore = defineStore('schemas', () => {
     }
   }
 
-  const setActiveSchema = async (schemaId: string) => {
+  const setActiveSchema = async (schemaId: number) => {
     isLoading.value = true
     error.value = null
 
