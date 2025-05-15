@@ -38,6 +38,7 @@
   } from '@/components/ui/breadcrumb'
   import { useSubjectGroupStore } from '@/store/subjectGroups'
   import { ComboboxOption } from '@/components/common/ComboBox.vue'
+  import ActivityDialog from '@/components/dialogs/ActivityDialog.vue'
 
   type TTEvent = components['schemas']['TTEvent']
   type TTEventType = components['schemas']['TTEventType']
@@ -75,6 +76,8 @@
   const itemToDelete = ref<number | null>(null)
 
   const generateDialogVisible = ref(false)
+  const activityDialogVisible = ref(false)
+  const currentEvent = ref<TTEvent | null>(null)
 
   const currentTimetable = computed(() =>
     timetableStore.timetables.find((t) => t.id === timetableId),
@@ -513,7 +516,6 @@
       header: 'Weeks',
       cell: ({ row }) => {
         const bitmask = row.getValue('weeks_bitmask') as number
-        if (!bitmask) return 'All weeks'
 
         return h(
           'span',
@@ -575,11 +577,14 @@
     pageIndex.value = 0
   }
 
+  function createEvent() {
+    currentEvent.value = null
+    activityDialogVisible.value = true
+  }
+
   function editEvent(event: TTEvent) {
-    toast({
-      title: 'Not implemented',
-      description: 'Event editing not implemented in this demo',
-    })
+    currentEvent.value = event
+    activityDialogVisible.value = true
   }
 
   function confirmDeleteEvent(event: TTEvent) {
@@ -636,6 +641,27 @@
     }
   }
 
+  function handleActivitySubmit(result: {
+    success: boolean
+    message: string
+    data?: TTEvent
+  }) {
+    if (result.success) {
+      toast({
+        title: 'Success',
+        description: result.message,
+      })
+      // Refresh events after successful operation
+      timetableEventStore.fetchEvents(timetableId)
+    } else {
+      toast({
+        title: 'Error',
+        description: result.message,
+        variant: 'destructive',
+      })
+    }
+  }
+
   onMounted(async () => {
     await timetableEventStore.fetchEvents(timetableId)
   })
@@ -667,7 +693,7 @@
         </h2>
       </div>
       <div class="flex items-center space-x-2">
-        <Button>Add Activity</Button>
+        <Button @click="createEvent">Add Activity</Button>
         <Button
           variant="outline"
           @click="generateDialogVisible = true"
@@ -819,6 +845,15 @@
       :is-loading="timetableEventStore.isLoading"
       @update:open="generateDialogVisible = $event"
       @generate="handleGenerateResult"
+    />
+
+    <ActivityDialog
+      :open="activityDialogVisible"
+      :timetable-id="timetableId"
+      :event="currentEvent"
+      :is-loading="timetableEventStore.isLoading"
+      @update:open="activityDialogVisible = $event"
+      @submit="handleActivitySubmit"
     />
   </div>
 </template>

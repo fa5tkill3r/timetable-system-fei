@@ -5,7 +5,15 @@ import { useSchemaStore } from './schemas'
 import { components } from '@/types/schema'
 
 type TTEvent = components['schemas']['TTEvent']
+type TTActivity = components['schemas']['TTActivity']
 type TTEventRequest = components['schemas']['TTEventRequest']
+type TTActivityRequest = components['schemas']['TTActivityRequest']
+export type TTEventRequestExtended = Omit<TTEventRequest, 'tta'> & {
+  tta: number | TTActivityRequest
+}
+export type TTEventExtended = Omit<TTEventRequest, 'tta'> & {
+  tta: number | TTActivity
+}
 
 export const useTimetableEventStore = defineStore(
   'timetableEvents',
@@ -68,15 +76,34 @@ export const useTimetableEventStore = defineStore(
       }
     }
 
-    const createEvent = async (event: TTEventRequest) => {
+    const createEvent = async (event: TTEventRequestExtended) => {
       isLoading.value = true
       try {
+        if (typeof event.tta !== 'number') {
+          const activityResponse = await client.POST('/api/ttactivity/', {
+            params: {
+              header: schemaStore.termHeader,
+            },
+            body: event.tta,
+          })
+
+          if (!activityResponse.data) {
+            return null
+          }
+
+          event = {
+            ...event,
+            tta: activityResponse.data.id!,
+          }
+        }
+
         const response = await client.POST('/api/ttevent/', {
           params: {
             header: schemaStore.termHeader,
           },
-          body: event,
+          body: event as TTEventRequest,
         })
+
         if (response.data) {
           if (events.value.length > 0 && typeof event.tt === 'number') {
             await fetchEvents(event.tt)
@@ -86,6 +113,7 @@ export const useTimetableEventStore = defineStore(
           return null
         }
       } catch (err) {
+        console.error('Error creating event:', err)
         return null
       } finally {
         isLoading.value = false
@@ -94,16 +122,29 @@ export const useTimetableEventStore = defineStore(
 
     const updateEvent = async (
       id: number,
-      eventData: Partial<TTEventRequest>,
+      eventData: Partial<TTEventExtended>,
     ) => {
       isLoading.value = true
       try {
+        if (eventData.tta && typeof eventData.tta !== 'number') {
+          await client.PATCH('/api/ttactivity/{id}/', {
+            params: {
+              path: { id: eventData.tta.id as number },
+              header: schemaStore.termHeader,
+            },
+            body: eventData.tta,
+          })
+
+          eventData.tta = eventData.tta.id
+          eventData.tt = eventData.tt
+        }
+
         const response = await client.PATCH('/api/ttevent/{id}/', {
           params: {
             path: { id },
             header: schemaStore.termHeader,
           },
-          body: eventData,
+          body: eventData as Partial<TTEventRequest>,
         })
         if (response.data) {
           const index = events.value.findIndex((e) => e.id === id)
