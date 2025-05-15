@@ -1,7 +1,7 @@
 import { CalendarEvent, TimeSlot } from '@/types/types'
 import { DAYS } from '@/lib/timetable'
 import { computed, ComputedRef, CSSProperties, Ref } from 'vue'
-import { Conflicts } from './Conflicts'
+import { Conflicts } from './TimetableConflicts'
 import { useTimetableSettingsStore } from '@/store/timetableSettings'
 
 export interface TimeTableStyleOptions {

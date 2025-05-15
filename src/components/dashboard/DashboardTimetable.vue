@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
-  import { useTimeTableBase } from '@/components/timetables/TimeTableBase'
-  import { useTimeTableStyle } from '@/components/timetables/TimeTableStyle'
+  import { useTimeTableBase } from '@/composables/timetable/TimetableBase'
+  import { useTimeTableStyle } from '@/composables/timetable/TimetableStyle'
   import { DAYS } from '@/lib/timetable'
   import { useTimetableEventStore } from '@/store/timetableEvents'
   import { useTimetableSettingsStore } from '@/store/timetableSettings'
