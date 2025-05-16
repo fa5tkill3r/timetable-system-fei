@@ -24,7 +24,7 @@
     TabsList,
     TabsTrigger,
   } from '@/components/ui/tabs'
-  import { MoreVertical, Building } from 'lucide-vue-next'
+  import { Building, CalendarCog, AlertCircle } from 'lucide-vue-next'
   import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
   import { Badge } from '@/components/ui/badge'
   import { Button } from '@/components/ui/button'
