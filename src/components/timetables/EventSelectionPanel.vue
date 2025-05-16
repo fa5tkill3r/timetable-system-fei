@@ -196,7 +196,7 @@
     if (template.color) return template.color
 
     const brightnessAdjustment = template.event_type === 1 ? 0.9 : 1.1
-    return getColorFromString(template.title, 'pastel', brightnessAdjustment)
+    return getColorFromString(template.title, brightnessAdjustment)
   }
 
   const isCompactMode = ref(false)

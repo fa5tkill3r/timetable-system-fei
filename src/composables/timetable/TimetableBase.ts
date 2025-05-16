@@ -58,7 +58,7 @@ export function useTimeTableBase(options: TimeTableBaseOptions) {
         start_index: timeToIndex(startTime),
         title: subjectName!,
         shortcut: subjectCode!,
-        color: getColorFromString(subjectName!, 'pastel', brightnessAdjustment),
+        color: getColorFromString(subjectName!, brightnessAdjustment),
         room_id: room?.id,
         room_name: room?.name,
         subject_id: subjectId,
