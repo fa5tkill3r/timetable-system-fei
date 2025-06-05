@@ -43,8 +43,8 @@
 <template>
   <div class="flex h-screen flex-col">
     <div class="border-b">
-      <div class="flex h-16 items-center px-4">
-        <SchemaSwitcher />
+      <div class="flex h-16 items-center px-4 bg-[#f5f5f5]">
+        <SchemaSwitcher/>
         <div class="flex flex-1 items-center justify-between">
           <Navigation class="mx-6" />
           <div class="flex items-center gap-4">

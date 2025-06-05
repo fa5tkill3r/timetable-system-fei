@@ -33,12 +33,11 @@
         </div>
       </template>
 
-      <template #pagination="{ filteredCount, selectedCount }">
+      <template #pagination="{ filteredCount }">
         <TablePagination
           :current-page="pageIndex"
           :page-size="pageSize"
           :total-count="filteredCount"
-          :selected-count="selectedCount"
           @page-change="onPageChange"
         />
       </template>
@@ -104,27 +103,6 @@
   const itemToDelete = ref<number | null>(null)
 
   const columns: ColumnDef<Timetable>[] = [
-    {
-      id: 'select',
-      header: ({ table }) =>
-        h(Checkbox, {
-          modelValue:
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate'),
-          'onUpdate:modelValue': (value: boolean) =>
-            table.toggleAllPageRowsSelected(!!value),
-          ariaLabel: 'Select all',
-        }),
-      cell: ({ row }) =>
-        h(Checkbox, {
-          modelValue: row.getIsSelected(),
-          'onUpdate:modelValue': (value: boolean) =>
-            row.toggleSelected(!!value),
-          ariaLabel: 'Select row',
-        }),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: 'name',
       header: ({ column }) => {

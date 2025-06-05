@@ -508,7 +508,7 @@
                   class="h-7 text-xs"
                   @click="selectOddWeeks"
                 >
-                  Odd
+                  A
                 </Button>
                 <Button
                   type="button"
@@ -517,7 +517,7 @@
                   class="h-7 text-xs"
                   @click="selectEvenWeeks"
                 >
-                  Even
+                  B
                 </Button>
                 <Button
                   type="button"
